@@ -141,8 +141,8 @@ COORD Document::moveCursorUp(const int index, const int bufferWidth) {
 		return COORD{ -1, -1 };
 	}
 	auto cursorPos = cursors[index].position();
+	cursors[index].setOffset(cursors[index].offset() % bufferWidth);
 	auto offset = cursors[index].offset();
-	cursors[index].setOffset(offset % bufferWidth);
 	if (cursorPos.X >= bufferWidth) {
 		cursorPos.X = (cursorPos.X / bufferWidth - 1) * bufferWidth + offset;
 	}
@@ -162,8 +162,8 @@ COORD Document::moveCursorDown(const int index, const int bufferWidth) {
 		return COORD{ -1, -1 };
 	}
 	auto cursorPos = cursors[index].position();
+	cursors[index].setOffset(cursors[index].offset() % bufferWidth);
 	auto offset = cursors[index].offset();
-	cursors[index].setOffset(offset % bufferWidth);
 	if (data[cursorPos.Y].size() > (cursorPos.X / bufferWidth + 1) * bufferWidth) {
 		bool endlPresent = !data[cursorPos.Y].empty() && data[cursorPos.Y][data[cursorPos.Y].size() - 1] == '\n';
 		cursorPos.X = (std::min)(cursorPos.X + bufferWidth, (int)data[cursorPos.Y].size() - endlPresent);
