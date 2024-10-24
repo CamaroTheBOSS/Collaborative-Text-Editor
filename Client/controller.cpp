@@ -25,7 +25,7 @@ bool Controller::processChar(const int key) {
     case TABULAR:
         return client.sendMsg(msg::Type::write, version, std::string{""}, std::string{"    "});
     case BACKSPACE:
-        return client.sendMsg(msg::Type::erase, version, std::string{""}, 1);
+        return client.sendMsg(msg::Type::erase, version, std::string{""}, static_cast<unsigned int>(1));
     case ARROW_LEFT:
         return client.sendMsg(msg::Type::moveHorizontal, version, std::string{""}, msg::MoveSide::left);
     case ARROW_RIGHT:
@@ -38,14 +38,16 @@ bool Controller::processChar(const int key) {
     return false;
 }
 
-void Controller::checkIncomingMessages() {
+bool Controller::checkIncomingMessages() {
+    int needRender = 0;
     while (true) {
         msg::Buffer msgBuffer = client.getNextMsg();
         if (msgBuffer.empty()) {
             break;
         }
-        repo.processMsg(msgBuffer);
+        needRender += repo.processMsg(msgBuffer);
     }
+    return needRender;
 }
 
 void Controller::render() {

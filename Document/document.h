@@ -45,6 +45,7 @@ public:
 	bool setCursorPos(const int cursor, const COORD newPos);
 	bool setCursorOffset(const int cursor, const int newOffset);
 	COORD getCursorPos(const int cursor) const;
+	std::vector<COORD> getCursorPositions() const;
 
 	const std::vector<std::string>& get();
 	std::string getLine(const int lineIndex) const;

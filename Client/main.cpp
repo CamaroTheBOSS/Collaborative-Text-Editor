@@ -25,8 +25,10 @@ int main() {
 	while (true) {
 		int key = controller.readChar();
 		controller.processChar(key);
-		controller.checkIncomingMessages();
-		controller.render();
+		bool render = controller.checkIncomingMessages();
+		if (render) {
+			controller.render();
+		}
 	}
 
 	controller.disconnect();

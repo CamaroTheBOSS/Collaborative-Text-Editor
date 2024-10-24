@@ -1,5 +1,7 @@
 #pragma once
+#define _WINSOCKAPI_ 
 #include <Winsock2.h>
+#include <Windows.h>
 #include "document.h"
 
 #define ARROW_UP 1296
@@ -16,6 +18,8 @@
 #define TABULAR 9
 #define ENTER 13
 
+using ScreenBufferData = CONSOLE_SCREEN_BUFFER_INFO;
+
 class Terminal {
 public:
 	Terminal();
@@ -23,10 +27,11 @@ public:
 	void render(Document& doc);
 	unsigned int getWidth() const;
 private:
-	void renderCursors(Document& doc);
-	COORD syncCursors(Document& doc);
-	void setCursorPos(const COORD& newPos);
+	void adjustBufferPos();
+	void renderCursors(Document& doc, std::vector<COORD>& cursorPositions);
+	std::vector<COORD> syncCursors(Document& doc);
 
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	COORD cursorPos{0, 0};
+	ScreenBufferData screenData;
+	COORD relevantCursorPos{0, 0};
 };

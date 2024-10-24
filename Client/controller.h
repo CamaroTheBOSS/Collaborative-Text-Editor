@@ -9,7 +9,7 @@ public:
 	bool disconnect();
 	int readChar();
 	bool processChar(const int key);
-	void checkIncomingMessages();
+	bool checkIncomingMessages();
 	void render();
 private:
 

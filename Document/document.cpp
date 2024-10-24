@@ -206,6 +206,14 @@ COORD Document::getCursorPos(const int index) const {
 	return cursors[index].position();
 }
 
+std::vector<COORD> Document::getCursorPositions() const {
+	std::vector<COORD> positions;
+	for (const auto& cursor : cursors) {
+		positions.emplace_back(cursor.position());
+	}
+	return positions;
+}
+
 const std::vector<std::string>& Document::get() {
 	return data;
 }
