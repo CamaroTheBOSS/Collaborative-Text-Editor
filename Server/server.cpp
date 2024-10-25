@@ -48,10 +48,10 @@ void Server::start() {
 		}
 		int sendBytes = send(notifiers[worker], "", 1, 0);
 		if (sendBytes < 0) {
-			logger.logError(WSAGetLastError(), ": Error when notifying thread ", id, " about new connection");
+			logger.logError(WSAGetLastError(), ": Error when notifying thread", id, "about new connection");
 			continue;
 		}
-		logger.logDebug("Connection ", newConnection, " has been forwarded to thread ", id);
+		logger.logDebug("Connection", newConnection, "has been forwarded to thread", id);
 	}
 }
 
@@ -80,7 +80,7 @@ void Server::initWorkers(const int nWorkers) {
 		auto notifySocket = accept(listenSocket, nullptr, nullptr);
 		if (notifySocket == INVALID_SOCKET) {
 			closesocket(notifySocket);
-			logger.logError(WSAGetLastError(), ": Error on opening notify socket to thread ", worker.thread.get_id());
+			logger.logError(WSAGetLastError(), ": Error on opening notify socket to thread", worker.thread.get_id());
 			continue;
 		}
 		if (worker.thread.joinable()) {
@@ -89,5 +89,5 @@ void Server::initWorkers(const int nWorkers) {
 		workers.push_back(std::move(worker));
 		notifiers.push_back(notifySocket);
 	}
-	logger.logDebug("Created ", workers.size(), " threads");
+	logger.logDebug("Created", workers.size(), "threads");
 }

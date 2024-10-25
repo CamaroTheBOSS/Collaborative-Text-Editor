@@ -24,7 +24,7 @@ Response Repository::process(SOCKET client, msg::Buffer& buffer) {
 	case msg::Type::moveVertical:
 		return moveVertical(client, buffer);
 	}
-	logger.logError("Unrecognized message type ", type);
+	assert(false && "Unrecognized msg type. Aborting...");
 	return Response{ buffer, {}, msg::Type::error };
 }
 
@@ -43,7 +43,7 @@ int Repository::findClient(SOCKET client) {
 Response Repository::connectUserToDoc(SOCKET client, msg::Buffer& buffer) {
 	msg::Connect msg;
 	msg::parse(buffer, 1, msg.version);
-	logger.logDebug("Thread ", std::this_thread::get_id(), " connected new user to document!");
+	logger.logDebug("Thread", std::this_thread::get_id(), "connected new user to document!");
 	std::scoped_lock lock{connectedClientsLock, docLock};
 	msg::OneByteInt cursor = connectedClients.size();
 	connectedClients.push_back(client);
@@ -71,7 +71,7 @@ Response Repository::disconnectUserFromDoc(SOCKET client, msg::Buffer& buffer) {
 }
 
 Response Repository::masterNotification(SOCKET client, msg::Buffer& buffer) const {
-	logger.logDebug("Thread ", std::this_thread::get_id(), " got new connection!");
+	logger.logDebug("Thread", std::this_thread::get_id(), "got new connection!");
 	return Response{ buffer, {} };
 }
 
@@ -81,7 +81,7 @@ Response Repository::write(SOCKET client, msg::Buffer& buffer) {
 	int cursor = findClient(client);
 	std::scoped_lock lock{docLock};
 	doc.write(cursor, msg.text);
-	logger.logInfo("cursor ", cursor, " wrote '" + msg.text + "' to document");
+	logger.logInfo("cursor", cursor, "wrote '" + msg.text + "' to document");
 	buffer.clear();
 	auto cursorBuff = static_cast<msg::OneByteInt>(cursor);
 	msg::serializeTo(buffer, 0, msg.type, msg.version, cursorBuff, msg.text);
@@ -94,7 +94,7 @@ Response Repository::erase(SOCKET client, msg::Buffer& buffer) {
 	int cursor = findClient(client);
 	std::scoped_lock lock{docLock};
 	doc.erase(cursor, msg.eraseSize);
-	logger.logInfo("cursor ", cursor, " erased ", msg.eraseSize, " letters from document");
+	logger.logInfo("cursor", cursor, "erased", msg.eraseSize, "letters from document");
 	buffer.clear();
 	auto cursorBuff = static_cast<msg::OneByteInt>(cursor);
 	msg::serializeTo(buffer, 0, msg.type, msg.version, cursorBuff, msg.eraseSize);
@@ -109,11 +109,11 @@ Response Repository::moveHorizontal(SOCKET client, msg::Buffer& buffer) {
 	COORD newCursorPos = doc.getCursorPos(cursor);
 	if (msg.side == msg::MoveSide::left) {
 		newCursorPos = doc.moveCursorLeft(cursor);
-		logger.logInfo("cursor ", cursor, " moved left");
+		logger.logInfo("cursor", cursor, "moved left");
 	}
 	else if (msg.side == msg::MoveSide::right) {
 		newCursorPos = doc.moveCursorRight(cursor);
-		logger.logInfo("cursor ", cursor, " moved right");
+		logger.logInfo("cursor", cursor, "moved right");
 	}
 	else {
 		logger.logError("Invalid MoveSide parameter in MoveHorizontal");
@@ -135,11 +135,11 @@ Response Repository::moveVertical(SOCKET client, msg::Buffer& buffer) {
 	COORD newCursorPos = doc.getCursorPos(cursor);
 	if (msg.side == msg::MoveSide::up) {
 		newCursorPos = doc.moveCursorUp(cursor, msg.clientWidth);
-		logger.logInfo("cursor ", cursor, " moved up");
+		logger.logInfo("cursor", cursor, "moved up");
 	}
 	else if (msg.side == msg::MoveSide::down) {
 		newCursorPos = doc.moveCursorDown(cursor, msg.clientWidth);
-		logger.logInfo("cursor ", cursor, " moved down");
+		logger.logInfo("cursor", cursor, "moved down");
 	}
 	else {
 		logger.logError("Invalid MoveSide parameter in MoveHorizontal");

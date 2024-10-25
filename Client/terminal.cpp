@@ -138,7 +138,7 @@ std::vector<COORD> Terminal::syncCursors(Document& doc) {
     std::vector<COORD> terminalCursors(docCursors.size(), COORD{ 0, 0 });
     for (int c = 0; c < docCursors.size(); c++) {
         for (int i = 0; i <= docCursors[c].Y; i++) {
-            if (data[i].empty()) {
+            if (i >= data.size() || data[i].empty()) {
                 continue;
             }
             bool endlPresent = data[i][data[i].size() - 1] == '\n' && i != docCursors[c].Y;

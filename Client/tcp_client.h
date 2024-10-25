@@ -23,7 +23,7 @@ public:
 			logger.logError(WSAGetLastError(), ": Send error!");
 			return false;
 		}
-		logger.logDebug("Send message with args: ", args...);
+		logger.logDebug("Send message with args:", args...);
 		return true;
 	}	
 

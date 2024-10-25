@@ -60,7 +60,7 @@ void TCPClient::recvMsg() {
             closesocket(client);
             return;
         }
-        logger.logDebug("Put new message in queue");
+        logger.logDebug("Put new message in queue with size", buffer.size);
         std::scoped_lock lock{recvQueueLock};
         recvQueue.push(std::move(buffer));
     }

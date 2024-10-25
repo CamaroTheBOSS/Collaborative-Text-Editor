@@ -1,12 +1,14 @@
 #pragma once
 #include <fstream>
 #include <sstream>
-#include <map>
+#include "messages.h"
 
 namespace logs {
+	
 	enum class Level { error, info, debug };
 
 	std::string lvlToStr(Level lvl);
+	std::stringstream getCurrentTime();
 
 	class Logger {
 	public:
@@ -15,18 +17,10 @@ namespace logs {
 
 		template<typename... Args>
 		void log(Level lvl, const Args... args) {
-			time_t timestamp;
-			time(&timestamp);
-			std::stringstream stream;
-			char timeBuffer[100];
-			if (ctime_s(timeBuffer, 100, &timestamp)) {
-				return;
-			}
-			std::string timeStr{timeBuffer};
-			timeStr.erase(timeStr.size() - 1, 1);
-			stream << "[" << timeStr << "] " << lvlToStr(lvl);
+			std::stringstream stream = getCurrentTime();
+			stream << lvlToStr(lvl);
 			([&] {
-				stream << args;
+				_log(stream, args);
 				} (), ...);
 			file << stream.str() << "\n" << std::flush;
 		}
@@ -43,6 +37,13 @@ namespace logs {
 			return log(Level::error, args...);
 		}
 	private:
+		template<typename T>
+		void _log(std::stringstream& ss, const T& arg) {
+			ss << arg << " ";
+		}
+		void _log(std::stringstream& ss,  const msg::OneByteInt& arg) {
+			ss << static_cast<int>(arg) << " ";
+		}
 		std::ofstream file;
 	};
 }
