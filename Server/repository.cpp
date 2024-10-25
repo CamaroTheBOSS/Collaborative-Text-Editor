@@ -11,6 +11,10 @@ Response Repository::process(SOCKET client, msg::Buffer& buffer) {
 	msg::OneByteInt version;
 	msg::parse(buffer, 0, type, version);
 	switch (type) {
+	case msg::Type::sync:
+		return connectUserToDoc(client, buffer);
+	case msg::Type::disconnect:
+		return disconnectUserFromDoc(client, buffer);
 	case msg::Type::write:
 		return write(client, buffer);
 	case msg::Type::erase:
@@ -21,16 +25,52 @@ Response Repository::process(SOCKET client, msg::Buffer& buffer) {
 		return moveVertical(client, buffer);
 	}
 	logger.logError("Unrecognized message type ", type);
-	return Response{ buffer, {} };
+	return Response{ buffer, {}, msg::Type::error };
 }
 
-void Repository::connectUser(SOCKET client) {
-	std::scoped_lock lock{clientToCursorLock};
-	clientToCursor.try_emplace(client, connectedClients.size());
+int Repository::findClient(SOCKET client) {
+	std::scoped_lock lock{connectedClientsLock};
+	int cursor = -1;
+	for (int i = 0; i < connectedClients.size(); i++) {
+		if (connectedClients[i] == client) {
+			cursor = i;
+			break;
+		}
+	}
+	return cursor;
+}
+
+Response Repository::connectUserToDoc(SOCKET client, msg::Buffer& buffer) {
+	msg::Connect msg;
+	msg::parse(buffer, 1, msg.version);
+	logger.logDebug("Thread ", std::this_thread::get_id(), " connected new user to document!");
+	std::scoped_lock lock{connectedClientsLock, docLock};
+	msg::OneByteInt cursor = connectedClients.size();
 	connectedClients.push_back(client);
+	doc.addCursor();
+	buffer.clear();
+	msg::serializeTo(buffer, 0, msg::Type::sync, msg.version, cursor, doc.getText());
+	return Response{ buffer, { connectedClients }, msg::Type::sync };
 }
 
-Response Repository::masterNotification(SOCKET client, msg::Buffer& buffer) {
+Response Repository::disconnectUserFromDoc(SOCKET client, msg::Buffer& buffer) {
+	msg::Disconnect msg;
+	msg::parse(buffer, 1, msg.version);
+	int cursor = findClient(client);
+	std::scoped_lock lock{connectedClientsLock, docLock};
+	if (cursor == -1) {
+		logger.logDebug("Error when trying to disconnect user! Cursor not found!!!");
+	}
+	else {
+		connectedClients.erase(connectedClients.cbegin() + cursor);
+		doc.eraseCursor(cursor);
+	}
+	buffer.clear();
+	msg::serializeTo(buffer, 0, msg::Type::disconnect, msg.version, cursor);
+	return Response{ buffer, connectedClients, msg::Type::disconnect };
+}
+
+Response Repository::masterNotification(SOCKET client, msg::Buffer& buffer) const {
 	logger.logDebug("Thread ", std::this_thread::get_id(), " got new connection!");
 	return Response{ buffer, {} };
 }
@@ -38,34 +78,34 @@ Response Repository::masterNotification(SOCKET client, msg::Buffer& buffer) {
 Response Repository::write(SOCKET client, msg::Buffer& buffer) {
 	auto msg = msg::Write{};
 	msg::parse(buffer, 0, msg.type, msg.version, msg.token, msg.text);
-	std::scoped_lock lock{clientToCursorLock, docLock};
-	int cursor = clientToCursor[client];
+	int cursor = findClient(client);
+	std::scoped_lock lock{docLock};
 	doc.write(cursor, msg.text);
 	logger.logInfo("cursor ", cursor, " wrote '" + msg.text + "' to document");
 	buffer.clear();
 	auto cursorBuff = static_cast<msg::OneByteInt>(cursor);
 	msg::serializeTo(buffer, 0, msg.type, msg.version, cursorBuff, msg.text);
-	return Response{ buffer, connectedClients };
+	return Response{ buffer, connectedClients, msg::Type::write };
 }
 
 Response Repository::erase(SOCKET client, msg::Buffer& buffer) {
 	auto msg = msg::Erase{};
 	msg::parse(buffer, 0, msg.type, msg.version, msg.token, msg.eraseSize);
-	std::scoped_lock lock{clientToCursorLock, docLock};
-	int cursor = clientToCursor[client];
+	int cursor = findClient(client);
+	std::scoped_lock lock{docLock};
 	doc.erase(cursor, msg.eraseSize);
 	logger.logInfo("cursor ", cursor, " erased ", msg.eraseSize, " letters from document");
 	buffer.clear();
 	auto cursorBuff = static_cast<msg::OneByteInt>(cursor);
 	msg::serializeTo(buffer, 0, msg.type, msg.version, cursorBuff, msg.eraseSize);
-	return Response{ buffer, connectedClients };
+	return Response{ buffer, connectedClients, msg::Type::erase };
 }
 
 Response Repository::moveHorizontal(SOCKET client, msg::Buffer& buffer) {
 	auto msg = msg::MoveHorizontal{};
 	msg::parse(buffer, 0, msg.type, msg.version, msg.token, msg.side);
-	std::scoped_lock lock{clientToCursorLock, docLock};
-	int cursor = clientToCursor[client];
+	int cursor = findClient(client);
+	std::scoped_lock lock{docLock};
 	COORD newCursorPos = doc.getCursorPos(cursor);
 	if (msg.side == msg::MoveSide::left) {
 		newCursorPos = doc.moveCursorLeft(cursor);
@@ -77,21 +117,21 @@ Response Repository::moveHorizontal(SOCKET client, msg::Buffer& buffer) {
 	}
 	else {
 		logger.logError("Invalid MoveSide parameter in MoveHorizontal");
-		return Response{ buffer, {} };
+		return Response{ buffer, {}, msg::Type::error };
 	}
 	buffer.clear();
 	auto cursorBuff = static_cast<msg::OneByteInt>(cursor);
 	unsigned int cursorX = newCursorPos.X;
 	unsigned int cursorY = newCursorPos.Y;
 	msg::serializeTo(buffer, 0, msg.type, msg.version, cursorBuff, cursorX, cursorY);
-	return Response{ buffer, connectedClients };
+	return Response{ buffer, connectedClients, msg::Type::moveHorizontal };
 }
 
 Response Repository::moveVertical(SOCKET client, msg::Buffer& buffer) {
 	auto msg = msg::MoveVertical{};
 	msg::parse(buffer, 0, msg.type, msg.version, msg.token, msg.side, msg.clientWidth);
-	std::scoped_lock lock{clientToCursorLock, docLock};
-	int cursor = clientToCursor[client];
+	int cursor = findClient(client);
+	std::scoped_lock lock{docLock};
 	COORD newCursorPos = doc.getCursorPos(cursor);
 	if (msg.side == msg::MoveSide::up) {
 		newCursorPos = doc.moveCursorUp(cursor, msg.clientWidth);
@@ -103,12 +143,12 @@ Response Repository::moveVertical(SOCKET client, msg::Buffer& buffer) {
 	}
 	else {
 		logger.logError("Invalid MoveSide parameter in MoveHorizontal");
-		return Response{ buffer, {} };
+		return Response{ buffer, {}, msg::Type::error };
 	}
 	buffer.clear();
 	auto cursorBuff = static_cast<msg::OneByteInt>(cursor);
 	unsigned int cursorX = newCursorPos.X;
 	unsigned int cursorY = newCursorPos.Y;
 	msg::serializeTo(buffer, 0, msg.type, msg.version, cursorBuff, cursorX, cursorY);
-	return Response{ buffer, connectedClients };
+	return Response{ buffer, connectedClients, msg::Type::moveVertical };
 }

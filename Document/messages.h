@@ -22,12 +22,14 @@ namespace msg {
 		getFiles,
 		saveFile,
 		error,
-		inter,
 		// Modifiers
 		write,
 		erase,
 		moveVertical,
-		moveHorizontal
+		moveHorizontal,
+		sync,
+		connect,
+		disconnect
 	};
 
 	enum class MoveSide {
@@ -104,9 +106,27 @@ namespace msg {
 		} (), ...);
 	}
 
-	struct Internal {
-		Type type = Type::inter;
-		OneByteInt code;
+	struct Connect {
+		Type type = Type::connect;
+		OneByteInt version;
+	};
+
+	struct ConnectResponse {
+		Type type = Type::connect;
+		OneByteInt version;
+		OneByteInt user; // Which user idx you are in doc
+		std::string text; // Whole current state of the document
+	};
+
+	struct Disconnect {
+		Type type = Type::disconnect;
+		OneByteInt version;
+	};
+
+	struct DisconnectResponse {
+		Type type = Type::disconnect;
+		OneByteInt version;
+		OneByteInt user;
 	};
 
 	struct Write {

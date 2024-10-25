@@ -11,6 +11,9 @@ private:
 	bool write(msg::Buffer& buffer);
 	bool erase(msg::Buffer& buffer);
 	bool move(msg::Buffer& buffer);
+	bool sync(msg::Buffer& buffer);
+	bool connectNewUser(msg::Buffer& buffer);
+	bool disconnectUser(msg::Buffer& buffer);
 
 	Document doc;
 

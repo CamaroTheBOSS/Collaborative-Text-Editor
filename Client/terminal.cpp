@@ -59,12 +59,6 @@ unsigned int Terminal::getWidth() const {
 void Terminal::render(Document& doc) {
     std::vector<COORD> correctCursorPositions = syncCursors(doc);
     adjustBufferPos();
-    //SetConsoleCursorPosition(hConsole, COORD{ 0, relevantCursorPos.Y });
-    //CONSOLE_SCREEN_BUFFER_INFO screenInfo;
-    //if (!GetConsoleScreenBufferInfo(hConsole, &screenInfo)) {
-    //    return;
-    //}
-    //SetConsoleCursorPosition(hConsole, COORD{ 0, screenInfo.srWindow.Top });
     int tLineCounter = 0;
     std::string toPrint;
     for (const auto& line : doc.get()) {
@@ -130,7 +124,7 @@ void Terminal::renderCursors(Document& doc, std::vector<COORD>& terminalCursorPo
             std::cout << ' ';
         }
     }
-    SetConsoleCursorPosition(hConsole, terminalCursorPositions[0]);
+    SetConsoleCursorPosition(hConsole, relevantCursorPos);
     SetConsoleTextAttribute(hConsole, defaultColor);
 }
 
@@ -153,6 +147,6 @@ std::vector<COORD> Terminal::syncCursors(Document& doc) {
         }
         terminalCursors[c].X = docCursors[c].X % cursorInfo.dwSize.X;
     }
-    relevantCursorPos = terminalCursors[0];
+    relevantCursorPos = terminalCursors[doc.getMyCursor()];
     return terminalCursors;
 }

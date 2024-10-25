@@ -17,7 +17,33 @@ bool Repository::processMsg(msg::Buffer& buffer) {
 	case msg::Type::moveHorizontal:
 	case msg::Type::moveVertical:
 		return move(buffer);
+	case msg::Type::sync:
+		return sync(buffer);
+	case msg::Type::connect:
+		return connectNewUser(buffer);
+	case msg::Type::disconnect:
+		return disconnectUser(buffer);
 	}
+}
+
+bool Repository::sync(msg::Buffer& buffer) {
+	msg::ConnectResponse msg;
+	parse(buffer, 1, msg.version, msg.user, msg.text);
+	doc = Document(msg.text, msg.user + 1, msg.user);
+	logger.logInfo("Connected to document (nCursors: ", msg.user, ", text: " + msg.text + ")");
+	return true;
+}
+
+bool Repository::connectNewUser(msg::Buffer& buffer) {
+	logger.logInfo("Added new user to document");
+	return doc.addCursor();
+}
+
+bool Repository::disconnectUser(msg::Buffer& buffer) {
+	msg::DisconnectResponse msg;
+	parse(buffer, 1, msg.version, msg.user);
+	logger.logInfo("Disconnected user ", msg.user);
+	return doc.eraseCursor(msg.user);
 }
 
 bool Repository::write(msg::Buffer& buffer) {

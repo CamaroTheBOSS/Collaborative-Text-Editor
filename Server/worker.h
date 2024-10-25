@@ -16,10 +16,11 @@ public:
 private:
 	bool connectToMaster(const std::string& ip, const int port);
 	void handleConnections();
-	void shutdownConnection(SOCKET client);
+	Response shutdownConnection(SOCKET client, msg::Buffer& buffer);
 	msg::Buffer recvMsg(SOCKET client) const;
 	Response processMsg(SOCKET client, msg::Buffer& buffer);
-	void sendResponses(const Response& response) const;
+	void sendResponses(Response& response) const;
+	void syncClientState(Response& response) const;
 	
 	friend class Server;
 	std::mutex connSetLock;

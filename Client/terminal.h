@@ -32,6 +32,6 @@ private:
 	std::vector<COORD> syncCursors(Document& doc);
 
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	ScreenBufferData screenData;
+	ScreenBufferData screenData = {0};
 	COORD relevantCursorPos{0, 0};
 };

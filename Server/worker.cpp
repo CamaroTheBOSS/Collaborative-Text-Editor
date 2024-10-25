@@ -59,6 +59,9 @@ void Worker::handleConnections() {
             SOCKET client = listenConnections.fd_array[i];
             msg::Buffer recvBuffer = recvMsg(client);
             Response response = processMsg(client, recvBuffer);
+            if (response.msgType == msg::Type::sync) {
+                syncClientState(response);
+            }
             sendResponses(response);
         }
     }
@@ -75,13 +78,23 @@ Response Worker::processMsg(const SOCKET client, msg::Buffer& buffer) {
         return repo->process(client, buffer);
     }
     if (buffer.size < 0) {
-        logger.logError("Error on receiving data from ", client, "! Closing connection");
+        logger.logError(WSAGetLastError(), ": Error on receiving data from ", client, "! Closing connection");
     }
-    shutdownConnection(client);
-    return Response{ buffer, {} };
+    return shutdownConnection(client, buffer);
 }
 
-void Worker::sendResponses(const Response& response) const {
+void Worker::syncClientState(Response& response) const {
+    SOCKET lastConnectedClient = response.destinations[response.destinations.size() - 1];
+    int sendBytes = send(lastConnectedClient, response.buffer.get(), response.buffer.size, 0);
+    if (sendBytes <= 0) {
+        logger.logError("Error on sending data to ", lastConnectedClient);
+    }
+    response.destinations.pop_back();
+    response.buffer.clear();
+    msg::serializeTo(response.buffer, 0, msg::Type::connect, static_cast<msg::OneByteInt>(1));
+}
+
+void Worker::sendResponses(Response& response) const {
     for (const auto& dst : response.destinations) {
         int sendBytes = send(dst, response.buffer.get(), response.buffer.size, 0);
         if (sendBytes <= 0) {
@@ -90,10 +103,13 @@ void Worker::sendResponses(const Response& response) const {
     }
 }
 
-void Worker::shutdownConnection(const SOCKET client) {
+Response Worker::shutdownConnection(const SOCKET client, msg::Buffer& buffer) {
     closesocket(client);
     shutdown(client, SD_SEND);
+    logger.logDebug("Closing connection with ", client);
+    buffer.clear();
+    msg::serializeTo(buffer, 0, msg::Type::disconnect, static_cast<msg::OneByteInt>(1));
     std::scoped_lock lock{connSetLock};
     FD_CLR(client, &connections);
-    logger.logDebug("Closing connection with ", client);
+    return repo->process(client, buffer);
 }

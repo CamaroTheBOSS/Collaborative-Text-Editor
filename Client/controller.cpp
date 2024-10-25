@@ -1,4 +1,8 @@
+#include <chrono>
+#include <thread>
+
 #include "controller.h"
+#include "logging.h"
 
 constexpr msg::OneByteInt version = 1;
 
@@ -48,6 +52,27 @@ bool Controller::checkIncomingMessages() {
         needRender += repo.processMsg(msgBuffer);
     }
     return needRender;
+}
+
+bool Controller::requestDocument(const std::chrono::milliseconds& timeout, const int tries) {
+    int currTry = 0;
+    client.sendMsg(msg::Type::sync, version);
+    while (currTry < tries) {
+        msg::Buffer msgBuffer = client.getNextMsg();
+        if (msgBuffer.empty()) {
+            currTry++;
+            logger.logDebug(currTry, " try to request document failed");
+            std::this_thread::sleep_for(timeout);
+            continue;
+        }
+        msg::Type msgType;
+        msg::parse(msgBuffer, 0, msgType);
+        repo.processMsg(msgBuffer);     
+        if (msgType == msg::Type::sync) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void Controller::render() {

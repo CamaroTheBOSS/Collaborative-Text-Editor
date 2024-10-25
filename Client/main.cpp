@@ -2,6 +2,7 @@
 #pragma comment(lib, "Ws2_32.lib")
 
 #include <iostream>
+#include <chrono>
 
 #include "controller.h";
 
@@ -20,6 +21,10 @@ int main() {
 	Controller controller{};
 	if (!controller.connect("192.168.1.10", 8081)) {
 		std::cout << "Connection to server failed!\n";
+		return -1;
+	}
+	if (!controller.requestDocument(std::chrono::milliseconds(500), 3)) {
+		std::cout << "Requesting document from the server failed!\n";
 		return -1;
 	}
 	while (true) {

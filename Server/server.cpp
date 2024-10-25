@@ -51,7 +51,6 @@ void Server::start() {
 			logger.logError(WSAGetLastError(), ": Error when notifying thread ", id, " about new connection");
 			continue;
 		}
-		repo.connectUser(newConnection);
 		logger.logDebug("Connection ", newConnection, " has been forwarded to thread ", id);
 	}
 }

@@ -30,6 +30,7 @@ public:
 
 	Document();
 	Document(const std::string& text);
+	Document(const std::string& text, const int cursors, const int myCursor);
 
 	COORD write(const int cursor, const char letter);
 	COORD write(const int cursor, const std::string& text);
@@ -42,9 +43,12 @@ public:
 	COORD moveCursorDown(const int cursor, const int bufferWidth);
 
 	bool addCursor();
+	bool eraseCursor(const int cursor);
 	bool setCursorPos(const int cursor, const COORD newPos);
 	bool setCursorOffset(const int cursor, const int newOffset);
 	COORD getCursorPos(const int cursor) const;
+	int getMyCursor() const;
+	void setMyCursor(const int cursor);
 	std::vector<COORD> getCursorPositions() const;
 
 	const std::vector<std::string>& get();
@@ -56,4 +60,5 @@ private:
 	void adjustCursorsRelativeToCursor(const int cursor);
 	std::vector<Cursor> cursors;
 	std::vector<std::string> data;
+	int myCursorIdx;
 };

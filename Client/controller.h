@@ -10,7 +10,9 @@ public:
 	int readChar();
 	bool processChar(const int key);
 	bool checkIncomingMessages();
+	bool requestDocument(const std::chrono::milliseconds& timeout, const int tries);
 	void render();
+
 private:
 
 	TCPClient client;

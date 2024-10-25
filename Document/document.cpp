@@ -5,13 +5,22 @@
 
 Document::Document():
 	data({""}),
-	cursors({ Cursor() }) {
+	cursors({ Cursor() }),
+	myCursorIdx(0) {
 	data.reserve(1024);
 }
 
 Document::Document(const std::string& text):
 	data(),
 	cursors({ Cursor() }) {
+	data.reserve(text.size());
+	setText(text);
+}
+
+Document::Document(const std::string& text, const int nCursors, const int myCursorIdx) :
+	data(),
+	myCursorIdx(myCursorIdx),
+	cursors(nCursors, Cursor()) {
 	data.reserve(text.size());
 	setText(text);
 }
@@ -183,6 +192,17 @@ bool Document::addCursor() {
 	return true;
 }
 
+bool Document::eraseCursor(const int cursor) {
+	if (cursor < 0 || cursor >= cursors.size()) {
+		return false;
+	}
+	cursors.erase(cursors.cbegin() + cursor);
+	if (myCursorIdx > cursor) {
+		myCursorIdx--;
+	}
+	return true;
+}
+
 bool Document::setCursorPos(const int index, COORD newPos) {
 	if (index < 0 || index >= cursors.size() || newPos.Y >= data.size() || newPos.X > data[newPos.Y].size()) {
 		return false;
@@ -204,6 +224,14 @@ COORD Document::getCursorPos(const int index) const {
 		return COORD{-1, -1};
 	}
 	return cursors[index].position();
+}
+
+int Document::getMyCursor() const {
+	return myCursorIdx;
+}
+
+void Document::setMyCursor(const int index) {
+	myCursorIdx = index;
 }
 
 std::vector<COORD> Document::getCursorPositions() const {

@@ -52,8 +52,9 @@ namespace msg {
 		return sizeof(OneByteInt);
 	}
 
-	constexpr std::array<const char*, 13> typeToStr = { "REGISTRATION", "LOGIN", "CREATE" , "LOAD" ,
-	"JOIN" , "GETFILES", "SAVEFILE", "ERROR", "INTER", "WRITE", "ERASE", "MOVEVERTICAL", "MOVEHORIZONTAL" };
+	constexpr std::array<const char*, 15> typeToStr = { "REGISTRATION", "LOGIN", "CREATE" , "LOAD" ,
+	"JOIN" , "GETFILES", "SAVEFILE", "ERROR", "WRITE", "ERASE", "MOVEVERTICAL", "MOVEHORIZONTAL", "SYNC",
+	"CONNECT", "DISCONNECT"};
 
 	constexpr std::array<const char*, 4> sideToStr = { "LEFT", "RIGHT", "UP", "DOWN" };
 

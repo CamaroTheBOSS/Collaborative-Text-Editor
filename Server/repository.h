@@ -11,6 +11,7 @@
 struct Response {
 	msg::Buffer& buffer;
 	std::vector<SOCKET> destinations;
+	msg::Type msgType;
 };
 
 struct Session {
@@ -22,18 +23,19 @@ struct Session {
 class Repository {
 public:
 	Response process(SOCKET client, msg::Buffer& buffer);
-	void connectUser(SOCKET client);
 private:
-	Response masterNotification(SOCKET client, msg::Buffer& buffer);
+	Response connectUserToDoc(SOCKET client, msg::Buffer& buffer);
+	Response disconnectUserFromDoc(SOCKET client, msg::Buffer& buffer);
+	Response masterNotification(SOCKET client, msg::Buffer& buffer) const;
 	Response write(SOCKET client, msg::Buffer& buffer);
 	Response erase(SOCKET client, msg::Buffer& buffer);
 	Response moveHorizontal(SOCKET client, msg::Buffer& buffer);
 	Response moveVertical(SOCKET client, msg::Buffer& buffer);
+	int findClient(SOCKET client);
 
 	// TODO BETTER SYSTEM
-	Document doc;
-	std::unordered_map<SOCKET, int> clientToCursor;
+	Document doc{"", 0, 0};
 	std::vector<SOCKET> connectedClients;
-	std::mutex clientToCursorLock;
+	std::mutex connectedClientsLock;
 	std::mutex docLock;
 };
