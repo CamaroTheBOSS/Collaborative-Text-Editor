@@ -36,6 +36,10 @@ bool TCPClient::disconnect() {
     return true;
 }
 
+bool TCPClient::isConnected() const {
+    return connected;
+}
+
 msg::Buffer TCPClient::getNextMsg() {
     std::scoped_lock lock{recvQueueLock};
     if (recvQueue.empty()) {

@@ -13,6 +13,7 @@ class TCPClient {
 public:
 	bool connectServer(const std::string& ip, const int port);
 	bool disconnect();
+	bool isConnected() const;
 	msg::Buffer getNextMsg();
 	template<typename... Args>
 	bool sendMsg(Args&&... args) {

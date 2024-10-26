@@ -17,6 +17,7 @@
 #define BACKSPACE 8
 #define TABULAR 9
 #define ENTER 13
+#define ESC 27
 
 using ScreenBufferData = CONSOLE_SCREEN_BUFFER_INFO;
 

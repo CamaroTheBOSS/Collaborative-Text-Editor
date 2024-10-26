@@ -27,7 +27,7 @@ int main() {
 		std::cout << "Requesting document from the server failed!\n";
 		return -1;
 	}
-	while (true) {
+	while (controller.isConnected()) {
 		int key = controller.readChar();
 		controller.processChar(key);
 		bool render = controller.checkIncomingMessages();
@@ -36,7 +36,6 @@ int main() {
 		}
 	}
 
-	controller.disconnect();
 	WSACleanup();
 
 	return 0;

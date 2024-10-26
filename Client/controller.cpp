@@ -14,7 +14,11 @@ bool Controller::disconnect() {
 	return client.disconnect();
 }
 
-int Controller::readChar() {
+bool Controller::isConnected() const {
+    return client.isConnected();
+}
+
+int Controller::readChar() const {
     return terminal.readChar();
 }
 
@@ -38,6 +42,8 @@ bool Controller::processChar(const int key) {
         return client.sendMsg(msg::Type::moveVertical, version, std::string{""}, msg::MoveSide::up, terminal.getWidth());
     case ARROW_DOWN:
         return client.sendMsg(msg::Type::moveVertical, version, std::string{""}, msg::MoveSide::down, terminal.getWidth());
+    case ESC:
+        return disconnect();
     }
     return false;
 }

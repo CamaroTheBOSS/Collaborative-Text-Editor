@@ -7,7 +7,8 @@ class Controller {
 public:
 	bool connect(const std::string& ip, const int port);
 	bool disconnect();
-	int readChar();
+	bool isConnected() const;
+	int readChar() const;
 	bool processChar(const int key);
 	bool checkIncomingMessages();
 	bool requestDocument(const std::chrono::milliseconds& timeout, const int tries);
@@ -18,5 +19,4 @@ private:
 	TCPClient client;
 	Terminal terminal;
 	Repository repo;
-
 };
