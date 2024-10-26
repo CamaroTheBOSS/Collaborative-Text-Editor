@@ -65,7 +65,10 @@ int main() {
 		return -1;
 	}
 	while (controller.isConnected()) {
-		int key = getRandomKey();
+		int key = controller.readChar();
+		if (key == '\0') {
+			key = getRandomKey();
+		}
 		controller.processChar(key);
 		bool render = controller.checkIncomingMessages();
 		if (render) {
