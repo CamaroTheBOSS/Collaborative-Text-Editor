@@ -84,3 +84,7 @@ bool Controller::requestDocument(const std::chrono::milliseconds& timeout, const
 void Controller::render() {
     terminal.render(repo.getDoc());
 }
+
+bool Controller::saveDoc() const {
+    return repo.saveDoc();
+}

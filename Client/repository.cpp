@@ -1,8 +1,19 @@
+#include <fstream>
+
 #include "repository.h"
 #include "logging.h"
 
 Document& Repository::getDoc() {
 	return doc;
+}
+
+bool Repository::saveDoc() const {
+	std::ofstream file(doc.getFilename(), std::ios::out);
+	if (!file) {
+		return false;
+	}
+	file << doc.getText();
+	return true;
 }
 
 bool Repository::processMsg(msg::Buffer& buffer) {

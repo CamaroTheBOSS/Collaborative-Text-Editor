@@ -75,7 +75,7 @@ int main() {
 			controller.render();
 		}
 	}
-
+	controller.saveDoc();
 	WSACleanup();
 
 	return 0;

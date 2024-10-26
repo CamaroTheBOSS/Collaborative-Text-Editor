@@ -55,10 +55,13 @@ public:
 	std::string getLine(const int lineIndex) const;
 	std::string getText() const;
 	void setText(const std::string& txt);
+	std::string getFilename() const;
 
 private:
 	void adjustCursorsRelativeToCursor(const int cursor);
+	std::string filename = "document.txt";
 	std::vector<Cursor> cursors;
 	std::vector<std::string> data;
 	int myCursorIdx;
+	
 };

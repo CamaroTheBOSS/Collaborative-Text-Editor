@@ -13,6 +13,7 @@ public:
 	bool checkIncomingMessages();
 	bool requestDocument(const std::chrono::milliseconds& timeout, const int tries);
 	void render();
+	bool saveDoc() const;
 
 private:
 

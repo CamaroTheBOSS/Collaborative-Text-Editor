@@ -277,6 +277,10 @@ void Document::setText(const std::string& txt) {
 	}
 }
 
+std::string Document::getFilename() const {
+	return filename;
+}
+
 void Document::adjustCursorsRelativeToCursor(const int index) {
 	if (index < 0 || index >= cursors.size()) {
 		return;

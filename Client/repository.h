@@ -6,6 +6,7 @@
 class Repository {
 public:
 	bool processMsg(msg::Buffer& buffer);
+	bool saveDoc() const;
 	Document& getDoc();
 private:
 	bool write(msg::Buffer& buffer);
