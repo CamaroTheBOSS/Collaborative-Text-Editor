@@ -7,6 +7,7 @@
 
 #include "messages.h"
 #include "repository.h"
+#include "framer.h"
 
 class Worker {
 public:
@@ -17,7 +18,7 @@ private:
 	bool connectToMaster(const std::string& ip, const int port);
 	void handleConnections();
 	Response shutdownConnection(SOCKET client, msg::Buffer& buffer);
-	msg::Buffer recvMsg(SOCKET client) const;
+	std::vector<msg::Buffer> recvMsg(SOCKET client);
 	Response processMsg(SOCKET client, msg::Buffer& buffer);
 	void sendResponses(Response& response) const;
 	void syncClientState(Response& response) const;
@@ -31,4 +32,5 @@ private:
 	std::thread thread;
 
 	Repository* repo;
+	Framer framer{ 4096 };
 };

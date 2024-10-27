@@ -49,7 +49,9 @@ Response Repository::connectUserToDoc(SOCKET client, msg::Buffer& buffer) {
 	connectedClients.push_back(client);
 	doc.addCursor();
 	buffer.clear();
-	msg::serializeTo(buffer, 0, msg::Type::sync, msg.version, cursor, doc.getText());
+	std::string docText = doc.getText();
+	buffer.reserve(30 + docText.size());
+	msg::serializeTo(buffer, 0, msg::Type::sync, msg.version, cursor, std::move(docText));
 	return Response{ buffer, { connectedClients }, msg::Type::sync };
 }
 
@@ -66,6 +68,7 @@ Response Repository::disconnectUserFromDoc(SOCKET client, msg::Buffer& buffer) {
 		doc.eraseCursor(cursor);
 	}
 	buffer.clear();
+	buffer.reserve(30);
 	msg::serializeTo(buffer, 0, msg::Type::disconnect, msg.version, cursor);
 	return Response{ buffer, connectedClients, msg::Type::disconnect };
 }
@@ -83,6 +86,7 @@ Response Repository::write(SOCKET client, msg::Buffer& buffer) {
 	doc.write(cursor, msg.text);
 	logger.logInfo("cursor", cursor, "wrote '" + msg.text + "' to document");
 	buffer.clear();
+	buffer.reserve(30 + msg.text.size());
 	auto cursorBuff = static_cast<msg::OneByteInt>(cursor);
 	msg::serializeTo(buffer, 0, msg.type, msg.version, cursorBuff, msg.text);
 	return Response{ buffer, connectedClients, msg::Type::write };
@@ -96,6 +100,7 @@ Response Repository::erase(SOCKET client, msg::Buffer& buffer) {
 	doc.erase(cursor, msg.eraseSize);
 	logger.logInfo("cursor", cursor, "erased", msg.eraseSize, "letters from document");
 	buffer.clear();
+	buffer.reserve(30);
 	auto cursorBuff = static_cast<msg::OneByteInt>(cursor);
 	msg::serializeTo(buffer, 0, msg.type, msg.version, cursorBuff, msg.eraseSize);
 	return Response{ buffer, connectedClients, msg::Type::erase };
@@ -120,6 +125,7 @@ Response Repository::moveHorizontal(SOCKET client, msg::Buffer& buffer) {
 		return Response{ buffer, {}, msg::Type::error };
 	}
 	buffer.clear();
+	buffer.reserve(30);
 	auto cursorBuff = static_cast<msg::OneByteInt>(cursor);
 	unsigned int cursorX = newCursorPos.X;
 	unsigned int cursorY = newCursorPos.Y;
@@ -146,6 +152,7 @@ Response Repository::moveVertical(SOCKET client, msg::Buffer& buffer) {
 		return Response{ buffer, {}, msg::Type::error };
 	}
 	buffer.clear();
+	buffer.reserve(30);
 	auto cursorBuff = static_cast<msg::OneByteInt>(cursor);
 	unsigned int cursorX = newCursorPos.X;
 	unsigned int cursorY = newCursorPos.Y;

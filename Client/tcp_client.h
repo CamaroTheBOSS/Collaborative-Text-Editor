@@ -8,6 +8,7 @@
 
 #include "messages.h"
 #include "logging.h"
+#include "framer.h"
 
 class TCPClient {
 public:
@@ -19,7 +20,8 @@ public:
 	bool sendMsg(Args&&... args) {
 		msg::Buffer buffer{128};
 		msg::serializeTo(buffer, 0, args...);
-		int sentBytes = send(client, buffer.get(), buffer.size, 0);
+		msg::Buffer msgWithSize = msg::enrich(buffer);
+		int sentBytes = send(client, msgWithSize.get(), msgWithSize.size, 0);
 		if (sentBytes <= 0) {
 			logger.logError(WSAGetLastError(), ": Send error!");
 			return false;
@@ -38,4 +40,5 @@ private:
 	std::queue<msg::Buffer> recvQueue;
 	std::mutex recvQueueLock;
 	std::atomic_bool connected;
+	Framer framer{4096};
 };

@@ -18,7 +18,7 @@ int main() {
 		return wsaError;
 	}
 
-	Controller controller{};
+	Controller controller;
 	if (!controller.connect("192.168.1.10", 8081)) {
 		std::cout << "Connection to server failed!\n";
 		return -1;

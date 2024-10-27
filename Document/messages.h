@@ -73,14 +73,27 @@ namespace msg {
 			memcpy(data.get() + size, str->c_str(), str->size() + 1);
 			size += str->size() + 1;
 		}
+		void add(const Buffer* other) {
+			assert(capacity >= size + other->size && "Error, buffer size excedeed!");
+			memcpy(data.get() + size, other->get(), other->size);
+			size += other->size;
+		}
+		void add(const Buffer* other, const int start, const int cpsize) {
+			assert(capacity >= size + cpsize && "Error, buffer size excedeed!");
+			assert(start + cpsize <= other->size && "Error, buffer size excedeed!");
+			memcpy(data.get() + size, other->get() + start, cpsize);
+			size += cpsize;
+		}
 		void clear();
 		char* get() const;
 		bool empty() const;
+		void reserve(const int capacity);
 
 		std::unique_ptr<char[]> data;
 		int size;
-		const int capacity;
+		int capacity;
 	};
+	Buffer enrich(Buffer& buffer);
 
 	template<typename T>
 	int parseObj(T& obj, Buffer& buffer, const int offset) {

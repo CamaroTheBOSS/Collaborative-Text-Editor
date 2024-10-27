@@ -57,21 +57,30 @@ void Worker::handleConnections() {
         int socketCount = select(0, &listenConnections, nullptr, nullptr, nullptr);
         for (int i = 0; i < socketCount; i++) {
             SOCKET client = listenConnections.fd_array[i];
-            msg::Buffer recvBuffer = recvMsg(client);
-            Response response = processMsg(client, recvBuffer);
-            if (response.msgType == msg::Type::sync) {
-                syncClientState(response);
+            auto msgBuffers = recvMsg(client);
+            for (auto& msgBuffer : msgBuffers) {
+                Response response = processMsg(client, msgBuffer);
+                if (response.msgType == msg::Type::sync) {
+                    syncClientState(response);
+                }
+                sendResponses(response);
             }
-            sendResponses(response);
         }
     }
 }
 
-msg::Buffer Worker::recvMsg(const SOCKET client) const {
+std::vector<msg::Buffer> Worker::recvMsg(const SOCKET client) {
     msg::Buffer recvBuff{128};
     recvBuff.size = recv(client, recvBuff.get(), recvBuff.capacity, 0);
-    logger.logDebug("Received msg from client", client, "with size", recvBuff.size);
-    return recvBuff;
+    if (recvBuff.size > 0) {
+        auto msgBuffers = framer.extractMessages(recvBuff);
+        if (!msgBuffers.empty()) {
+            logger.logDebug("Received", msgBuffers.size(), "messages from client", client);
+        }
+        return msgBuffers;
+    }
+    return { std::move(recvBuff) };
+    
 }
 
 Response Worker::processMsg(const SOCKET client, msg::Buffer& buffer) {
@@ -86,7 +95,8 @@ Response Worker::processMsg(const SOCKET client, msg::Buffer& buffer) {
 
 void Worker::syncClientState(Response& response) const {
     SOCKET lastConnectedClient = response.destinations[response.destinations.size() - 1];
-    int sendBytes = send(lastConnectedClient, response.buffer.get(), response.buffer.size, 0);
+    msg::Buffer msgWithSize = msg::enrich(response.buffer);
+    int sendBytes = send(lastConnectedClient, msgWithSize.get(), msgWithSize.size, 0);
     if (sendBytes <= 0) {
         logger.logError("Error on sending data to", lastConnectedClient);
     }
@@ -96,8 +106,9 @@ void Worker::syncClientState(Response& response) const {
 }
 
 void Worker::sendResponses(Response& response) const {
+    msg::Buffer msgWithSize = msg::enrich(response.buffer);
     for (const auto& dst : response.destinations) {
-        int sendBytes = send(dst, response.buffer.get(), response.buffer.size, 0);
+        int sendBytes = send(dst, msgWithSize.get(), msgWithSize.size, 0);
         if (sendBytes <= 0) {
             logger.logError("Error on sending data to", dst);
         }

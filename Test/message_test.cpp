@@ -54,6 +54,15 @@ TEST(BufferTests, SerializeMoveSideTest) {
 	EXPECT_EQ(buffer.size, 1);
 }
 
+TEST(BufferTests, SerializeOBufferTest) {
+	msg::Buffer bigger{16};
+	msg::Buffer smaller{8};
+	msg::serializeTo(smaller, 0, 'a');
+	msg::serializeTo(bigger, 0, smaller);
+	EXPECT_EQ(bigger.get()[0], 'a');
+	EXPECT_EQ(bigger.size, 1);
+}
+
 TEST(BufferTests, SerializeMultipleTypes) {
 	msg::Buffer buffer{128};
 	auto container = ExampleStruct{ oneByteInt, str, uint, msgType, moveSide };
@@ -161,4 +170,41 @@ TEST(BufferTests, ParseMultipleTypesTest) {
 	EXPECT_EQ(myStruct.value, uint);
 	EXPECT_EQ(myStruct.type, msgType);
 	EXPECT_EQ(myStruct.side, moveSide);
+}
+
+TEST(BufferTests, EnrichBufferTest) {
+	msg::Buffer buffer{8};
+	msg::serializeTo(buffer, 0, oneByteInt);
+	msg::Buffer enriched = msg::enrich(buffer);
+	EXPECT_EQ(enriched.size, 5);
+	EXPECT_EQ(enriched.get()[0], 0);
+	EXPECT_EQ(enriched.get()[1], 0);
+	EXPECT_EQ(enriched.get()[2], 0);
+	EXPECT_EQ(enriched.get()[3], 1);
+	EXPECT_EQ(enriched.get()[4], oneByteInt);
+}
+
+TEST(BufferTests, ReserveMemoryTest) {
+	msg::Buffer buffer{1};
+	msg::serializeTo(buffer, 0, oneByteInt);
+	buffer.reserve(13);
+	msg::serializeTo(buffer, 0, str);
+	EXPECT_EQ(buffer.size, 5);
+	EXPECT_EQ(buffer.capacity, 13);
+	EXPECT_EQ(buffer.get()[0], oneByteInt);
+	EXPECT_EQ(buffer.get()[1], 't');
+	EXPECT_EQ(buffer.get()[2], 'x');
+	EXPECT_EQ(buffer.get()[3], 't');
+	EXPECT_EQ(buffer.get()[4], 0);
+}
+
+TEST(BufferTests, SerializeWriteMsg) {
+	msg::Buffer buffer{128};
+	const int key = 97;
+	msg::serializeTo(buffer, 0, msg::Type::write, oneByteInt, std::string{""}, std::string(1, key));
+	EXPECT_EQ(buffer.size, 5);
+	EXPECT_EQ(buffer.get()[1], oneByteInt);
+	EXPECT_EQ(buffer.get()[2], 0);
+	EXPECT_EQ(buffer.get()[3], key);
+	EXPECT_EQ(buffer.get()[4], 0);
 }

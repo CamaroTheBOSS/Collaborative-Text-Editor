@@ -10,23 +10,40 @@ namespace msg {
 		data(std::make_unique<char[]>(other.capacity)),
 		size(other.size),
 		capacity(other.capacity) {
-		memcpy(data.get(), other.get(), other.size);
+		if (other.size > 0) {
+			memcpy(data.get(), other.get(), other.size);
+		}
 	}
 	Buffer::Buffer(Buffer&& other) noexcept :
 		data(std::move(other.data)),
 		size(other.size),
-		capacity(other.size) {}
+		capacity(other.capacity) {}
 
 	char* Buffer::get() const {
 		return data.get();
 	}
 
 	void Buffer::clear() {
-		memset(data.get(), 0, capacity);
+		if (size > 0) {
+			memset(data.get(), 0, size);
+		}
 		size = 0;
 	}
 	bool Buffer::empty() const {
 		return size == 0;
+	}
+
+	void Buffer::reserve(const int newCapacity) {
+		auto newData = std::make_unique<char[]>(newCapacity);
+		memcpy(newData.get(), data.get(), size);
+		data = std::move(newData);
+		capacity = newCapacity;
+	}
+
+	Buffer enrich(Buffer& buffer) {
+		Buffer newBuffer{ buffer.capacity + 4 };
+		serializeTo(newBuffer, 0, static_cast<unsigned int>(buffer.size), buffer);
+		return newBuffer;
 	}
 
 	int parseObj(std::string& obj, Buffer& buffer, const int offset) {

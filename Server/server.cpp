@@ -3,6 +3,9 @@
 #include "server.h"
 #include "logging.h"
 
+constexpr int msgBufferSize = 5;
+constexpr char notifyMsgBuffer[msgBufferSize] = { 0, 0, 0, 1, 0 }; // (0001 = length 1 and 0 is empty string)
+
 Server::Server(std::string ip, const int port) :
 	ip(ip),
 	port(port) {
@@ -46,7 +49,7 @@ void Server::start() {
 			std::scoped_lock lock{workers[worker].connSetLock};
 			FD_SET(newConnection, &workers[worker].connections);
 		}
-		int sendBytes = send(notifiers[worker], "", 1, 0);
+		int sendBytes = send(notifiers[worker], notifyMsgBuffer, msgBufferSize, 0);
 		if (sendBytes < 0) {
 			logger.logError(WSAGetLastError(), ": Error when notifying thread", id, "about new connection");
 			continue;

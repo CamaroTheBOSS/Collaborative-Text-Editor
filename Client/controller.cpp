@@ -25,7 +25,7 @@ int Controller::readChar() const {
 bool Controller::processChar(const int key) {
     
     if (key >= 32 && key <= 127) {
-        return client.sendMsg(msg::Type::write, version, std::string{""}, static_cast<msg::OneByteInt>(key));
+        return client.sendMsg(msg::Type::write, version, std::string{""}, std::string(1, key));
     }
     switch (key) {
     case ENTER:

@@ -64,8 +64,11 @@ void TCPClient::recvMsg() {
             closesocket(client);
             return;
         }
-        logger.logDebug("Put new message in queue with size", buffer.size);
+        auto messages = framer.extractMessages(buffer);
         std::scoped_lock lock{recvQueueLock};
-        recvQueue.push(std::move(buffer));
+        for (auto& msg : messages) {
+            logger.logDebug("Put new message in queue with size", msg.size);
+            recvQueue.push(std::move(msg));
+        }
     }
 }
