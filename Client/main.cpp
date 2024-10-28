@@ -27,6 +27,7 @@ int main() {
 		std::cout << "Requesting document from the server failed!\n";
 		return -1;
 	}
+	controller.render();
 	while (controller.isConnected()) {
 		int key = controller.readChar();
 		controller.processChar(key);
