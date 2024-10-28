@@ -41,8 +41,13 @@ bool Repository::processMsg(msg::Buffer& buffer) {
 
 bool Repository::sync(msg::Buffer& buffer) {
 	msg::ConnectResponse msg;
-	parse(buffer, 1, msg.version, msg.user, msg.text);
+	parse(buffer, 1, msg.version, msg.user, msg.text, msg.cursorPositions);
+	assert(msg.cursorPositions.size() == (msg.user + 1) * 2);
 	doc = Document(msg.text, msg.user + 1, msg.user);
+	for (int i = 1; i < msg.cursorPositions.size(); i += 2) {
+		auto pos = COORD{ static_cast<SHORT>(msg.cursorPositions[i - 1]), static_cast<SHORT>(msg.cursorPositions[i]) };
+		doc.setCursorPos(i / 2, pos);
+	}
 	logger.logInfo("Connected to document (nCursors:", msg.user, ", text:" + msg.text + ")");
 	return true;
 }

@@ -48,10 +48,16 @@ Response Repository::connectUserToDoc(SOCKET client, msg::Buffer& buffer) {
 	msg::OneByteInt cursor = connectedClients.size();
 	connectedClients.push_back(client);
 	doc.addCursor();
+	std::vector<unsigned int> cursorPositions;
+	for (const auto& cursorPos : doc.getCursorPositions()) {
+		cursorPositions.push_back(static_cast<unsigned int>(cursorPos.X));
+		cursorPositions.push_back(static_cast<unsigned int>(cursorPos.Y));
+	}
+	
 	buffer.clear();
 	std::string docText = doc.getText();
-	buffer.reserve(30 + docText.size());
-	msg::serializeTo(buffer, 0, msg::Type::sync, msg.version, cursor, std::move(docText));
+	buffer.reserve(30 + docText.size() + 8 * cursorPositions.size());
+	msg::serializeTo(buffer, 0, msg::Type::sync, msg.version, cursor, std::move(docText), std::move(cursorPositions));
 	return Response{ buffer, { connectedClients }, msg::Type::sync };
 }
 

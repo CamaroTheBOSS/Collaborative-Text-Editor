@@ -47,6 +47,20 @@ TEST(BufferTests, SerializeTypeTest) {
 	EXPECT_EQ(buffer.size, 1);
 }
 
+TEST(BufferTests, SerializeVectorTest) {
+	msg::Buffer buffer{128};
+	std::vector<unsigned int> values = { 34, 54, 64, 12, 127, 2 };
+	msg::serializeTo(buffer, 0, values);
+	values.insert(values.cbegin(), values.size());
+	for (int i = 0; i < values.size(); i++) {
+		int index = 4 * (i + 1);
+		EXPECT_EQ(buffer.get()[index - 4], 0);
+		EXPECT_EQ(buffer.get()[index - 3], 0);
+		EXPECT_EQ(buffer.get()[index - 2], 0);
+		EXPECT_EQ(buffer.get()[index - 1], values[i]);
+	}
+}
+
 TEST(BufferTests, SerializeMoveSideTest) {
 	msg::Buffer buffer{8};
 	msg::serializeTo(buffer, 0, moveSide);
@@ -150,6 +164,37 @@ TEST(BufferTests, ParseMoveSideTest) {
 	msg::MoveSide side;
 	msg::parse(buffer, 0, side);
 	EXPECT_EQ(side, moveSide);
+}
+
+TEST(BufferTests, ParseBiggerUnsignedIntTest) {
+	msg::Buffer buffer{128};
+	buffer.get()[0] = 0;
+	buffer.get()[1] = 0;
+	buffer.get()[2] = 0;
+	buffer.get()[3] = -12;
+	unsigned int val;
+	msg::parse(buffer, 0, val);
+	EXPECT_EQ(val, 244);
+}
+
+
+TEST(BufferTests, ParseVectorTest) {
+	msg::Buffer buffer{128};
+	std::vector<unsigned int> values = { 2, 5, 7 };
+	for (int i = 0; i < values.size(); i++) {
+		int index = 4 * (i + 1);
+		buffer.get()[index - 4] = 0;
+		buffer.get()[index - 3] = 0;
+		buffer.get()[index - 2] = 0;
+		buffer.get()[index - 1] = values[i];
+	}
+	values.erase(values.cbegin(), values.cbegin() + 1);
+	std::vector<unsigned int> parsed;
+	msg::parse(buffer, 0, parsed);
+	EXPECT_EQ(parsed.size(), values.size());
+	for (int i = 0; i < values.size(); i++) {
+		EXPECT_EQ(values[i], parsed[i]);
+	}
 }
 
 TEST(BufferTests, ParseMultipleTypesTest) {

@@ -3,6 +3,7 @@
 #include <memory>
 #include <assert.h>
 #include <string>
+#include <vector>
 #include <sstream>
 #include <type_traits>
 #include <array>
@@ -84,6 +85,14 @@ namespace msg {
 			memcpy(data.get() + size, other->get() + start, cpsize);
 			size += cpsize;
 		}
+		template<typename T>
+		void add(const std::vector<T>* arr) {
+			unsigned int arrSize = arr->size();
+			add(&arrSize);
+			for (const auto& element : *arr) {
+				add(&element);
+			}
+		}
 		void clear();
 		char* get() const;
 		bool empty() const;
@@ -104,6 +113,17 @@ namespace msg {
 	int parseObj(unsigned int& obj, Buffer& buffer, const int offset); 
 	int parseObj(Type& obj, Buffer& buffer, const int offset);
 	int parseObj(MoveSide& obj, Buffer& buffer, const int offset);
+	template<typename T>
+	int parseObj(std::vector<T>& arr, Buffer& buffer, const int offset) {
+		unsigned int arrSize;
+		int pos = offset;
+		pos += parseObj(arrSize, buffer, pos);
+		for (int i = 0; i < arrSize; i++) {
+			arr.push_back(T{ 0 });
+			pos += parseObj(arr[arr.size() - 1], buffer, pos);
+		}
+		return pos;
+	}
 	template<typename... Args>
 	int parse(Buffer& buffer, int pos, Args&... args) {
 		([&] {
@@ -129,6 +149,7 @@ namespace msg {
 		OneByteInt version;
 		OneByteInt user; // Which user idx you are in doc
 		std::string text; // Whole current state of the document
+		std::vector<unsigned int> cursorPositions;
 	};
 
 	struct Disconnect {
