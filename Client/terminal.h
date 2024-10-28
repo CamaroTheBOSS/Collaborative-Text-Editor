@@ -28,6 +28,7 @@ public:
 	void render(Document& doc);
 	unsigned int getWidth() const;
 private:
+	std::string getTextToRender(Document& doc) const;
 	void adjustBufferPos();
 	void renderCursors(Document& doc, std::vector<COORD>& cursorPositions);
 	std::vector<COORD> syncCursors(Document& doc);

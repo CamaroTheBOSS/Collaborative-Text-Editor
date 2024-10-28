@@ -86,8 +86,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>..\$(IntDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Document.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Document.lib;Client.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreLinkEvent>
+      <Command>\cmd &amp; "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.36.32532\bin\HostX64\x64\lib.exe" /OUT:D:\Code\CollaborativeTextEditor\$(IntDir)Client.lib ..\Client\$(IntDir)*.obj
+\cmd &amp; "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.36.32532\bin\HostX64\x64\lib.exe" D:\Code\CollaborativeTextEditor\$(IntDir)Client.lib /REMOVE:..\Client\$(IntDir)main.obj</Command>
+    </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -122,8 +126,12 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <AdditionalLibraryDirectories>..\$(IntDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Document.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Document.lib;Client.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreLinkEvent>
+      <Command>\cmd &amp; "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.36.32532\bin\HostX64\x64\lib.exe" /OUT:D:\Code\CollaborativeTextEditor\$(IntDir)Client.lib ..\Client\$(IntDir)*.obj
+\cmd &amp; "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.36.32532\bin\HostX64\x64\lib.exe" D:\Code\CollaborativeTextEditor\$(IntDir)Client.lib /REMOVE:..\Client\$(IntDir)main.obj</Command>
+    </PreLinkEvent>
   </ItemDefinitionGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
