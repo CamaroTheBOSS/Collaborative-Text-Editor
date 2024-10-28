@@ -3,6 +3,7 @@
 #include <Winsock2.h>
 #include <Windows.h>
 #include "document.h"
+#include "renderer.h"
 
 #define ARROW_UP 1296
 #define ARROW_DOWN 1304
@@ -19,21 +20,15 @@
 #define ENTER 13
 #define ESC 27
 
-using ScreenBufferData = CONSOLE_SCREEN_BUFFER_INFO;
-
 class Terminal {
 public:
 	Terminal();
 	int readChar() const;
-	void render(Document& doc);
+	void render(Document& doc) const;
 	unsigned int getWidth() const;
 private:
-	std::string getTextToRender(Document& doc) const;
-	void adjustBufferPos();
-	void renderCursors(Document& doc, std::vector<COORD>& cursorPositions);
-	std::vector<COORD> syncCursors(Document& doc);
-
+	ScreenBuffer adjustScreenBuffer(ScreenBuffer& screenBuffer, const COORD& terminalCursor) const;
+	
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	ScreenBufferData screenData = {0};
-	COORD relevantCursorPos{0, 0};
+	Renderer renderer;
 };

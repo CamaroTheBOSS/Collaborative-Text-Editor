@@ -53,9 +53,9 @@ COORD Document::write(const int index, const char letter) {
 			cursorPos.X = 0;
 		}
 	}
+	adjustCursorsRelativeToCursor(index);
 	cursors[index].setPosition(cursorPos);
 	cursors[index].setOffset(cursorPos.X);
-	adjustCursorsRelativeToCursor(index);
 	return cursorPos;
 }
 
@@ -90,9 +90,9 @@ COORD Document::erase(const int index) {
 		cursorPos.X = data[cursorPos.Y].size();
 		data[cursorPos.Y] += toMoveUpper;
 	}
+	adjustCursorsRelativeToCursor(index);
 	cursors[index].setPosition(cursorPos);
 	cursors[index].setOffset(cursorPos.X);
-	adjustCursorsRelativeToCursor(index);
 	return cursorPos;
 }
 
@@ -185,6 +185,17 @@ COORD Document::moveCursorDown(const int index, const int bufferWidth) {
 	}
 	cursors[index].setPosition(cursorPos);
 	return cursorPos;
+}
+
+bool Document::isCursorValid(const int cursor) {
+	if (cursor < 0 || cursor >= cursors.size()) {
+		return false;
+	}
+	auto pos = cursors[cursor].position();
+	if (pos.Y < 0 || pos.Y >= data.size() || pos.X < 0 || pos.X > data[pos.Y].size()) {
+		return false;
+	}
+	return true;
 }
 
 bool Document::addCursor() {
@@ -285,16 +296,17 @@ void Document::adjustCursorsRelativeToCursor(const int index) {
 	if (index < 0 || index >= cursors.size()) {
 		return;
 	}
-	auto baseCursorPos = cursors[index].position();
 	for (int i = 0; i < cursors.size(); i++) {
-		if (i == index) {
+		if (i == index || isCursorValid(i)) {
 			continue;
 		}
 		auto cursorPos = cursors[i].position();
-		if (baseCursorPos.Y == cursorPos.Y && baseCursorPos.X <= cursorPos.X) {
-			cursorPos.X += 1;
-			setCursorPos(i, cursorPos);
-			setCursorOffset(i, cursorPos.X);
+		if (cursorPos.Y >= data.size()) {
+			cursorPos.Y = data.size() - 1;
 		}
+		bool endlPresent = !data[cursorPos.Y].empty() && data[cursorPos.Y][data[cursorPos.Y].size() - 1] == '\n';
+		cursorPos.X = data[cursorPos.Y].size() - endlPresent;
+		cursors[i].setPosition(cursorPos);
+		cursors[i].setOffset(cursorPos.X);
 	}
 }

@@ -42,6 +42,7 @@ public:
 	COORD moveCursorUp(const int cursor, const int bufferWidth);
 	COORD moveCursorDown(const int cursor, const int bufferWidth);
 
+	bool isCursorValid(const int cursor);
 	bool addCursor();
 	bool eraseCursor(const int cursor);
 	bool setCursorPos(const int cursor, const COORD newPos);

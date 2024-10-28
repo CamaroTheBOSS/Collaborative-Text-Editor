@@ -402,4 +402,7 @@ FodyWeavers.xsd
 ClientPrototype/*
 ServerPrototype/*
 Client/client.log
+Client/document.txt
+RandomClient/client.log
+RandomClient/document.txt
 Server/server.log

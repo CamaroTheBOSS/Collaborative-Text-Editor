@@ -138,6 +138,7 @@
     <ClCompile Include="controller.cpp" />
     <ClCompile Include="logging.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="renderer.cpp" />
     <ClCompile Include="repository.cpp" />
     <ClCompile Include="tcp_client.h" />
     <ClCompile Include="tcp_client_windows.cpp" />
@@ -146,6 +147,7 @@
   <ItemGroup>
     <ClInclude Include="controller.h" />
     <ClInclude Include="logging.h" />
+    <ClInclude Include="renderer.h" />
     <ClInclude Include="repository.h" />
     <ClInclude Include="terminal.h" />
   </ItemGroup>
