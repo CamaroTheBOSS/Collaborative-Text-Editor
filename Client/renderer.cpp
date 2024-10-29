@@ -88,6 +88,9 @@ COORD Renderer::synchronizeCursor(Document& doc, const COORD& docCursor, const S
         bool endlPresent = data[i][data[i].size() - 1] == '\n' && i != docCursor.Y;
         int base = i != docCursor.Y ? data[i].size() : docCursor.X;
         terminalCursor.Y += base / screenBuffer.dwSize.X + endlPresent;
+        if (data[i].size() == screenBuffer.dwSize.X && endlPresent) {
+            terminalCursor.Y--;
+        }
     }
     terminalCursor.X = docCursor.X % screenBuffer.dwSize.X;
     return terminalCursor;
