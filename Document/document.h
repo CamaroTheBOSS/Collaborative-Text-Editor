@@ -49,6 +49,8 @@ public:
 	bool setCursorOffset(const int cursor, const int newOffset);
 	COORD getCursorPos(const int cursor) const;
 	int getMyCursor() const;
+	int getCursorNum() const;
+	char getCharPointedByCursor(const int cursor) const;
 	void setMyCursor(const int cursor);
 	std::vector<COORD> getCursorPositions() const;
 

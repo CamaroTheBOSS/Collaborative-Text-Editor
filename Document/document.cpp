@@ -241,7 +241,25 @@ int Document::getMyCursor() const {
 	return myCursorIdx;
 }
 
+int Document::getCursorNum() const {
+	return cursors.size();
+}
+
+char Document::getCharPointedByCursor(const int cursor) const {
+	if (cursor < 0 || cursor >= cursors.size()) {
+		return ' ';
+	}
+	auto cursorPos = cursors[cursor].position();
+	if (cursorPos.Y >= data.size() || cursorPos.X >= data[cursorPos.Y].size() || data[cursorPos.Y][cursorPos.X] == '\n') {
+		return ' ';
+	}
+	return data[cursorPos.Y][cursorPos.X];
+}
+
 void Document::setMyCursor(const int index) {
+	if (index < 0 || index >= cursors.size()) {
+		return;
+	}
 	myCursorIdx = index;
 }
 

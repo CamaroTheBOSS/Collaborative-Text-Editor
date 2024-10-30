@@ -140,6 +140,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="repository.cpp" />
+    <ClCompile Include="screen_buffers.cpp" />
     <ClCompile Include="tcp_client.h" />
     <ClCompile Include="tcp_client_windows.cpp" />
     <ClCompile Include="terminal.cpp" />
@@ -149,6 +150,7 @@
     <ClInclude Include="logging.h" />
     <ClInclude Include="renderer.h" />
     <ClInclude Include="repository.h" />
+    <ClInclude Include="screen_buffers.h" />
     <ClInclude Include="terminal.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

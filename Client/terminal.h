@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include "document.h"
 #include "renderer.h"
+#include "screen_buffers.h"
 
 #define ARROW_UP 1296
 #define ARROW_DOWN 1304
@@ -24,11 +25,12 @@ class Terminal {
 public:
 	Terminal();
 	int readChar() const;
-	void render(Document& doc) const;
-	unsigned int getWidth() const;
+	void render(Document& doc);
+	unsigned int getDocBufferWidth() const;
 private:
-	ScreenBuffer adjustScreenBuffer(ScreenBuffer& screenBuffer, const COORD& terminalCursor) const;
-	
+	void scrollDocBuffer(const Cursor& tCursor);
+
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	Renderer renderer;
+	ScrollableScreenBuffer docBuffer;
 };

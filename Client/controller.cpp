@@ -39,9 +39,9 @@ bool Controller::processChar(const int key) {
     case ARROW_RIGHT:
         return client.sendMsg(msg::Type::moveHorizontal, version, std::string{""}, msg::MoveSide::right);
     case ARROW_UP:
-        return client.sendMsg(msg::Type::moveVertical, version, std::string{""}, msg::MoveSide::up, terminal.getWidth());
+        return client.sendMsg(msg::Type::moveVertical, version, std::string{""}, msg::MoveSide::up, terminal.getDocBufferWidth());
     case ARROW_DOWN:
-        return client.sendMsg(msg::Type::moveVertical, version, std::string{""}, msg::MoveSide::down, terminal.getWidth());
+        return client.sendMsg(msg::Type::moveVertical, version, std::string{""}, msg::MoveSide::down, terminal.getDocBufferWidth());
     case ESC:
         return disconnect();
     }

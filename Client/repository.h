@@ -2,6 +2,7 @@
 
 #include "document.h"
 #include "messages.h"
+#include "screen_buffers.h"
 
 class Repository {
 public:

@@ -11,25 +11,35 @@ Terminal::Terminal() {
     DWORD features = (
         ENABLE_LINE_INPUT |
         ENABLE_ECHO_INPUT |
+        ENABLE_INSERT_MODE |
         ENABLE_MOUSE_INPUT |
         ENABLE_PROCESSED_INPUT |
         ENABLE_QUICK_EDIT_MODE |
         ENABLE_WINDOW_INPUT |
-        ENABLE_PROCESSED_OUTPUT
+        ENABLE_VIRTUAL_TERMINAL_INPUT
         );
     auto stdInput = GetStdHandle(STD_INPUT_HANDLE);
     GetConsoleMode(stdInput, &currMode);
     SetConsoleMode(stdInput, currMode & ~features);
-    system("cls");
 
     CONSOLE_CURSOR_INFO cursorInfo;
-    if (!GetConsoleCursorInfo(hConsole, &cursorInfo)) {
-        return;
+    if (GetConsoleCursorInfo(hConsole, &cursorInfo)) {
+        cursorInfo.bVisible = 0;
+        SetConsoleCursorInfo(hConsole, &cursorInfo);
     }
-    cursorInfo.bVisible = 0;
-    if (!SetConsoleCursorInfo(hConsole, &cursorInfo)) {
-        return;
-    }
+
+    CONSOLE_SCREEN_BUFFER_INFO screenInfo;
+    GetConsoleScreenBufferInfo(hConsole, &screenInfo);
+    COORD size = {
+            screenInfo.srWindow.Right - screenInfo.srWindow.Left + 1,
+            screenInfo.srWindow.Bottom - screenInfo.srWindow.Top + 1
+    };
+    SetConsoleScreenBufferSize(hConsole, size);
+    screenInfo.srWindow.Top += 3;
+    screenInfo.srWindow.Bottom -= 3;
+    screenInfo.srWindow.Right -= 10;
+    screenInfo.srWindow.Left += 10;
+    docBuffer = ScrollableScreenBuffer{ screenInfo.srWindow };
 }
 
 int Terminal::readChar() const {
@@ -44,39 +54,23 @@ int Terminal::readChar() const {
 	return '\0';
 }
 
-unsigned int Terminal::getWidth() const {
-	CONSOLE_SCREEN_BUFFER_INFO screenInfo;
-	if (!GetConsoleScreenBufferInfo(hConsole, &screenInfo)) {
-		return 0;
-	}
-	return screenInfo.dwSize.X - rightMargin;
+void Terminal::render(Document& doc) {
+    auto tCursor = docBuffer.getMyTerminalCursor(doc);
+    scrollDocBuffer(tCursor);
+    return renderer.render(doc, docBuffer);
 }
 
-void Terminal::render(Document& doc) const {
-    ScreenBuffer screenBuffer;
-    if (!GetConsoleScreenBufferInfo(hConsole, &screenBuffer)) {
-        return;
-    }
-    screenBuffer.dwSize.X -= rightMargin;
-    auto docCursor = doc.getCursorPos(doc.getMyCursor());
-    auto terminalCursor = renderer.synchronizeCursor(doc, docCursor, screenBuffer);
-    adjustScreenBuffer(screenBuffer, terminalCursor);
-    renderer.render(doc, screenBuffer);
-}
-
-ScreenBuffer Terminal::adjustScreenBuffer(ScreenBuffer& screenBuffer, const COORD& terminalCursor) const {
-    int topDiff = (screenBuffer.srWindow.Top + 5) - terminalCursor.Y;
-    int bottomDiff = terminalCursor.Y - (screenBuffer.srWindow.Bottom - 5);
+void Terminal::scrollDocBuffer(const Cursor& tCursor) {
+    int topDiff = (docBuffer.top + 2) - tCursor.pos.Y;
+    int bottomDiff = tCursor.pos.Y - (docBuffer.bottom - 2);
     if (topDiff > 0) {
-        int height = screenBuffer.srWindow.Bottom - screenBuffer.srWindow.Top;
-        screenBuffer.srWindow.Top = (std::max)(screenBuffer.srWindow.Top - topDiff, 0);
-        screenBuffer.srWindow.Bottom = screenBuffer.srWindow.Top + height;
+        docBuffer.scrollScreen(-topDiff);
     }
     else if (bottomDiff > 0) {
-        screenBuffer.srWindow.Top += bottomDiff;
-        screenBuffer.srWindow.Bottom += bottomDiff;
+        docBuffer.scrollScreen(bottomDiff);
     }
-    SetConsoleWindowInfo(hConsole, true, &screenBuffer.srWindow);
-    return screenBuffer;
 }
 
+unsigned int Terminal::getDocBufferWidth() const {
+    return docBuffer.width();
+}
