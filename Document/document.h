@@ -61,7 +61,7 @@ public:
 	std::string getFilename() const;
 
 private:
-	void adjustCursorsRelativeToCursor(const int cursor);
+	void adjustCursors();
 	std::string filename = "document.txt";
 	std::vector<Cursor> cursors;
 	std::vector<std::string> data;

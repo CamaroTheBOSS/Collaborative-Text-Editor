@@ -53,7 +53,7 @@ COORD Document::write(const int index, const char letter) {
 			cursorPos.X = 0;
 		}
 	}
-	adjustCursorsRelativeToCursor(index);
+	adjustCursors();
 	cursors[index].setPosition(cursorPos);
 	cursors[index].setOffset(cursorPos.X);
 	return cursorPos;
@@ -89,8 +89,9 @@ COORD Document::erase(const int index) {
 		cursorPos.Y -= 1;
 		cursorPos.X = data[cursorPos.Y].size();
 		data[cursorPos.Y] += toMoveUpper;
+		
 	}
-	adjustCursorsRelativeToCursor(index);
+	adjustCursors();
 	cursors[index].setPosition(cursorPos);
 	cursors[index].setOffset(cursorPos.X);
 	return cursorPos;
@@ -192,7 +193,11 @@ bool Document::isCursorValid(const int cursor) {
 		return false;
 	}
 	auto pos = cursors[cursor].position();
-	if (pos.Y < 0 || pos.Y >= data.size() || pos.X < 0 || pos.X > data[pos.Y].size()) {
+	if (pos.Y < 0 || pos.Y >= data.size()) {
+		return false;
+	}
+	bool endlPresent = !data[pos.Y].empty() && data[pos.Y][data[pos.Y].size() - 1] == '\n';
+	if (pos.X < 0 || pos.X > data[pos.Y].size() - endlPresent) {
 		return false;
 	}
 	return true;
@@ -310,12 +315,9 @@ std::string Document::getFilename() const {
 	return filename;
 }
 
-void Document::adjustCursorsRelativeToCursor(const int index) {
-	if (index < 0 || index >= cursors.size()) {
-		return;
-	}
+void Document::adjustCursors() {
 	for (int i = 0; i < cursors.size(); i++) {
-		if (i == index || isCursorValid(i)) {
+		if (isCursorValid(i)) {
 			continue;
 		}
 		auto cursorPos = cursors[i].position();
