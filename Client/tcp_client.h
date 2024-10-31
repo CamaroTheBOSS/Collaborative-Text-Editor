@@ -40,5 +40,5 @@ private:
 	std::queue<msg::Buffer> recvQueue;
 	std::mutex recvQueueLock;
 	std::atomic_bool connected;
-	Framer framer{4096};
+	Framer framer{32768}; //Max length of document is around 32k letters (longer messages are simply dropped)
 };

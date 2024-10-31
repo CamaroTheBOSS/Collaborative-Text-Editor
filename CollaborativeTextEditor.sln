@@ -4,18 +4,31 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.6.33829.357
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client", "Client\Client.vcxproj", "{C6B1BF4F-D67B-4E55-8406-844F408AFFA2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{35FFF3D9-A0DE-44F8-8C78-8C731A78FD27} = {35FFF3D9-A0DE-44F8-8C78-8C731A78FD27}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Document", "Document\Document.vcxproj", "{35FFF3D9-A0DE-44F8-8C78-8C731A78FD27}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test", "Test\Test.vcxproj", "{391DCE06-FCD7-44F2-A90E-632120D14F0D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{35FFF3D9-A0DE-44F8-8C78-8C731A78FD27} = {35FFF3D9-A0DE-44F8-8C78-8C731A78FD27}
+		{C6B1BF4F-D67B-4E55-8406-844F408AFFA2} = {C6B1BF4F-D67B-4E55-8406-844F408AFFA2}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Server", "Server\Server.vcxproj", "{17B3342D-55FF-40B6-917D-EAF43C7FE265}"
+	ProjectSection(ProjectDependencies) = postProject
+		{35FFF3D9-A0DE-44F8-8C78-8C731A78FD27} = {35FFF3D9-A0DE-44F8-8C78-8C731A78FD27}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ClientPrototype", "ClientPrototype\ClientPrototype.vcxproj", "{74050895-C47D-48D7-8485-2A7139F3297E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ServerPrototype", "ServerPrototype\ServerPrototype.vcxproj", "{50F361AF-D9EE-4DAE-B469-4FD246E68C46}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RandomClient", "RandomClient\RandomClient.vcxproj", "{BA147157-9D8B-43D7-8F7B-B78DB379D0E6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C6B1BF4F-D67B-4E55-8406-844F408AFFA2} = {C6B1BF4F-D67B-4E55-8406-844F408AFFA2}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
