@@ -15,17 +15,17 @@ int main() {
 	if (wsaError) {
 		std::cout << wsaError << " Error on WSA stratup\n";
 		WSACleanup();
-		return wsaError;
+		return 0;
 	}
 
 	Controller controller;
 	if (!controller.connect("192.168.1.10", 8081)) {
 		std::cout << "Connection to server failed!\n";
-		return -1;
+		return 0;
 	}
 	if (!controller.requestDocument(std::chrono::milliseconds(500), 3)) {
 		std::cout << "Requesting document from the server failed!\n";
-		return -1;
+		return 0;
 	}
 	controller.render();
 	while (controller.isConnected()) {
