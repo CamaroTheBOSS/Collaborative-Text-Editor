@@ -3,8 +3,10 @@
 #include "server.h"
 #include "logging.h"
 
-constexpr int msgBufferSize = 5;
-constexpr char notifyMsgBuffer[msgBufferSize] = { 0, 0, 0, 1, 0 }; // (0001 = length 1 and 0 is empty string)
+constexpr int msgBufferSize = 6;
+constexpr char notifyType = static_cast<char>(msg::Type::masterNotification);
+constexpr char version = 1;
+constexpr char notifyMsgBuffer[msgBufferSize] = { 0, 0, 0, 2, notifyType, version }; // (0002 = length)
 
 Server::Server(std::string ip, const int port) :
 	ip(ip),

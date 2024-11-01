@@ -40,6 +40,10 @@ namespace msg {
 		capacity = newCapacity;
 	}
 
+	bool Buffer::operator=(const Buffer& other) {
+		return other.data == data;
+	}
+
 	Buffer enrich(Buffer& buffer) {
 		Buffer newBuffer{ buffer.capacity + 4 };
 		serializeTo(newBuffer, 0, static_cast<unsigned int>(buffer.size), buffer);

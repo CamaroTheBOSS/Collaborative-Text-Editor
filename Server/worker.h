@@ -4,6 +4,7 @@
 #include <mutex>
 #include <vector>
 #include <memory>
+#include <unordered_map>
 
 #include "messages.h"
 #include "repository.h"
@@ -32,5 +33,5 @@ private:
 	std::thread thread;
 
 	Repository* repo;
-	Framer framer{ 4096 };
+	std::unordered_map<SOCKET, Framer> clientFramerMap;
 };

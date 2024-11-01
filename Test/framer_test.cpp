@@ -80,6 +80,54 @@ TEST(FramerTests, ExtractingIncompleteMessageTest) {
 	testMsgs(secondMsgs, { testStr, testStr });
 }
 
+TEST(FramerTests, ExtractingIncompleteMessageLastFourBytesTest) {
+	Framer framer{ 1024 };
+	int nMessages = 2;
+	auto msg = prepTestMsg();
+	for (int i = 0; i < 4; i++) {
+		msg::Buffer firstBigBuffer{(nMessages + 1) * 16 - 1 - i};
+		msg::Buffer secondBigBuffer{64};
+		for (int j = 0; j < nMessages; j++) {
+			firstBigBuffer.add(&msg);
+		}
+		int anchor = firstBigBuffer.capacity - firstBigBuffer.size;
+		firstBigBuffer.add(&msg, 0, anchor);
+		secondBigBuffer.add(&msg, anchor, msg.size - anchor);
+		msg::serializeTo(secondBigBuffer, msg.size - anchor, msg, msg);
+		auto firstMsgs = extractStrings(framer, firstBigBuffer);
+		auto secondMsgs = extractStrings(framer, secondBigBuffer);
+		testMsgs(firstMsgs, std::vector<std::string>(nMessages, testStr));
+		testMsgs(secondMsgs, std::vector<std::string>(3, testStr));
+	}
+	// there was a bug where in this specific test case neededSymbols were read wrongly what was broking whole Framer
+}
+
+TEST(FramerTests, ExtractingIncompleteMessageLastFourBytesWithFinishingInSeparateBufferTest) {
+	Framer framer{ 1024 };
+	int nMessages = 2;
+	auto msg = prepTestMsg();
+	for (int i = 0; i < 4; i++) {
+		msg::Buffer firstBigBuffer{(nMessages + 1) * 16 - 1 - i};
+		msg::Buffer secondBigBuffer{64};
+		msg::Buffer thirdBigBuffer{64};
+		for (int j = 0; j < nMessages; j++) {
+			firstBigBuffer.add(&msg);
+		}
+		int anchor = firstBigBuffer.capacity - firstBigBuffer.size;
+		firstBigBuffer.add(&msg, 0, anchor);
+		secondBigBuffer.add(&msg, anchor, msg.size - anchor);
+		msg::serializeTo(thirdBigBuffer, 0, msg, msg);
+		auto firstMsgs = extractStrings(framer, firstBigBuffer);
+		auto secondMsgs = extractStrings(framer, secondBigBuffer);
+		auto thirdMsgs = extractStrings(framer, thirdBigBuffer);
+		testMsgs(firstMsgs, std::vector<std::string>(nMessages, testStr));
+		testMsgs(secondMsgs, std::vector<std::string>(1, testStr));
+		testMsgs(thirdMsgs, std::vector<std::string>(2, testStr));
+	}
+	// there was a bug where in this specific test case neededSymbols were read wrongly what was broking whole Framer
+}
+
+
 TEST(FramerTests, ExtractingMessageWithIncompleteLengthTest) {
 	Framer framer{ 1024 };
 	int nMessages = 5;
@@ -97,10 +145,9 @@ TEST(FramerTests, ExtractingMessageWithIncompleteLengthTest) {
 		msg::serializeTo(secondBigBuffer, largeMsg.size - anchor, msg, msg);
 		auto firstMsgs = extractStrings(framer, firstBigBuffer);
 		auto secondMsgs = extractStrings(framer, secondBigBuffer);
-		testMsgs(firstMsgs, { testStr, testStr, testStr, testStr, testStr });
+		testMsgs(firstMsgs, std::vector<std::string>(nMessages, testStr));
 		testMsgs(secondMsgs, { largeTestStr, testStr, testStr });
 	}
-	
 }
 
 TEST(FramerTests, ContinousExtractionTest) {

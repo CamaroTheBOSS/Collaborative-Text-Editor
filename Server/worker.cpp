@@ -4,6 +4,8 @@
 #include "worker.h"
 #include "logging.h"
 
+constexpr int defaultBuffSize = 128;
+
 Worker::Worker(const std::string& ip, const int port, Repository* repo):
     repo(repo) {
     std::scoped_lock lock{connSetLock};
@@ -70,10 +72,11 @@ void Worker::handleConnections() {
 }
 
 std::vector<msg::Buffer> Worker::recvMsg(const SOCKET client) {
-    msg::Buffer recvBuff{128};
+    msg::Buffer recvBuff{defaultBuffSize};
     recvBuff.size = recv(client, recvBuff.get(), recvBuff.capacity, 0);
     if (recvBuff.size > 0) {
-        auto msgBuffers = framer.extractMessages(recvBuff);
+        auto [it, newOne] = clientFramerMap.try_emplace(client, Framer{ defaultBuffSize });
+        auto msgBuffers = it->second.extractMessages(recvBuff);
         if (!msgBuffers.empty()) {
             logger.logDebug("Received", msgBuffers.size(), "messages from client", client);
         }

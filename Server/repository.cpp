@@ -4,13 +4,12 @@
 #include "logging.h"
 
 Response Repository::process(SOCKET client, msg::Buffer& buffer) {
-	if (buffer.size == 1) {
-		return masterNotification(client, buffer);
-	}
 	msg::Type type;
 	msg::OneByteInt version;
 	msg::parse(buffer, 0, type, version);
 	switch (type) {
+	case msg::Type::masterNotification:
+		return masterNotification(client, buffer);
 	case msg::Type::sync:
 		return connectUserToDoc(client, buffer);
 	case msg::Type::disconnect:

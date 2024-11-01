@@ -15,6 +15,7 @@ namespace msg {
 	using OneByteInt = unsigned char;
 	enum class Type {
 		// Commands
+		masterNotification,
 		registration,
 		login,
 		create,
@@ -97,6 +98,7 @@ namespace msg {
 		char* get() const;
 		bool empty() const;
 		void reserve(const int capacity);
+		bool operator=(const Buffer& other);
 
 		std::unique_ptr<char[]> data;
 		int size;
