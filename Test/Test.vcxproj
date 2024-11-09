@@ -37,6 +37,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="document_test.cpp" />
+    <ClCompile Include="text_container_test.cpp" />
     <ClCompile Include="framer_test.cpp" />
     <ClCompile Include="logger_test.cpp" />
     <ClCompile Include="message_test.cpp" />

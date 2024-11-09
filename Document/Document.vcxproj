@@ -130,12 +130,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="document.h" />
+    <ClInclude Include="text_container.h" />
     <ClInclude Include="framer.h" />
     <ClInclude Include="logger.h" />
     <ClInclude Include="messages.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="document.cpp" />
+    <ClCompile Include="text_container.cpp" />
     <ClCompile Include="framer.cpp" />
     <ClCompile Include="logger.cpp" />
     <ClCompile Include="messages.cpp" />
