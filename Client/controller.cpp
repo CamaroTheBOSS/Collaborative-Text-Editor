@@ -48,6 +48,9 @@ bool Controller::processChar(const KeyPack& key) {
         return terminal.setClipboardData(repo.getDoc().getSelectedText());
     case CTRL_V:
         return client.sendMsg(msg::Type::write, version, std::string{""}, terminal.getClipboardData());
+    case CTRL_X:
+        terminal.setClipboardData(repo.getDoc().getSelectedText());
+        return client.sendMsg(msg::Type::erase, version, std::string{""}, static_cast<unsigned int>(1));
     case ESC:
         return disconnect();
     }
