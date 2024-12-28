@@ -411,6 +411,26 @@ std::string Document::getText() const {
 	return text;
 }
 
+std::string Document::getSelectedText() const {
+	auto& cursor = cursors[myCursorIdx];
+	auto cursorPos = cursor.position();
+	auto& anchor = cursors[myCursorIdx].selectAnchor;
+	if (!anchor.has_value() || equalPos(cursorPos, anchor.value())) {
+		return "";
+	}
+
+	auto [smaller, bigger] = getAscendingOrder(cursorPos, anchor.value());
+	if (smaller->Y == bigger->Y) {
+		return data[smaller->Y].substr(smaller->X, bigger->X - smaller->X);
+	}
+	std::string text = data[smaller->Y].substr(smaller->X, data[smaller->Y].size() - smaller->X);
+	for (int row = smaller->Y + 1; row < bigger->Y; row++ ) {
+		text += data[row];
+	}
+	text += data[smaller->Y].substr(0, bigger->X);
+	return text;
+}
+
 void Document::setText(const std::string& txt) {
 	std::vector<std::string> textData;
 	int offset = 0;

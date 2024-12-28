@@ -68,6 +68,7 @@ public:
 	const std::vector<std::string>& get();
 	std::string getLine(const int lineIndex) const;
 	std::string getText() const;
+	std::string getSelectedText() const;
 	void setText(const std::string& txt);
 	std::string getFilename() const;
 

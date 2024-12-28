@@ -32,6 +32,8 @@ public:
 	KeyPack readChar() const;
 	void render(Document& doc);
 	unsigned int getDocBufferWidth() const;
+	std::string getClipboardData() const;
+	bool setClipboardData(const std::string& txt) const;
 private:
 	void scrollDocBuffer(const Cursor& tCursor);
 

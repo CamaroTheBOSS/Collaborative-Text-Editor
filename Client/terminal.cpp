@@ -3,6 +3,7 @@
 #include <array>
 
 #include "terminal.h"
+#include "logging.h"
 
 constexpr int rightMargin = 5;
 
@@ -73,4 +74,55 @@ void Terminal::scrollDocBuffer(const Cursor& tCursor) {
 
 unsigned int Terminal::getDocBufferWidth() const {
     return docBuffer.width();
+}
+
+std::string Terminal::getClipboardData() const {
+    if (!OpenClipboard(nullptr)) {
+        logger.logError("Error during opening clipboard for read! Error code: ", GetLastError());
+        return "";
+    }
+    HANDLE hData = GetClipboardData(CF_TEXT);
+    if (hData == nullptr) {
+        logger.logError("Error during getting handler for clipboard object! Error code: ", GetLastError());
+        return "";
+    }
+    char* txtPointer = static_cast<char*>(GlobalLock(hData));
+    if (txtPointer == nullptr) {
+        logger.logError("Error during reading data from clipboard! Error code: ", GetLastError());
+        return "";
+    }
+    std::string txt(txtPointer);
+    GlobalUnlock(hData);
+    CloseClipboard();
+    return txt;
+}
+
+bool Terminal::setClipboardData(const std::string& txt) const {
+    if (txt.empty()) {
+        return false;
+    }
+    HGLOBAL spaceForData = GlobalAlloc(GMEM_MOVEABLE, txt.size() + 1);
+    auto allocMemoryPointer = GlobalLock(spaceForData);
+    if (allocMemoryPointer == nullptr) {
+        logger.logError("Error during getting handler for writing data to clipboard! Error code: ", GetLastError());
+        return false;
+    }
+    memcpy(allocMemoryPointer, txt.data(), txt.size() + 1);
+    GlobalUnlock(spaceForData);
+
+    if (!OpenClipboard(nullptr)) {
+        logger.logError("Error during opening clipboard for write! Error code: ", GetLastError());
+        return false;
+    }
+    if (!EmptyClipboard()) {
+        logger.logError("Error during emptying clipboard! Error code: ", GetLastError());
+        return false;
+    }
+    HANDLE hData = SetClipboardData(CF_TEXT, spaceForData);
+    if (hData == nullptr) {
+        logger.logError("Error during setting clipboard data! Error code: ", GetLastError());
+        return "";
+    }
+    CloseClipboard();
+    return true;
 }
