@@ -18,16 +18,16 @@ bool Controller::isConnected() const {
     return client.isConnected();
 }
 
-int Controller::readChar() const {
+KeyPack Controller::readChar() const {
     return terminal.readChar();
 }
 
-bool Controller::processChar(const int key) {
+bool Controller::processChar(const KeyPack& key) {
     
-    if (key >= 32 && key <= 127) {
-        return client.sendMsg(msg::Type::write, version, std::string{""}, std::string(1, key));
+    if (key.keyCode >= 32 && key.keyCode <= 127) {
+        return client.sendMsg(msg::Type::write, version, std::string{""}, std::string(1, key.keyCode));
     }
-    switch (key) {
+    switch (key.keyCode) {
     case ENTER:
         return client.sendMsg(msg::Type::write, version, std::string{""}, std::string{'\n'});
     case TABULAR:
@@ -35,13 +35,13 @@ bool Controller::processChar(const int key) {
     case BACKSPACE:
         return client.sendMsg(msg::Type::erase, version, std::string{""}, static_cast<unsigned int>(1));
     case ARROW_LEFT:
-        return client.sendMsg(msg::Type::moveHorizontal, version, std::string{""}, msg::MoveSide::left);
+        return client.sendMsg(msg::Type::moveHorizontal, version, std::string{""}, msg::MoveSide::left, key.shiftPressed);
     case ARROW_RIGHT:
-        return client.sendMsg(msg::Type::moveHorizontal, version, std::string{""}, msg::MoveSide::right);
+        return client.sendMsg(msg::Type::moveHorizontal, version, std::string{""}, msg::MoveSide::right, key.shiftPressed);
     case ARROW_UP:
-        return client.sendMsg(msg::Type::moveVertical, version, std::string{""}, msg::MoveSide::up, terminal.getDocBufferWidth());
+        return client.sendMsg(msg::Type::moveVertical, version, std::string{""}, msg::MoveSide::up, terminal.getDocBufferWidth(), key.shiftPressed);
     case ARROW_DOWN:
-        return client.sendMsg(msg::Type::moveVertical, version, std::string{""}, msg::MoveSide::down, terminal.getDocBufferWidth());
+        return client.sendMsg(msg::Type::moveVertical, version, std::string{""}, msg::MoveSide::down, terminal.getDocBufferWidth(), key.shiftPressed);
     case ESC:
         return disconnect();
     }

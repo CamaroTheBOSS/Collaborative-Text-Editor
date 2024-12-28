@@ -29,7 +29,7 @@ int main() {
 	}
 	controller.render();
 	while (controller.isConnected()) {
-		int key = controller.readChar();
+		KeyPack key = controller.readChar();
 		controller.processChar(key);
 		bool render = controller.checkIncomingMessages();
 		if (render) {

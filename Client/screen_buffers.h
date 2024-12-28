@@ -5,11 +5,13 @@
 using TextLines = std::vector<std::string>;
 
 struct Cursor {
-    Cursor(const COORD& pos, char pointedChar) :
+    Cursor(const COORD& pos, const char pointedChar, const int indexInDoc) :
         pos(pos),
-        pointedChar(pointedChar) {}
+        pointedChar(pointedChar),
+        indexInDoc(indexInDoc) {}
     COORD pos;
     char pointedChar;
+    int indexInDoc;
 };
 
 class ScrollableScreenBuffer {
@@ -17,6 +19,8 @@ public:
     ScrollableScreenBuffer();
     ScrollableScreenBuffer(const SMALL_RECT& screen);
     COORD getStartPos() const;
+    COORD getEndPos() const;
+    COORD getTerminalCursorPos(Document& doc, const COORD& docCursor) const;
     Cursor getTerminalCursor(Document& doc, const int cursor) const;
     Cursor getMyTerminalCursor(Document& doc) const;
     std::vector<Cursor> getTerminalCursors(Document& doc) const;

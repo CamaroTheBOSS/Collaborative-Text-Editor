@@ -81,9 +81,9 @@ bool Repository::erase(msg::Buffer& buffer) {
 }
 
 bool Repository::move(msg::Buffer& buffer) {
-	msg::MoveHorizontalResponse msg;
-	parse(buffer, 1, msg.version, msg.user, msg.X, msg.Y);
-	doc.setCursorPos(msg.user, COORD{ static_cast<SHORT>(msg.X), static_cast<SHORT>(msg.Y) });
+	msg::MoveResponse msg;
+	parse(buffer, 1, msg.version, msg.user, msg.X, msg.Y, msg.withSelect);
+	doc.moveTo(msg.user, COORD{ static_cast<SHORT>(msg.X), static_cast<SHORT>(msg.Y) }, msg.withSelect);
 	logger.logInfo("User", msg.user, "moved his cursor to", msg.X, ",", msg.Y);
 	return true;
 }

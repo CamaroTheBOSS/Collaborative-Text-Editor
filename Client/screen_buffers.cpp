@@ -40,15 +40,18 @@ COORD ScrollableScreenBuffer::getStartPos() const {
 	return COORD{ static_cast<SHORT>(left), static_cast<SHORT>(top) };
 }
 
-Cursor ScrollableScreenBuffer::getTerminalCursor(Document& doc, const int cursor) const {
+COORD ScrollableScreenBuffer::getEndPos() const {
+	return COORD{ static_cast<SHORT>(right), static_cast<SHORT>(bottom) };
+}
+
+COORD ScrollableScreenBuffer::getTerminalCursorPos(Document& doc, const COORD& docCursor) const {
 	const auto& data = doc.get();
-	COORD docCursor = doc.getCursorPos(cursor);
 	if (docCursor.X < 0) {
-		return Cursor(docCursor, '\0');
+		return COORD{0, 0};
 	}
 
 	int screenWidth = width();
-	COORD terminalCursor{0, 0};
+	COORD terminalCursor{ 0, 0 };
 	for (int i = 0; i <= docCursor.Y; i++) {
 		if (i >= data.size() || data[i].empty()) {
 			continue;
@@ -62,7 +65,12 @@ Cursor ScrollableScreenBuffer::getTerminalCursor(Document& doc, const int cursor
 	}
 	terminalCursor.Y += top - scroll;
 	terminalCursor.X += left + (docCursor.X % screenWidth);
-	return Cursor(terminalCursor, doc.getCharPointedByCursor(cursor));
+	return terminalCursor;
+}
+
+Cursor ScrollableScreenBuffer::getTerminalCursor(Document& doc, const int cursor) const {
+	auto terminalCursor = getTerminalCursorPos(doc, doc.getCursorPos(cursor));
+	return Cursor(terminalCursor, doc.getCharPointedByCursor(cursor), cursor);
 }
 
 Cursor ScrollableScreenBuffer::getMyTerminalCursor(Document& doc) const {
@@ -109,7 +117,8 @@ TextLines ScrollableScreenBuffer::getTextInBuffer(Document& doc) const {
 		}
 	}
 
-	for (int i = 0; i <= screenHeight - (int)textLines.size(); i++) {
+	int textLinesSize = textLines.size();
+	for (int i = 0; i <= screenHeight - textLinesSize; i++) {
 		std::string emptyLine = std::string(screenWidth, ' ') + "\n";
 		textLines.emplace_back(std::move(emptyLine));
 	}

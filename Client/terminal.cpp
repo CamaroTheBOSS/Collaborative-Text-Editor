@@ -42,16 +42,16 @@ Terminal::Terminal() {
     docBuffer = ScrollableScreenBuffer{ screenInfo.srWindow };
 }
 
-int Terminal::readChar() const {
+KeyPack Terminal::readChar() const {
 	if (_kbhit()) {
         int keyCode = _getch();
         if (keyCode == 0 || keyCode == 224) {
             keyCode += _getch() + 1000;
         }
         bool shiftPressed = ((GetKeyState(VK_SHIFT) & 0x8000) == 0x8000);
-        return keyCode;
+        return { keyCode, shiftPressed };
 	}
-	return '\0';
+    return { '\0', false };
 }
 
 void Terminal::render(Document& doc) {

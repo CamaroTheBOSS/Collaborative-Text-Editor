@@ -21,10 +21,15 @@
 #define ENTER 13
 #define ESC 27
 
+struct KeyPack {
+	int keyCode;
+	bool shiftPressed;
+};
+
 class Terminal {
 public:
 	Terminal();
-	int readChar() const;
+	KeyPack readChar() const;
 	void render(Document& doc);
 	unsigned int getDocBufferWidth() const;
 private:

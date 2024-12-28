@@ -113,16 +113,16 @@ Response Repository::erase(SOCKET client, msg::Buffer& buffer) {
 
 Response Repository::moveHorizontal(SOCKET client, msg::Buffer& buffer) {
 	auto msg = msg::MoveHorizontal{};
-	msg::parse(buffer, 0, msg.type, msg.version, msg.token, msg.side);
+	msg::parse(buffer, 0, msg.type, msg.version, msg.token, msg.side, msg.withSelect);
 	int cursor = findClient(client);
 	std::scoped_lock lock{docLock};
 	COORD newCursorPos = doc.getCursorPos(cursor);
 	if (msg.side == msg::MoveSide::left) {
-		newCursorPos = doc.moveCursorLeft(cursor);
+		newCursorPos = doc.moveCursorLeft(cursor, msg.withSelect);
 		logger.logInfo("cursor", cursor, "moved left");
 	}
 	else if (msg.side == msg::MoveSide::right) {
-		newCursorPos = doc.moveCursorRight(cursor);
+		newCursorPos = doc.moveCursorRight(cursor, msg.withSelect);
 		logger.logInfo("cursor", cursor, "moved right");
 	}
 	else {
@@ -134,22 +134,22 @@ Response Repository::moveHorizontal(SOCKET client, msg::Buffer& buffer) {
 	auto cursorBuff = static_cast<msg::OneByteInt>(cursor);
 	unsigned int cursorX = newCursorPos.X;
 	unsigned int cursorY = newCursorPos.Y;
-	msg::serializeTo(buffer, 0, msg.type, msg.version, cursorBuff, cursorX, cursorY);
+	msg::serializeTo(buffer, 0, msg.type, msg.version, cursorBuff, cursorX, cursorY, msg.withSelect);
 	return Response{ buffer, connectedClients, msg::Type::moveHorizontal };
 }
 
 Response Repository::moveVertical(SOCKET client, msg::Buffer& buffer) {
 	auto msg = msg::MoveVertical{};
-	msg::parse(buffer, 0, msg.type, msg.version, msg.token, msg.side, msg.clientWidth);
+	msg::parse(buffer, 0, msg.type, msg.version, msg.token, msg.side, msg.clientWidth, msg.withSelect);
 	int cursor = findClient(client);
 	std::scoped_lock lock{docLock};
 	COORD newCursorPos = doc.getCursorPos(cursor);
 	if (msg.side == msg::MoveSide::up) {
-		newCursorPos = doc.moveCursorUp(cursor, msg.clientWidth);
+		newCursorPos = doc.moveCursorUp(cursor, msg.clientWidth, msg.withSelect);
 		logger.logInfo("cursor", cursor, "moved up");
 	}
 	else if (msg.side == msg::MoveSide::down) {
-		newCursorPos = doc.moveCursorDown(cursor, msg.clientWidth);
+		newCursorPos = doc.moveCursorDown(cursor, msg.clientWidth, msg.withSelect);
 		logger.logInfo("cursor", cursor, "moved down");
 	}
 	else {
@@ -161,6 +161,6 @@ Response Repository::moveVertical(SOCKET client, msg::Buffer& buffer) {
 	auto cursorBuff = static_cast<msg::OneByteInt>(cursor);
 	unsigned int cursorX = newCursorPos.X;
 	unsigned int cursorY = newCursorPos.Y;
-	msg::serializeTo(buffer, 0, msg.type, msg.version, cursorBuff, cursorX, cursorY);
+	msg::serializeTo(buffer, 0, msg.type, msg.version, cursorBuff, cursorX, cursorY, msg.withSelect);
 	return Response{ buffer, connectedClients, msg::Type::moveVertical };
 }

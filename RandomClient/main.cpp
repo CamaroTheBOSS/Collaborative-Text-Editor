@@ -66,9 +66,9 @@ int main() {
 	}
 	controller.render();
 	while (controller.isConnected()) {
-		int key = controller.readChar();
-		if (key == '\0') {
-			key = getRandomKey();
+		KeyPack key = controller.readChar();
+		if (key.keyCode == '\0') {
+			key.keyCode = getRandomKey();
 		}
 		controller.processChar(key);
 		bool render = controller.checkIncomingMessages();

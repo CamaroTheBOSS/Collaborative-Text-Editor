@@ -198,14 +198,7 @@ namespace msg {
 		OneByteInt version;
 		std::string token;
 		MoveSide side;
-	};
-
-	struct MoveHorizontalResponse {
-		Type type = Type::moveHorizontal;
-		OneByteInt version;
-		OneByteInt user;
-		unsigned int X;
-		unsigned int Y;
+		OneByteInt withSelect;
 	};
 
 	struct MoveVertical {
@@ -214,14 +207,16 @@ namespace msg {
 		std::string token;
 		MoveSide side;
 		unsigned int clientWidth;
+		OneByteInt withSelect;
 	};
 
-	struct MoveVerticalResponse {
+	struct MoveResponse {
 		Type type = Type::moveVertical;
 		OneByteInt version;
 		OneByteInt user;
 		unsigned int X;
 		unsigned int Y;
+		OneByteInt withSelect;
 	};
 
 }
