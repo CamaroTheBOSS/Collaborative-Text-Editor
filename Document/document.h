@@ -49,13 +49,14 @@ public:
 	COORD moveCursorRight(const int cursor, const bool withSelect);
 	COORD moveCursorUp(const int cursor, const int bufferWidth, const bool withSelect);
 	COORD moveCursorDown(const int cursor, const int bufferWidth, const bool withSelect);
-	COORD moveTo(const int cursor, const COORD& newPos, const bool withSelect);
+	COORD moveTo(const int cursor, const COORD& newPos, const bool withSelect, const COORD& anchor);
 
 	bool isCursorValid(const int cursor);
 	bool addCursor();
 	bool eraseCursor(const int cursor);
 	bool setCursorPos(const int cursor, const COORD newPos);
 	bool setCursorOffset(const int cursor, const int newOffset);
+	bool setCursorAnchor(const int cursor, const COORD newAnchor);
 	COORD getCursorPos(const int cursor) const;
 	std::optional<COORD> getCursorSelectionAnchor(const int cursor) const;
 	int getMyCursor() const;

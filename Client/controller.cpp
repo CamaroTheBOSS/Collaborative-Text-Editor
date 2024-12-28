@@ -42,6 +42,8 @@ bool Controller::processChar(const KeyPack& key) {
         return client.sendMsg(msg::Type::moveVertical, version, std::string{""}, msg::MoveSide::up, terminal.getDocBufferWidth(), key.shiftPressed);
     case ARROW_DOWN:
         return client.sendMsg(msg::Type::moveVertical, version, std::string{""}, msg::MoveSide::down, terminal.getDocBufferWidth(), key.shiftPressed);
+    case CTRL_A:
+        return client.sendMsg(msg::Type::selectAll, version, std::string{""});
     case ESC:
         return disconnect();
     }

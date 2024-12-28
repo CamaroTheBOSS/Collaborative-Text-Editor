@@ -31,6 +31,7 @@ private:
 	Response erase(SOCKET client, msg::Buffer& buffer);
 	Response moveHorizontal(SOCKET client, msg::Buffer& buffer);
 	Response moveVertical(SOCKET client, msg::Buffer& buffer);
+	Response moveSelectAll(SOCKET client, msg::Buffer& buffer);
 	int findClient(SOCKET client);
 
 	// TODO BETTER SYSTEM

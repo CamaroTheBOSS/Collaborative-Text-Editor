@@ -31,7 +31,8 @@ namespace msg {
 		moveHorizontal,
 		sync,
 		connect,
-		disconnect
+		disconnect,
+		selectAll,
 	};
 
 	enum class MoveSide {
@@ -210,6 +211,12 @@ namespace msg {
 		OneByteInt withSelect;
 	};
 
+	struct MoveSelectAll {
+		Type type = Type::selectAll;
+		OneByteInt version;
+		std::string token;
+	};
+
 	struct MoveResponse {
 		Type type = Type::moveVertical;
 		OneByteInt version;
@@ -217,6 +224,7 @@ namespace msg {
 		unsigned int X;
 		unsigned int Y;
 		OneByteInt withSelect;
+		unsigned int anchorX;
+		unsigned int anchorY;
 	};
-
 }

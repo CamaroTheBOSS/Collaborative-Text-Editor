@@ -25,6 +25,7 @@ bool Repository::processMsg(msg::Buffer& buffer) {
 		return write(buffer);
 	case msg::Type::erase:
 		return erase(buffer);
+	case msg::Type::selectAll:
 	case msg::Type::moveHorizontal:
 	case msg::Type::moveVertical:
 		return move(buffer);
@@ -82,8 +83,12 @@ bool Repository::erase(msg::Buffer& buffer) {
 
 bool Repository::move(msg::Buffer& buffer) {
 	msg::MoveResponse msg;
-	parse(buffer, 1, msg.version, msg.user, msg.X, msg.Y, msg.withSelect);
-	doc.moveTo(msg.user, COORD{ static_cast<SHORT>(msg.X), static_cast<SHORT>(msg.Y) }, msg.withSelect);
+	parse(buffer, 1, msg.version, msg.user, msg.X, msg.Y, msg.withSelect, msg.anchorX, msg.anchorY);
+	doc.moveTo(msg.user, 
+		COORD{ static_cast<SHORT>(msg.X), static_cast<SHORT>(msg.Y) }, 
+		msg.withSelect, 
+		COORD{ static_cast<SHORT>(msg.anchorX), static_cast<SHORT>(msg.anchorY) }
+	);
 	logger.logInfo("User", msg.user, "moved his cursor to", msg.X, ",", msg.Y);
 	return true;
 }

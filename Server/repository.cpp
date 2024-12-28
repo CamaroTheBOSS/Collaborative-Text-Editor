@@ -22,6 +22,8 @@ Response Repository::process(SOCKET client, msg::Buffer& buffer) {
 		return moveHorizontal(client, buffer);
 	case msg::Type::moveVertical:
 		return moveVertical(client, buffer);
+	case msg::Type::selectAll:
+		return moveSelectAll(client, buffer);
 	}
 	assert(false && "Unrecognized msg type. Aborting...");
 	return Response{ buffer, {}, msg::Type::error };
@@ -134,7 +136,10 @@ Response Repository::moveHorizontal(SOCKET client, msg::Buffer& buffer) {
 	auto cursorBuff = static_cast<msg::OneByteInt>(cursor);
 	unsigned int cursorX = newCursorPos.X;
 	unsigned int cursorY = newCursorPos.Y;
-	msg::serializeTo(buffer, 0, msg.type, msg.version, cursorBuff, cursorX, cursorY, msg.withSelect);
+	auto anchor = doc.getCursorSelectionAnchor(cursor);
+	unsigned int anchorX = anchor.value_or(COORD{ 0, 0 }).X;
+	unsigned int anchorY = anchor.value_or(COORD{ 0, 0 }).Y;
+	msg::serializeTo(buffer, 0, msg.type, msg.version, cursorBuff, cursorX, cursorY, msg.withSelect, anchorX, anchorY);
 	return Response{ buffer, connectedClients, msg::Type::moveHorizontal };
 }
 
@@ -161,6 +166,32 @@ Response Repository::moveVertical(SOCKET client, msg::Buffer& buffer) {
 	auto cursorBuff = static_cast<msg::OneByteInt>(cursor);
 	unsigned int cursorX = newCursorPos.X;
 	unsigned int cursorY = newCursorPos.Y;
-	msg::serializeTo(buffer, 0, msg.type, msg.version, cursorBuff, cursorX, cursorY, msg.withSelect);
+	auto anchor = doc.getCursorSelectionAnchor(cursor);
+	unsigned int anchorX = anchor.value_or(COORD{0, 0}).X;
+	unsigned int anchorY = anchor.value_or(COORD{ 0, 0 }).Y;
+	msg::serializeTo(buffer, 0, msg.type, msg.version, cursorBuff, cursorX, cursorY, msg.withSelect, anchorX, anchorY);
 	return Response{ buffer, connectedClients, msg::Type::moveVertical };
+}
+
+Response Repository::moveSelectAll(SOCKET client, msg::Buffer& buffer) {
+	auto msg = msg::MoveSelectAll{};
+	msg::parse(buffer, 0, msg.type, msg.version, msg.token);
+	int cursor = findClient(client);
+	std::scoped_lock lock{docLock};
+	auto& data = doc.get();
+	COORD newCursorPos = COORD{ static_cast<SHORT>(data[data.size() - 1].size()), static_cast<SHORT>(data.size() - 1) };
+	doc.setCursorPos(cursor, newCursorPos);
+	doc.setCursorOffset(cursor, newCursorPos.X);
+	bool anchorSet = doc.setCursorAnchor(cursor, COORD{ 0, 0 });
+	logger.logInfo("cursor", cursor, "selection all", (anchorSet ? "successful" : "unsuccessful"));
+	buffer.clear();
+	buffer.reserve(30);
+	auto cursorBuff = static_cast<msg::OneByteInt>(cursor);
+	unsigned int cursorX = newCursorPos.X;
+	unsigned int cursorY = newCursorPos.Y;
+	auto anchor = doc.getCursorSelectionAnchor(cursor);
+	unsigned int anchorX = anchor.value_or(COORD{ 0, 0 }).X;
+	unsigned int anchorY = anchor.value_or(COORD{ 0, 0 }).Y;
+	msg::serializeTo(buffer, 0, msg.type, msg.version, cursorBuff, cursorX, cursorY, anchorSet, anchorX, anchorY);
+	return Response{ buffer, connectedClients, msg::Type::selectAll };
 }

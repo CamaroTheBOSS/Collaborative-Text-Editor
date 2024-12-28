@@ -274,18 +274,18 @@ COORD Document::moveCursorDown(const int index, const int bufferWidth, const boo
 	return cursorPos;
 }
 
-COORD Document::moveTo(const int cursor, const COORD& newPos, const bool withSelect) {
+COORD Document::moveTo(const int cursor, const COORD& newPos, const bool withSelect, const COORD& anchor) {
 	if (cursor < 0 || cursor >= cursors.size() || newPos.Y >= data.size() || newPos.X > data[newPos.Y].size()) {
 		return COORD{-1, -1};
 	}
 	auto& cursorObj = cursors[cursor];
 	if (withSelect && !cursorObj.selectAnchor.has_value()) {
-		cursorObj.selectAnchor = cursorObj.position();
+		cursorObj.selectAnchor = anchor;
 	}
 	else if (!withSelect){
 		cursorObj.selectAnchor.reset();
 	}
-	cursors[cursor].setPosition(std::move(newPos));
+	cursors[cursor].setPosition(newPos);
 	return cursorObj.position();
 }
 
@@ -333,6 +333,14 @@ bool Document::setCursorOffset(const int index, const int newOffset) {
 		return false;
 	}
 	cursors[index].setOffset(newOffset);
+	return true;
+}
+
+bool Document::setCursorAnchor(const int index, const COORD newAnchor) {
+	if (index < 0 || index >= cursors.size() || newAnchor.Y >= data.size() || newAnchor.X > data[newAnchor.Y].size()) {
+		return false;
+	}
+	cursors[index].selectAnchor = newAnchor;
 	return true;
 }
 
