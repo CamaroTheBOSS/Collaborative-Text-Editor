@@ -34,10 +34,14 @@ public:
 	unsigned int getDocBufferWidth() const;
 	std::string getClipboardData() const;
 	bool setClipboardData(const std::string& txt) const;
+	bool resizeScreenBufferIfNeeded();
 private:
 	void scrollDocBuffer(const Cursor& tCursor);
 
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	CONSOLE_SCREEN_BUFFER_INFO screenInfo;
+	CONSOLE_CURSOR_INFO cursorInfo;
+
 	Renderer renderer;
 	ScrollableScreenBuffer docBuffer;
 };

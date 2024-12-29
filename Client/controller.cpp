@@ -66,6 +66,7 @@ bool Controller::checkIncomingMessages() {
         }
         needRender += repo.processMsg(msgBuffer);
     }
+    needRender += terminal.resizeScreenBufferIfNeeded();
     return needRender;
 }
 

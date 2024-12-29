@@ -7,6 +7,11 @@
 
 constexpr int rightMargin = 5;
 
+bool screenBuffersEqual(const SMALL_RECT& first, const SMALL_RECT& second) {
+    return first.Top == second.Top && first.Bottom == second.Bottom &&
+        first.Left == second.Left && first.Right == second.Right;
+}
+
 Terminal::Terminal() {
     DWORD currMode;
     DWORD features = (
@@ -23,24 +28,37 @@ Terminal::Terminal() {
     GetConsoleMode(stdInput, &currMode);
     SetConsoleMode(stdInput, currMode & ~features);
 
-    CONSOLE_CURSOR_INFO cursorInfo;
     if (GetConsoleCursorInfo(hConsole, &cursorInfo)) {
         cursorInfo.bVisible = 0;
         SetConsoleCursorInfo(hConsole, &cursorInfo);
     }
+    resizeScreenBufferIfNeeded();
+}
 
-    CONSOLE_SCREEN_BUFFER_INFO screenInfo;
-    GetConsoleScreenBufferInfo(hConsole, &screenInfo);
+bool Terminal::resizeScreenBufferIfNeeded() {
+    CONSOLE_SCREEN_BUFFER_INFO newScreenInfo;
+    GetConsoleScreenBufferInfo(hConsole, &newScreenInfo);
+    if (screenBuffersEqual(screenInfo.srWindow, newScreenInfo.srWindow)) {
+        return false;
+    }
     COORD size = {
-            screenInfo.srWindow.Right - screenInfo.srWindow.Left + 1,
-            screenInfo.srWindow.Bottom - screenInfo.srWindow.Top + 1
+            newScreenInfo.srWindow.Right - newScreenInfo.srWindow.Left + 1,
+            newScreenInfo.srWindow.Bottom - newScreenInfo.srWindow.Top + 1
     };
     SetConsoleScreenBufferSize(hConsole, size);
-    screenInfo.srWindow.Top += 3;
-    screenInfo.srWindow.Bottom -= 3;
-    screenInfo.srWindow.Right -= 10;
-    screenInfo.srWindow.Left += 10;
-    docBuffer = ScrollableScreenBuffer{ screenInfo.srWindow };
+    SetConsoleCursorInfo(hConsole, &cursorInfo);
+    docBuffer.top = newScreenInfo.srWindow.Top + 3;
+    docBuffer.bottom = newScreenInfo.srWindow.Bottom - 3;
+    docBuffer.right = newScreenInfo.srWindow.Right - 10;
+    docBuffer.left = newScreenInfo.srWindow.Left + 10;
+    screenInfo = std::move(newScreenInfo);
+
+    //system("cls") breaks winsock2 recv somehow? Need to use approach with printf;
+    printf(
+        "\033[2J"       // clear the screen
+        "\033[1;1H"     // move cursor home
+    );
+    return true;
 }
 
 KeyPack Terminal::readChar() const {
