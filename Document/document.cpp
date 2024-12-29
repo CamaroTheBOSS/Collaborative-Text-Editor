@@ -282,10 +282,10 @@ COORD Document::moveTo(const int cursor, const COORD& newPos, const bool withSel
 		return COORD{-1, -1};
 	}
 	auto& cursorObj = cursors[cursor];
-	if (withSelect && !cursorObj.selectAnchor.has_value()) {
+	if (withSelect) {
 		cursorObj.selectAnchor = anchor;
 	}
-	else if (!withSelect){
+	else {
 		cursorObj.selectAnchor.reset();
 	}
 	cursors[cursor].setPosition(newPos);
