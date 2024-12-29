@@ -54,6 +54,7 @@ namespace msg {
 
 		template<typename T>
 		void add(const T* val) {
+			reserveIfNeeded(sizeof(T));
 			assert(capacity >= size + sizeof(T) && "Error, buffer size excedeed!");
 			memcpy(data.get() + size, val, sizeof(T));
 			size += sizeof(T);
@@ -72,16 +73,19 @@ namespace msg {
 			add(&byteVal);
 		}
 		void add(const std::string* str) {
+			reserveIfNeeded(str->size() + 1);
 			assert(capacity >= size + str->size() + 1 && "Error, buffer size excedeed!");
 			memcpy(data.get() + size, str->c_str(), str->size() + 1);
 			size += str->size() + 1;
 		}
 		void add(const Buffer* other) {
+			reserveIfNeeded(other->size);
 			assert(capacity >= size + other->size && "Error, buffer size excedeed!");
 			memcpy(data.get() + size, other->get(), other->size);
 			size += other->size;
 		}
 		void add(const Buffer* other, const int start, const int cpsize) {
+			reserveIfNeeded(cpsize);
 			assert(capacity >= size + cpsize && "Error, buffer size excedeed!");
 			assert(start + cpsize <= other->size && "Error, buffer size excedeed!");
 			memcpy(data.get() + size, other->get() + start, cpsize);
@@ -99,6 +103,7 @@ namespace msg {
 		char* get() const;
 		bool empty() const;
 		void reserve(const int capacity);
+		void reserveIfNeeded(const int cpsize);
 		bool operator=(const Buffer& other);
 
 		std::unique_ptr<char[]> data;

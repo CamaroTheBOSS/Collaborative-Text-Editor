@@ -38,6 +38,7 @@ void Framer::extractLength(int head, msg::Buffer& recvBuff, Messages& messages) 
 
 	if (lenBuff.size >= 4) {
 		msg::parse(lenBuff, 0, neededSymbols);
+		msgBuff.reserveIfNeeded(neededSymbols);
 		assert(neededSymbols >= 2 && neededSymbols <= msgBuff.capacity);
 		saveBuff(lenBuff, _prevMsgLengths, maxPrevMsgBuffLen);
 		lenBuff.clear();

@@ -35,9 +35,18 @@ namespace msg {
 
 	void Buffer::reserve(const int newCapacity) {
 		auto newData = std::make_unique<char[]>(newCapacity);
-		memcpy(newData.get(), data.get(), size);
+		if (size > 0) {
+			memcpy(newData.get(), data.get(), size);
+		}
 		data = std::move(newData);
 		capacity = newCapacity;
+		
+	}
+
+	void Buffer::reserveIfNeeded(const int cpsize) {
+		if (capacity < size + cpsize) {
+			reserve(size + cpsize + 64);
+		}
 	}
 
 	bool Buffer::operator=(const Buffer& other) {

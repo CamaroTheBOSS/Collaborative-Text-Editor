@@ -92,6 +92,9 @@ COORD Document::write(const int index, const char letter) {
 COORD Document::write(const int index, const std::string& text) {
 	COORD cursorPos = COORD{ -1, -1 };
 	for (const auto letter : text) {
+		if (letter == '\r') {
+			continue;
+		}
 		cursorPos = write(index, letter);
 	}
 	return cursorPos;
