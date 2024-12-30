@@ -430,7 +430,7 @@ std::string Document::getSelectedText() const {
 	for (int row = smaller->Y + 1; row < bigger->Y; row++ ) {
 		text += data[row];
 	}
-	text += data[smaller->Y].substr(0, bigger->X);
+	text += data[bigger->Y].substr(0, bigger->X);
 	return text;
 }
 
