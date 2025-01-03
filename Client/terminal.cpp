@@ -79,7 +79,7 @@ void Terminal::render(Document& doc) {
     return renderer.render(doc, docBuffer);
 }
 
-void Terminal::scrollDocBuffer(const Cursor& tCursor) {
+void Terminal::scrollDocBuffer(const RenderCursor& tCursor) {
     int topDiff = (docBuffer.top + 2) - tCursor.pos.Y;
     int bottomDiff = tCursor.pos.Y - (docBuffer.bottom - 2);
     if (topDiff > 0) {

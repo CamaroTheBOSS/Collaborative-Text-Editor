@@ -4,40 +4,19 @@
 #include <vector>
 #include <string>
 #include <optional>
-#include <string_view>
-#include <Windows.h>
+#include "user_action_history.h"
 
-bool smallerPos(const COORD& pos1, const COORD& pos2);
-bool equalPos(const COORD& pos1, const COORD& pos2);
-COORD diffPos(const COORD& pos1, const COORD& pos2);
+struct User {
+	Cursor cursor;
+	std::optional<Cursor> selectAnchor;
+	UserActionHistory history{ std::chrono::milliseconds(1000) };
+};
 
 class Document {
 public:
-	struct Cursor {
-		Cursor() :
-			_pos(COORD{ 0, 0 }),
-			_offset(0) {}
-		void setPosition(const COORD newPos) {
-			_pos = newPos;
-		}
-		void setOffset(int newOffset) {
-			_offset = newOffset;
-		}
-		COORD position() const {
-			return _pos;
-		}
-		int offset() const {
-			return _offset;
-		}
-
-		COORD _pos;
-		int _offset;
-		std::optional<COORD> selectAnchor;
-	};
-
 	Document();
 	Document(const std::string& text);
-	Document(const std::string& text, const int cursors, const int myCursor);
+	Document(const std::string& text, const int cursors, const int myUserIdx);
 
 	COORD write(const int cursor, const char letter);
 	COORD write(const int cursor, const std::string& text);
@@ -51,9 +30,9 @@ public:
 	COORD moveCursorDown(const int cursor, const int bufferWidth, const bool withSelect);
 	COORD moveTo(const int cursor, const COORD& newPos, const bool withSelect, const COORD& anchor);
 
-	bool isCursorValid(const int cursor);
-	bool addCursor();
-	bool eraseCursor(const int cursor);
+	bool isCursorValid(Cursor& cursor);
+	bool addUser();
+	bool eraseUser(const int cursor);
 	bool setCursorPos(const int cursor, const COORD newPos);
 	bool setCursorOffset(const int cursor, const int newOffset);
 	bool setCursorAnchor(const int cursor, const COORD newAnchor);
@@ -74,11 +53,15 @@ public:
 
 private:
 	void adjustCursors();
-	bool analyzeBackwardMove(Cursor& cursor, const bool withSelect);
-	bool analyzeForwardMove(Cursor& cursor, const bool withSelect);
+	void adjustCursor(Cursor& cursor);
+	void moveAffectedCursors(User& movedUser, COORD& posDiff);
+	void moveAffectedCursor(Cursor& cursor, COORD& moveStartPos, COORD& posDiff);
+	bool analyzeBackwardMove(User& user, const bool withSelect);
+	bool analyzeForwardMove(User& user, const bool withSelect);
 	std::string filename = "document.txt";
-	std::vector<Cursor> cursors;
+	std::vector<User> users;
+
 	std::vector<std::string> data;
-	int myCursorIdx;
+	int myUserIdx;
 
 };

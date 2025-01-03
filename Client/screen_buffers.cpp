@@ -68,17 +68,17 @@ COORD ScrollableScreenBuffer::getTerminalCursorPos(Document& doc, const COORD& d
 	return terminalCursor;
 }
 
-Cursor ScrollableScreenBuffer::getTerminalCursor(Document& doc, const int cursor) const {
+RenderCursor ScrollableScreenBuffer::getTerminalCursor(Document& doc, const int cursor) const {
 	auto terminalCursor = getTerminalCursorPos(doc, doc.getCursorPos(cursor));
-	return Cursor(terminalCursor, doc.getCharPointedByCursor(cursor), cursor);
+	return RenderCursor(terminalCursor, doc.getCharPointedByCursor(cursor), cursor);
 }
 
-Cursor ScrollableScreenBuffer::getMyTerminalCursor(Document& doc) const {
+RenderCursor ScrollableScreenBuffer::getMyTerminalCursor(Document& doc) const {
 	return getTerminalCursor(doc, doc.getMyCursor());
 }
 
-std::vector<Cursor> ScrollableScreenBuffer::getTerminalCursors(Document& doc) const {
-	std::vector<Cursor> terminalCursors;
+std::vector<RenderCursor> ScrollableScreenBuffer::getTerminalCursors(Document& doc) const {
+	std::vector<RenderCursor> terminalCursors;
 	for (int cursor = 0; cursor < doc.getCursorNum(); cursor++) {
 		terminalCursors.emplace_back(getTerminalCursor(doc, cursor));
 	}

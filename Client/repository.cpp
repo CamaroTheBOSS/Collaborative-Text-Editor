@@ -49,20 +49,20 @@ bool Repository::sync(msg::Buffer& buffer) {
 		auto pos = COORD{ static_cast<SHORT>(msg.cursorPositions[i - 1]), static_cast<SHORT>(msg.cursorPositions[i]) };
 		doc.setCursorPos(i / 2, pos);
 	}
-	logger.logInfo("Connected to document (nCursors:", msg.user, ", text:" + msg.text + ")");
+	logger.logInfo("Connected to document (nUsers:", msg.user, ", text:" + msg.text + ")");
 	return true;
 }
 
 bool Repository::connectNewUser(msg::Buffer& buffer) {
 	logger.logInfo("Added new user to document");
-	return doc.addCursor();
+	return doc.addUser();
 }
 
 bool Repository::disconnectUser(msg::Buffer& buffer) {
 	msg::DisconnectResponse msg;
 	parse(buffer, 1, msg.version, msg.user);
 	logger.logInfo("Disconnected user", msg.user);
-	return doc.eraseCursor(msg.user);
+	return doc.eraseUser(msg.user);
 }
 
 bool Repository::write(msg::Buffer& buffer) {

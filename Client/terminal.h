@@ -36,7 +36,7 @@ public:
 	bool setClipboardData(const std::string& txt) const;
 	bool resizeScreenBufferIfNeeded();
 private:
-	void scrollDocBuffer(const Cursor& tCursor);
+	void scrollDocBuffer(const RenderCursor& tCursor);
 
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_SCREEN_BUFFER_INFO screenInfo;

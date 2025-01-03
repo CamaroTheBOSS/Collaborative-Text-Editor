@@ -48,6 +48,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="screen_buffer_test.cpp" />
+    <ClCompile Include="user_action_history_tests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

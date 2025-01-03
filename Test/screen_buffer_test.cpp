@@ -10,7 +10,7 @@ TEST(RendererTests, CursorSyncOneLinerDocTest) {
 	doc.setCursorPos(0, dPos);
 
 	ScrollableScreenBuffer screenBuffer{ SMALL_RECT(0, 0, 20, 20) };
-	Cursor tCursor = screenBuffer.getMyTerminalCursor(doc);
+	RenderCursor tCursor = screenBuffer.getMyTerminalCursor(doc);
 	EXPECT_EQ(tCursor.pointedChar, 'n');
 	EXPECT_EQ(tCursor.pos.X, 5);
 	EXPECT_EQ(tCursor.pos.Y, 0);
@@ -23,7 +23,7 @@ TEST(RendererTests, CursorSyncOneEmptyLineTest) {
 	doc.setCursorPos(0, dPos);
 
 	ScrollableScreenBuffer screenBuffer{ SMALL_RECT(0, 0, 20, 20) };
-	Cursor tCursor = screenBuffer.getMyTerminalCursor(doc);
+	RenderCursor tCursor = screenBuffer.getMyTerminalCursor(doc);
 	EXPECT_EQ(tCursor.pointedChar, ' ');
 	EXPECT_EQ(tCursor.pos.X, 0);
 	EXPECT_EQ(tCursor.pos.Y, 1);
@@ -36,7 +36,7 @@ TEST(RendererTests, CursorSyncOneLinerFilledTest) {
 	doc.setCursorPos(0, dPos);
 
 	ScrollableScreenBuffer screenBuffer{ SMALL_RECT(0, 0, 20, 20) };
-	Cursor tCursor = screenBuffer.getMyTerminalCursor(doc);
+	RenderCursor tCursor = screenBuffer.getMyTerminalCursor(doc);
 	EXPECT_EQ(tCursor.pointedChar, ' ');
 	EXPECT_EQ(tCursor.pos.X, 0);
 	EXPECT_EQ(tCursor.pos.Y, 1);
@@ -50,7 +50,7 @@ TEST(RendererTests, CursorSyncOneLinerFilledWithEndlTest) {
 	doc.setCursorPos(0, dPos);
 
 	ScrollableScreenBuffer screenBuffer{ SMALL_RECT(0, 0, 20, 20) };
-	Cursor tCursor = screenBuffer.getMyTerminalCursor(doc);
+	RenderCursor tCursor = screenBuffer.getMyTerminalCursor(doc);
 	EXPECT_EQ(tCursor.pointedChar, ' ');
 	EXPECT_EQ(tCursor.pos.X, 0);
 	EXPECT_EQ(tCursor.pos.Y, 1);
@@ -68,7 +68,7 @@ TEST(RendererTests, CursorSyncForLongerLinesTest) {
 	std::vector<char> desiredPointedChars = { 'i', 'r', ' ', ' ' };
 	for (int i = 0; i < testDocPositions.size(); i++) {
 		doc.setCursorPos(i, testDocPositions[i]);
-		Cursor tCursor = screenBuffer.getTerminalCursor(doc, i);
+		RenderCursor tCursor = screenBuffer.getTerminalCursor(doc, i);
 		EXPECT_EQ(tCursor.pointedChar, desiredPointedChars[i]);
 		EXPECT_EQ(tCursor.pos.X, desiredTerminalPositions[i].X);
 		EXPECT_EQ(tCursor.pos.Y, desiredTerminalPositions[i].Y);

@@ -4,8 +4,8 @@
 
 using TextLines = std::vector<std::string>;
 
-struct Cursor {
-    Cursor(const COORD& pos, const char pointedChar, const int indexInDoc) :
+struct RenderCursor {
+    RenderCursor(const COORD& pos, const char pointedChar, const int indexInDoc) :
         pos(pos),
         pointedChar(pointedChar),
         indexInDoc(indexInDoc) {}
@@ -21,9 +21,9 @@ public:
     COORD getStartPos() const;
     COORD getEndPos() const;
     COORD getTerminalCursorPos(Document& doc, const COORD& docCursor) const;
-    Cursor getTerminalCursor(Document& doc, const int cursor) const;
-    Cursor getMyTerminalCursor(Document& doc) const;
-    std::vector<Cursor> getTerminalCursors(Document& doc) const;
+    RenderCursor getTerminalCursor(Document& doc, const int cursor) const;
+    RenderCursor getMyTerminalCursor(Document& doc) const;
+    std::vector<RenderCursor> getTerminalCursors(Document& doc) const;
     TextLines getTextInBuffer(Document& doc) const;
     void moveHorizontal(const int units);
     void moveVertical(const int units);

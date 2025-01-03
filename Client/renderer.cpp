@@ -1,4 +1,5 @@
 #include "renderer.h"
+#include "pos_helpers.h"
 
 #include <iostream>
 #include <array>
@@ -46,7 +47,7 @@ void Renderer::renderText(const ScrollableScreenBuffer& buffer, const std::vecto
     std::cout << linesToRender[renderIndexingBase.Y + nLines].substr(0, endPos.X - bufferStartPos.X);
 }
 
-void Renderer::renderCursor(const ScrollableScreenBuffer& buffer, const Cursor& cursor, const int color) const {
+void Renderer::renderCursor(const ScrollableScreenBuffer& buffer, const RenderCursor& cursor, const int color) const {
     if (!buffer.isVisible(cursor.pos)) {
         return;
     }
