@@ -133,12 +133,13 @@
     <ClInclude Include="action_erase.h" />
     <ClInclude Include="action_write.h" />
     <ClInclude Include="cursor.h" />
+    <ClInclude Include="new_text_container.h" />
     <ClInclude Include="pos_helpers.h" />
     <ClInclude Include="document.h" />
-    <ClInclude Include="text_container.h" />
     <ClInclude Include="framer.h" />
     <ClInclude Include="logger.h" />
     <ClInclude Include="messages.h" />
+    <ClInclude Include="text_container.h" />
     <ClInclude Include="user_action_history.h" />
   </ItemGroup>
   <ItemGroup>
@@ -146,12 +147,13 @@
     <ClCompile Include="action_erase.cpp" />
     <ClCompile Include="action_write.cpp" />
     <ClCompile Include="cursor.cpp" />
+    <ClCompile Include="new_text_container.cpp" />
     <ClCompile Include="pos_helpers.cpp" />
     <ClCompile Include="document.cpp" />
-    <ClCompile Include="text_container.cpp" />
     <ClCompile Include="framer.cpp" />
     <ClCompile Include="logger.cpp" />
     <ClCompile Include="messages.cpp" />
+    <ClCompile Include="text_container.cpp" />
     <ClCompile Include="user_action_history.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
