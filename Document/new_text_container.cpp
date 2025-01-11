@@ -28,15 +28,11 @@ namespace v3 {
 		y = other.y;
 		return *this;
 	}
-	Pos& Pos::operator+(const Pos& other) {
-		x += other.x;
-		y += other.y;
-		return *this;
+	Pos Pos::operator+(const Pos& other) const {
+		return Pos{x + other.x, y + other.y};
 	}
-	Pos& Pos::operator-(const Pos& other) {
-		x -= other.x;
-		y -= other.y;
-		return *this;
+	Pos Pos::operator-(const Pos& other) const {
+		return Pos{ x - other.x, y - other.y };
 	}
 
 	Cursor::Cursor(const Pos& pos) :
@@ -53,14 +49,10 @@ namespace v3 {
 		return first.pos == other.pos && first.offset == other.offset && first.label == other.label;
 	}
 
-	void Cursor::updateAfterEdit(const Pos& newPos, const std::string_view lastLine) {
+	void Cursor::updateAfterEdit(const Pos& newPos, const char newLabel) {
 		pos = newPos;
 		offset = newPos.x;
-		updateLabel(lastLine);
-	}
-
-	void Cursor::updateLabel(const std::string_view relevantLine) {
-		label = (pos.x >= relevantLine.size() || relevantLine[pos.x] == '\n') ? ' ' : relevantLine[pos.x];
+		label = newLabel;
 	}
 
 	Line::Line(const std::string_view& text) :
@@ -120,14 +112,12 @@ namespace v3 {
 		insertText(Pos{ 0, 0 }, parsedLines);
 	}
 
-	Pos& NewTextContainer::write(Cursor& cursor, const std::string& newText) {
+	Pos NewTextContainer::write(const Cursor& cursor, const std::string& newText) {
 		if (!isCursorValid(cursor)) {
 			return cursor.pos;
 		}
 		auto parsedLines = parseText(newText);	
-		Pos endPos = insertText(cursor.pos, parsedLines);
-		cursor.updateAfterEdit(endPos, lines[cursor.pos.y + parsedLines.size() - 1].get(0));
-		return cursor.pos;
+		return insertText(cursor.pos, parsedLines);
 	}
 
 	Pos NewTextContainer::insertText(Pos pos, const std::vector<std::string_view>& parsedLines) {
@@ -171,7 +161,7 @@ namespace v3 {
 		return parsedLines;
 	}
 
-	Pos& NewTextContainer::erase(Cursor& cursor, int n) {
+	Pos NewTextContainer::erase(const Cursor& cursor, int n) {
 		if (!isCursorValid(cursor)) {
 			return cursor.pos;
 		}
@@ -188,7 +178,6 @@ namespace v3 {
 			endPos.x = lines[endPos.y].erase(lines[endPos.y].size(), n);
 			lines[endPos.y].append(toMoveUp);
 		}
-		cursor.updateAfterEdit(endPos, lines[endPos.y].get(0));
 		return endPos;
 	}
 
@@ -196,6 +185,10 @@ namespace v3 {
 		int size = lines[col].size() + 1;
 		lines.erase(lines.cbegin() + col);
 		return size;
+	}
+
+	char NewTextContainer::getLabel(const Pos& pos) const {
+		return pos.y < size() && pos.x < lines[pos.y].size() ? lines[pos.y].get(pos.x)[0] : ' ';
 	}
 
 	Pos& NewTextContainer::moveLeft(Cursor& cursor) {
@@ -210,7 +203,7 @@ namespace v3 {
 			cursor.pos.x -= 1;
 		}
 		cursor.offset = cursor.pos.x;
-		cursor.updateLabel(lines[cursor.pos.y].get(0));
+		cursor.label = getLabel(cursor.pos);
 		return cursor.pos;
 	}
 
@@ -226,7 +219,7 @@ namespace v3 {
 			cursor.pos.x += 1;
 		}
 		cursor.offset = cursor.pos.x;
-		cursor.updateLabel(lines[cursor.pos.y].get(0));
+		cursor.label = getLabel(cursor.pos);
 		return cursor.pos;
 	}
 
@@ -245,7 +238,7 @@ namespace v3 {
 		else {
 			cursor.pos.x -= width;
 		}
-		cursor.updateLabel(lines[cursor.pos.y].get(0));
+		cursor.label = getLabel(cursor.pos);
 		return cursor.pos;
 	}
 
@@ -261,7 +254,7 @@ namespace v3 {
 		else {
 			cursor.pos.x += width;
 		}
-		cursor.updateLabel(lines[cursor.pos.y].get(0));
+		cursor.label = getLabel(cursor.pos);
 		return cursor.pos;
 	}
 
@@ -274,7 +267,7 @@ namespace v3 {
 			cursor.pos = endPos();
 		}
 		cursor.offset = cursor.pos.x;
-		cursor.updateLabel(lines[cursor.pos.y].get(0));
+		cursor.label = getLabel(cursor.pos);
 		return cursor.pos;
 	}
 
@@ -287,8 +280,8 @@ namespace v3 {
 		return txt;
 	}
 
-	std::string NewTextContainer::getLine(const int line) const {
-		return std::string{ lines[line].get(0) };
+	std::string_view NewTextContainer::getLine(const int line) const {
+		return lines[line].get(0);
 	}
 
 	Pos NewTextContainer::startPos() const {
@@ -305,6 +298,119 @@ namespace v3 {
 
 	bool NewTextContainer::isCursorValid(const Cursor& cursor) const {
 		return cursor.pos.y < size() && cursor.pos.x <= lines[cursor.pos.y].size();
+	}
+
+	Document::Document(const std::string& txt, const int nUsers, const int myUserIdx) :
+		container(txt),
+		users(nUsers, User()),
+		myUserIdx(myUserIdx) {}
+
+	Pos Document::write(const int userIdx, std::string& text) {
+		if (userIdx < 0 || userIdx >= users.size()) {
+			return Pos{0, 0};
+		}
+		auto& user = users[userIdx];
+		auto endPos = container.write(user.cursor.pos, text);
+		moveCursors(user, user.cursor.pos, endPos);
+		return user.cursor.pos;
+	}
+	Pos Document::erase(const int userIdx, const int n) {
+		if (userIdx < 0 || userIdx >= users.size()) {
+			return Pos{ 0, 0 };
+		}
+		auto& user = users[userIdx];
+		auto endPos = container.erase(user.cursor.pos, n);
+		moveCursors(user, user.cursor.pos, endPos);
+		return user.cursor.pos;
+	}
+	Pos Document::moveLeft(const int userIdx, const bool select) {
+		if (userIdx < 0 || userIdx >= users.size()) {
+			return Pos{ 0, 0 };
+		}
+		auto& user = users[userIdx];
+		return container.moveLeft(user.cursor);
+	}
+	Pos Document::moveRight(const int userIdx, const bool select) {
+		if (userIdx < 0 || userIdx >= users.size()) {
+			return Pos{ 0, 0 };
+		}
+		auto& user = users[userIdx];
+		return container.moveRight(user.cursor);
+	}
+	Pos Document::moveUp(const int userIdx, const int width, const bool select) {
+		if (userIdx < 0 || userIdx >= users.size()) {
+			return Pos{ 0, 0 };
+		}
+		auto& user = users[userIdx];
+		return container.moveUp(user.cursor, width);
+	}
+	Pos Document::moveDown(const int userIdx, const int width, const bool select) {
+		if (userIdx < 0 || userIdx >= users.size()) {
+			return Pos{ 0, 0 };
+		}
+		auto& user = users[userIdx];
+		return container.moveDown(user.cursor, width);
+	}
+	Pos Document::moveTo(const int userIdx, const Pos& pos) {
+		if (userIdx < 0 || userIdx >= users.size()) {
+			return Pos{ 0, 0 };
+		}
+		auto& user = users[userIdx];
+		return container.moveTo(user.cursor, pos);
+	}
+	std::string Document::getText() const {
+		return container.get(container.startPos(), container.endPos());
+	}
+
+	void Document::moveCursors(User& movedUser, const Pos startPos, const Pos& endPos) {
+		auto posDiff = endPos - startPos;
+		for (auto& user : users) {
+			moveCursor(user.cursor, startPos, posDiff);
+			if (user.anchor.has_value()) {
+				moveCursor(user.anchor.value(), startPos, posDiff);
+			}
+		}
+	}
+
+	void Document::moveCursor(Cursor& cursor, const Pos& startPos, const Pos& posDiff) {
+		auto otherCursorPos = cursor.pos;
+		if (otherCursorPos.y == startPos.y && otherCursorPos.x >= startPos.x) {
+			Pos newPos = otherCursorPos + posDiff;
+			cursor.updateAfterEdit(newPos, container.getLabel(newPos));
+		}
+		else if (otherCursorPos.y > startPos.y) {
+			Pos newPos = otherCursorPos + Pos{0, posDiff.y};
+			cursor.updateAfterEdit(newPos, container.getLabel(newPos));
+		}
+	}
+
+	int Document::height() const {
+		return container.size();
+	}
+
+	const std::string_view Document::getLine(const int n) const {
+		if (n >= height()) {
+			return "";
+		}
+		return container.getLine(n);
+	}
+	/*std::string Document::getSelectedText(const int userIdx) const {
+
+	}*/
+
+	/*std::vector<Cursor&> Document::getCursors() {
+		std::vector<Cursor&> cursors;
+		for (auto& user : users) {
+			cursors.push_back(user.cursor);
+		}
+		return cursors;
+	}*/
+
+	Cursor Document::getCursor(const int userIdx) const {
+		if (userIdx < 0 || userIdx >= users.size()) {
+			return Cursor();
+		}
+		return users[userIdx].cursor;
 	}
 
 }
