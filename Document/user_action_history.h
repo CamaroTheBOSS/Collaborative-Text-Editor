@@ -13,7 +13,7 @@ public:
 	void push(ActionPtr& action);
 	std::optional<ActionPtr> undo();
 	std::optional<ActionPtr> redo();
-	void affect(const ActionPtr& action, const COORD& posDiff);
+	void affect(const ActionPtr& action, const COORD& posDiff, const bool moveOnly);
 	int getHistoryLimit() const;
 	const std::vector<ActionPtr>& getUndoActions() const;
 	const std::vector<ActionPtr>& getRedoActions() const;
@@ -23,5 +23,5 @@ private:
 	std::vector<ActionPtr> undoActions;
 	std::vector<ActionPtr> redoActions;
 	std::chrono::milliseconds mergeIntervalMs;
-	const int historyLimit = 20;
+	const int historyLimit = 2000;
 };

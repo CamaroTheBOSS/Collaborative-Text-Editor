@@ -35,6 +35,9 @@ bool Repository::processMsg(msg::Buffer& buffer) {
 		return connectNewUser(buffer);
 	case msg::Type::disconnect:
 		return disconnectUser(buffer);
+	case msg::Type::undo:
+	case msg::Type::redo:
+		return undoRedo(buffer);
 	}
 	assert(false && "Unrecognized msg type. Aborting...");
 	return false;
@@ -90,5 +93,20 @@ bool Repository::move(msg::Buffer& buffer) {
 		COORD{ static_cast<SHORT>(msg.anchorX), static_cast<SHORT>(msg.anchorY) }
 	);
 	logger.logInfo("User", msg.user, "moved his cursor to", msg.X, ",", msg.Y);
+	return true;
+}
+
+bool Repository::undoRedo(msg::Buffer& buffer) {
+	auto msg = msg::ControlMessageResponse{};
+	msg::parse(buffer, 0, msg.type, msg.version, msg.user);
+	if (msg.type == msg::Type::undo && !doc.undo(msg.user)) {
+		logger.logInfo("Warning! Cannot", msg.type, "msg from user", msg.user, "with type");
+		return false;
+	}
+	else if (msg.type == msg::Type::redo && !doc.redo(msg.user)) {
+		logger.logInfo("Warning! Cannot", msg.type, "msg from user", msg.user, "with type");
+		return false;
+	}
+	logger.logInfo("User", msg.user, msg.type, "action");
 	return true;
 }

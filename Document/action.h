@@ -7,7 +7,7 @@
 #include "cursor.h"
 
 using Timestamp = std::chrono::time_point<std::chrono::system_clock>;
-enum class ActionType { write, erase, replace };
+enum class ActionType { write, erase, replace, noop };
 class Action {
 public:
 	friend class WriteAction;
@@ -20,7 +20,7 @@ public:
 	virtual COORD getStartPos() const = 0;
 	virtual COORD getEndPos() const = 0;
 
-	ModifyResult affect(const ActionPtr& other, const COORD& posDiff);
+	ModifyResult affect(const ActionPtr& other, const COORD& posDiff, bool moveOnly);
 	void setLeft(const COORD newPos);
 	void setRight(const COORD newPos);
 	COORD getLeft() const;

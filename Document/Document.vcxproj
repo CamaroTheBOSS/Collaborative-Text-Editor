@@ -131,6 +131,7 @@
   <ItemGroup>
     <ClInclude Include="action.h" />
     <ClInclude Include="action_erase.h" />
+    <ClInclude Include="action_noop.h" />
     <ClInclude Include="action_write.h" />
     <ClInclude Include="cursor.h" />
     <ClInclude Include="pos_helpers.h" />
@@ -144,6 +145,7 @@
   <ItemGroup>
     <ClCompile Include="action.cpp" />
     <ClCompile Include="action_erase.cpp" />
+    <ClCompile Include="action_noop.cpp" />
     <ClCompile Include="action_write.cpp" />
     <ClCompile Include="cursor.cpp" />
     <ClCompile Include="pos_helpers.cpp" />

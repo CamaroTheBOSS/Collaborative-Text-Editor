@@ -25,32 +25,37 @@ KeyPack Controller::readChar() const {
 bool Controller::processChar(const KeyPack& key) {
     
     if (key.keyCode >= 32 && key.keyCode <= 127) {
-        return client.sendMsg(msg::Type::write, version, std::string{""}, std::string(1, key.keyCode));
+        return client.sendMsg(msg::Type::write, version, authToken, std::string(1, key.keyCode));
     }
     switch (key.keyCode) {
     case ENTER:
-        return client.sendMsg(msg::Type::write, version, std::string{""}, std::string{'\n'});
+        return client.sendMsg(msg::Type::write, version, authToken, std::string{'\n'});
     case TABULAR:
-        return client.sendMsg(msg::Type::write, version, std::string{""}, std::string{"    "});
+        return client.sendMsg(msg::Type::write, version, authToken, std::string{"    "});
     case BACKSPACE:
-        return client.sendMsg(msg::Type::erase, version, std::string{""}, static_cast<unsigned int>(1));
+        return client.sendMsg(msg::Type::erase, version, authToken, static_cast<unsigned int>(1));
     case ARROW_LEFT:
-        return client.sendMsg(msg::Type::moveHorizontal, version, std::string{""}, msg::MoveSide::left, key.shiftPressed);
+        return client.sendMsg(msg::Type::moveHorizontal, version, authToken, msg::MoveSide::left, key.shiftPressed);
     case ARROW_RIGHT:
-        return client.sendMsg(msg::Type::moveHorizontal, version, std::string{""}, msg::MoveSide::right, key.shiftPressed);
+        return client.sendMsg(msg::Type::moveHorizontal, version, authToken, msg::MoveSide::right, key.shiftPressed);
     case ARROW_UP:
-        return client.sendMsg(msg::Type::moveVertical, version, std::string{""}, msg::MoveSide::up, terminal.getDocBufferWidth(), key.shiftPressed);
+        return client.sendMsg(msg::Type::moveVertical, version, authToken, msg::MoveSide::up, terminal.getDocBufferWidth(), key.shiftPressed);
     case ARROW_DOWN:
-        return client.sendMsg(msg::Type::moveVertical, version, std::string{""}, msg::MoveSide::down, terminal.getDocBufferWidth(), key.shiftPressed);
+        return client.sendMsg(msg::Type::moveVertical, version, authToken, msg::MoveSide::down, terminal.getDocBufferWidth(), key.shiftPressed);
     case CTRL_A:
-        return client.sendMsg(msg::Type::selectAll, version, std::string{""});
+        return client.sendMsg(msg::Type::selectAll, version, authToken);
     case CTRL_C:
         return terminal.setClipboardData(repo.getDoc().getSelectedText());
     case CTRL_V:
-        return client.sendMsg(msg::Type::write, version, std::string{""}, terminal.getClipboardData());
+        return client.sendMsg(msg::Type::write, version, authToken, terminal.getClipboardData());
     case CTRL_X:
         terminal.setClipboardData(repo.getDoc().getSelectedText());
-        return client.sendMsg(msg::Type::erase, version, std::string{""}, static_cast<unsigned int>(1));
+        return client.sendMsg(msg::Type::erase, version, authToken, static_cast<unsigned int>(1));
+    case CTRL_Z:
+        if (key.shiftPressed) {
+            return client.sendMsg(msg::Type::redo, version, authToken);
+        }
+        return client.sendMsg(msg::Type::undo, version, authToken);
     case ESC:
         return disconnect();
     }

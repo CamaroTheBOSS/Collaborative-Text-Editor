@@ -33,6 +33,8 @@ namespace msg {
 		connect,
 		disconnect,
 		selectAll,
+		undo,
+		redo
 	};
 
 	enum class MoveSide {
@@ -216,12 +218,6 @@ namespace msg {
 		OneByteInt withSelect;
 	};
 
-	struct MoveSelectAll {
-		Type type = Type::selectAll;
-		OneByteInt version;
-		std::string token;
-	};
-
 	struct MoveResponse {
 		Type type = Type::moveVertical;
 		OneByteInt version;
@@ -231,5 +227,17 @@ namespace msg {
 		OneByteInt withSelect;
 		unsigned int anchorX;
 		unsigned int anchorY;
+	};
+
+	struct ControlMessage {
+		Type type;
+		OneByteInt version;
+		std::string token;
+	};
+
+	struct ControlMessageResponse {
+		Type type;
+		OneByteInt version;
+		OneByteInt user;
 	};
 }

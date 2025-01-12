@@ -8,9 +8,12 @@ Action::Action(ActionType&& type, COORD&& left, COORD&& right, std::string&& txt
 	text(txt),
 	timestamp(std::chrono::system_clock::now()) {}
 
-Action::ModifyResult Action::affect(const ActionPtr& other, const COORD& posDiff) {
+Action::ModifyResult Action::affect(const ActionPtr& other, const COORD& posDiff, bool moveOnly) {
 	moveLeftCursor(other, posDiff);
 	moveRightCursor(other, posDiff);
+	if (moveOnly) {
+		return { false, std::optional<ActionPtr>{} };
+	}
 	return modify(other);
 }
 
@@ -45,18 +48,17 @@ Timestamp Action::getTimestamp() const {
 std::pair<int, int> Action::getOffsets(const ActionPtr& other) const {
 	COORD otherLeft = other->getLeft();
 	COORD otherRight = other->getRight();
-	auto diffLeft = diffPos(otherLeft, getLeft());
-	auto diffRight = diffPos(otherRight, getRight());
+	auto diffToLeft = diffPos(otherLeft, getLeft());
+	auto diffToRight = diffPos(otherLeft, getRight());
 	int offsetLeft = 0;
 	int offsetRight = 0;
-	for (int y = 0; y < diffLeft.Y; y++) {
-		offsetLeft = other->text.find(offsetLeft, '\n') + 1;
-		offsetRight = offsetLeft;
+	for (int y = 0; y < diffToLeft.Y; y++) {
+		offsetLeft = text.find('\n', offsetLeft) + 1;
 	}
-	for (int y = 0; y < diffRight.Y; y++) {
-		offsetRight = other->text.find(offsetRight, '\n') + 1;
+	for (int y = 0; y < diffToRight.Y; y++) {
+		offsetRight = other->text.find('\n', offsetRight) + 1;
 	}
 	offsetLeft += otherLeft.X;
-	offsetRight += otherRight.X;
+	offsetRight += offsetLeft + otherRight.X;
 	return { offsetLeft, offsetRight };
 }

@@ -20,6 +20,35 @@ ActionPtr makeEmptyEraseAction() {
 	return std::make_shared<EraseAction>();
 }
 
+void addWriteActionToHistory(UserActionHistory& history, COORD startPos, COORD endPos, std::string txt) {
+	auto diff = diffPos(endPos, startPos);
+	auto action = makeWriteAction(std::move(startPos), std::move(endPos), std::move(txt));
+	history.affect(action, diff, false);
+	history.push(action);
+}
+
+void addEraseActionToHistory(UserActionHistory& history, COORD startPos, COORD endPos, std::string txt) {
+	auto diff = diffPos(endPos, startPos);
+	auto action = makeEraseAction(std::move(startPos), std::move(endPos), std::move(txt));
+	history.affect(action, diff, false);
+	history.push(action);
+}
+
+void validateAction(ActionPtr action, COORD desiredStartPos, COORD desiredEndPos, std::string desiredTxt) {
+	EXPECT_TRUE(equalPos(action->getStartPos(), desiredStartPos));
+	EXPECT_TRUE(equalPos(action->getEndPos(), desiredEndPos));
+	EXPECT_EQ(action->getText(), desiredTxt);
+}
+
+
+
+void validUndoAction(UserActionHistory& history, COORD desiredStartPos, COORD desiredEndPos, std::string desiredTxt) {
+	auto action = history.undo().value_or(makeEmptyWriteAction());
+	EXPECT_TRUE(equalPos(action->getStartPos(), desiredStartPos));
+	EXPECT_TRUE(equalPos(action->getEndPos(), desiredEndPos));
+	EXPECT_EQ(action->getText(), desiredTxt);
+}
+
 UserActionHistory prepSimpleHistory(const int nEntries, const int mergeIntervalMs = 0) {
 	UserActionHistory history{ std::chrono::milliseconds(mergeIntervalMs) };
 	int historyLimit = nEntries < 0 ? history.getHistoryLimit() : nEntries;
@@ -195,7 +224,7 @@ TEST(UserActionHistoryTests, SplitActionTest) {
 
 	auto anotherUserAction = makeWriteAction(COORD{ 4, 0 }, COORD{ 8, 0 }, "test");
 	COORD diffPos = COORD{ 4, 0 };
-	history.affect(anotherUserAction, diffPos);
+	history.affect(anotherUserAction, diffPos, false);
 
 	EXPECT_EQ(history.getUndoActions().size(), 2);
 	action = history.undo().value_or(makeEmptyWriteAction());
@@ -216,7 +245,7 @@ TEST(UserActionHistoryTests, SplitActionWithEndlTest) {
 
 	auto anotherUserAction = makeWriteAction(COORD{ 4, 0 }, COORD{ 0, 1 }, "ThisTextIsSoLong\n");
 	COORD diffPos = COORD{ -4, 1 };
-	history.affect(anotherUserAction, diffPos);
+	history.affect(anotherUserAction, diffPos, false);
 
 	EXPECT_EQ(history.getUndoActions().size(), 2);
 	action = history.undo().value_or(makeEmptyWriteAction());
@@ -229,48 +258,116 @@ TEST(UserActionHistoryTests, SplitActionWithEndlTest) {
 	EXPECT_EQ(action->getText(), "very");
 }
 
-//TEST(UserActionHistoryTests, CutActionFromRightTest) {
-//	// ...[...(...]...)... //
-//	UserActionHistory history{ std::chrono::milliseconds(0) };
-//	auto action = makeWriteAction(COORD{ 0, 0 }, COORD{ 10, 0 }, "testing123");
-//	history.push(action);
-//
-//	auto anotherUserAction = makeWriteAction(COORD{ 8, 0 }, COORD{ 12, 0 }, "testing123");
-//	COORD diffPos = COORD{ 4, 0 };
-//	history.affect(anotherUserAction, diffPos);
-//
-//	EXPECT_EQ(history.getUndoActions().size(), 1);
-//	action = history.undo().value_or(makeEmptyWriteAction());
-//	EXPECT_TRUE(equalPos(action->getStartPos(), COORD{ 0, 0 }));
-//	EXPECT_TRUE(equalPos(action->getEndPos(), COORD{ 8, 0 }));
-//}
+TEST(UserActionHistoryTests, a1bcTest) {
+	UserActionHistory history{ std::chrono::milliseconds(0) };
+	addWriteActionToHistory(history, COORD{ 0, 0 }, COORD{ 1, 0 }, "a");
+	addWriteActionToHistory(history, COORD{ 1, 0 }, COORD{ 2, 0 }, "b");
+	addWriteActionToHistory(history, COORD{ 2, 0 }, COORD{ 3, 0 }, "c");
+	addWriteActionToHistory(history, COORD{ 1, 0 }, COORD{ 2, 0 }, "1");
+	history.undo();
+	auto action = makeEraseAction(COORD{ 2, 0 }, COORD{ 1, 0 }, "1");
+	history.affect(action, diffPos(action->getEndPos(), action->getStartPos()), true);
 
+	auto& undoActions = history.getUndoActions();
+	EXPECT_EQ(undoActions.size(), 3);
+	if (undoActions.size() == 3) {
+		validateAction(undoActions[0], COORD{ 0, 0 }, COORD{ 1, 0 }, "a");
+		validateAction(undoActions[1], COORD{ 1, 0 }, COORD{ 2, 0 }, "b");
+		validateAction(undoActions[2], COORD{ 2, 0 }, COORD{ 3, 0 }, "c");
+	}
+}
 
-//TEST(UserActionHistoryTests, CutActionFromLeftTest) {
-//	// ...(...[...)...]... //
-//	UserActionHistory history{ std::chrono::milliseconds(0) };
-//	auto action = makeWriteAction(COORD{ 6, 0 }, COORD{ 16, 0 }, "testing123");
-//	history.push(action);
-//
-//	auto anotherUserAction = makeWriteAction(COORD{ 0, 0 }, COORD{ 10, 0 }, "testing123");
-//	COORD diffPos = COORD{ 10, 0 };
-//	history.affect(anotherUserAction, diffPos);
-//
-//	EXPECT_EQ(history.getUndoActions().size(), 1);
-//	action = history.undo().value_or(makeEmptyWriteAction());
-//	EXPECT_TRUE(equalPos(action->getStartPos(), COORD{ 10, 0 }));
-//	EXPECT_TRUE(equalPos(action->getEndPos(), COORD{ 16, 0 }));
-//}
+TEST(UserActionHistoryTests, ActionsWithEndlinesSplitTest) {
+	UserActionHistory history1{ std::chrono::milliseconds(0) };
+	UserActionHistory history2{ std::chrono::milliseconds(0) };
+	addWriteActionToHistory(history1, COORD{ 0, 0 }, COORD{ 6, 1 }, "first\nsecond");
+	addWriteActionToHistory(history1, COORD{ 6, 1 }, COORD{ 6, 3 }, "\nthird\nfourth");
+	addWriteActionToHistory(history1, COORD{ 6, 3 }, COORD{ 5, 4 }, "\nfifth");
+	auto action = makeWriteAction(COORD{ 2, 4 }, COORD{6, 4}, "1234");
+	history1.affect(action, COORD{ 4, 0 }, false);
+	action = makeWriteAction(COORD{ 6, 3 }, COORD{ 9, 3 }, "123");
+	history1.affect(action, COORD{ 3, 0 }, false);
+	auto& undoActions = history1.getUndoActions();
+	EXPECT_EQ(undoActions.size(), 4);
+	if (undoActions.size() == 4) {
+		validateAction(undoActions[0], COORD{ 0, 0 }, COORD{ 6, 1 }, "first\nsecond");
+		validateAction(undoActions[1], COORD{ 6, 1 }, COORD{ 6, 3 }, "\nthird\nfourth");
+		validateAction(undoActions[2], COORD{ 9, 3 }, COORD{ 2, 4 }, "\nfi");
+		validateAction(undoActions[3], COORD{ 6, 4 }, COORD{ 9, 4 }, "fth");
+	}
+}
 
-//TEST(UserActionHistoryTests, DeleteActionTest) {
-//	// ...([......])... //
-//	UserActionHistory history{ std::chrono::milliseconds(0) };
-//	auto action = makeWriteAction(COORD{ 6, 0 }, COORD{ 16, 0 }, "testing123");
-//	history.push(action);
-//
-//	auto anotherUserAction = makeWriteAction(COORD{ 6, 0 }, COORD{ 16, 0 }, "testing123");
-//	COORD diffPos = COORD{ 10, 0 };
-//	history.affect(anotherUserAction, diffPos);
-//
-//	EXPECT_EQ(history.getUndoActions().size(), 0);
-//}
+TEST(UserActionHistoryTests, ActionsWithEndlinesNewActionWithEndlineSplitTest) {
+	UserActionHistory history1{ std::chrono::milliseconds(0) };
+	UserActionHistory history2{ std::chrono::milliseconds(0) };
+	addWriteActionToHistory(history1, COORD{ 0, 0 }, COORD{ 6, 1 }, "first\nsecond");
+	addWriteActionToHistory(history1, COORD{ 6, 1 }, COORD{ 6, 3 }, "\nthird\nfourth");
+	addWriteActionToHistory(history1, COORD{ 6, 3 }, COORD{ 5, 4 }, "\nfifth");
+	auto action = makeWriteAction(COORD{ 2, 4 }, COORD{ 0, 5 }, "1234\n");
+	history1.affect(action, COORD{ -2, 1 }, false);
+	auto& undoActions = history1.getUndoActions();
+	EXPECT_EQ(undoActions.size(), 4);
+	if (undoActions.size() == 4) {
+		validateAction(undoActions[0], COORD{ 0, 0 }, COORD{ 6, 1 }, "first\nsecond");
+		validateAction(undoActions[1], COORD{ 6, 1 }, COORD{ 6, 3 }, "\nthird\nfourth");
+		validateAction(undoActions[2], COORD{ 6, 3 }, COORD{ 2, 4 }, "\nfi");
+		validateAction(undoActions[3], COORD{ 0, 5 }, COORD{ 3, 5 }, "fth");
+	}
+}
+
+TEST(UserActionHistoryTests, CutActionFromRightTest) {
+	// ...[...(...]...)... //
+	UserActionHistory history{ std::chrono::milliseconds(0) };
+	addWriteActionToHistory(history, COORD{ 0, 0 }, COORD{ 10, 0 }, "testing123");
+
+	auto action = makeEraseAction(COORD{ 12, 0 }, COORD{ 8, 0 }, "23xd");
+	history.affect(action, diffPos(action->getEndPos(), action->getStartPos()), false);
+
+	auto& undoActions = history.getUndoActions();
+	EXPECT_EQ(undoActions.size(), 1);
+	if (undoActions.size() == 1) {
+		validateAction(undoActions[0], COORD{ 0, 0 }, COORD{ 8, 0 }, "testing1");
+	}
+}
+
+TEST(UserActionHistoryTests, CutActionFromLeftTest) {
+	// ...[...(...]...)... //
+	UserActionHistory history{ std::chrono::milliseconds(0) };
+	addWriteActionToHistory(history, COORD{ 2, 0 }, COORD{ 12, 0 }, "testing123");
+
+	auto action = makeEraseAction(COORD{ 4, 0 }, COORD{ 0, 0 }, "xdte");
+	history.affect(action, diffPos(action->getEndPos(), action->getStartPos()), false);
+
+	auto& undoActions = history.getUndoActions();
+	EXPECT_EQ(undoActions.size(), 1);
+	if (undoActions.size() == 1) {
+		validateAction(undoActions[0], COORD{ 0, 0 }, COORD{ 8, 0 }, "sting123");
+	}
+}
+
+TEST(UserActionHistoryTests, DeleteActionTest) {
+	// ...[...(...]...)... //
+	UserActionHistory history{ std::chrono::milliseconds(0) };
+	addWriteActionToHistory(history, COORD{ 2, 0 }, COORD{ 12, 0 }, "testing123");
+
+	auto action = makeEraseAction(COORD{ 12, 0 }, COORD{ 2, 0 }, "testing123");
+	history.affect(action, diffPos(action->getEndPos(), action->getStartPos()), false);
+
+	auto& undoActions = history.getUndoActions();
+	EXPECT_EQ(undoActions.size(), 0);
+}
+
+TEST(UserActionHistoryTests, EraseInWriteTest) {
+	// ...[...(...]...)... //
+	UserActionHistory history{ std::chrono::milliseconds(0) };
+	addWriteActionToHistory(history, COORD{ 2, 0 }, COORD{ 12, 0 }, "testing123");
+
+	auto action = makeEraseAction(COORD{ 8, 0 }, COORD{ 4, 0 }, "stin");
+	history.affect(action, diffPos(action->getEndPos(), action->getStartPos()), false);
+
+	auto& undoActions = history.getUndoActions();
+	EXPECT_EQ(undoActions.size(), 1);
+	if (undoActions.size() == 1) {
+		validateAction(undoActions[0], COORD{ 0, 0 }, COORD{ 8, 0 }, "teg123");
+	}
+}

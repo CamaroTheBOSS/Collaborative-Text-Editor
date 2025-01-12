@@ -1,6 +1,10 @@
 #include <algorithm>
 #include "document.h"
+#include "action_write.h"
+#include "action_erase.h"
+#include "action_noop.h"
 #include "pos_helpers.h"
+#include <assert.h>
 
 #define NOMINMAX
 
@@ -26,12 +30,9 @@ Document::Document(const std::string& text, const int nCursors, const int myUser
 	setText(text);
 }
 
-COORD Document::write(const int index, const char letter) {
-	if (index < 0 || index >= users.size()) {
-		return COORD{ -1, -1 };
-	}
-	auto& cursor = users[index].cursor;
-	auto& anchor = users[index].selectAnchor;
+COORD Document::write(User& user, const char letter, const bool fromAction) {
+	auto& cursor = user.cursor;
+	auto& anchor = user.selectAnchor;
 	auto cursorPos = cursor.position();
 	if (cursorPos.Y > data.size()) {
 		return cursorPos;
@@ -61,23 +62,33 @@ COORD Document::write(const int index, const char letter) {
 		}
 	}
 	auto startPos = cursor.position();
-	auto diff = diffPos(cursorPos, startPos);
-	moveAffectedCursors(users[index], diff);
+	auto endPos = cursorPos;
+	auto diff = endPos - startPos;
+	ActionPtr action = std::make_shared<WriteAction>(std::move(startPos), std::move(cursorPos), std::string{letter});
+	affectHistory(action, diff, fromAction);
+	if (!fromAction) {
+		user.history.push(action);
+	}
+	moveAffectedCursors(user, diff);
 	adjustCursors();
-	//cursor.setPosition(cursorPos);
-	cursor.setOffset(cursorPos.X);
-	return cursorPos;
+	cursor.setOffset(endPos.X);
+	return endPos;
 }
 
-COORD Document::write(const int index, const std::string& text) {
-	COORD cursorPos = COORD{ -1, -1 };
+COORD Document::write(const int index, const std::string& text, const bool fromAction) {
+	if (index < 0 || index >= users.size()) {
+		return COORD{ -1, -1 };
+	}
+	auto& user = users[index];
+	auto startPos = user.cursor.position();
+	auto endPos = user.cursor.position();
 	for (const auto letter : text) {
 		if (letter == '\r') {
 			continue;
 		}
-		cursorPos = write(index, letter);
+		endPos = write(user, letter, fromAction);
 	}
-	return cursorPos;
+	return endPos;
 }
 
 COORD Document::eraseTextBetween(const COORD& cursor1, const COORD& cursor2) {
@@ -95,21 +106,19 @@ COORD Document::eraseTextBetween(const COORD& cursor1, const COORD& cursor2) {
 	return *smaller;
 }
 
-COORD Document::erase(const int index) {
-	if (index < 0 || index >= users.size()) {
-		return COORD{ -1, -1 };
-	}
-	auto& cursor = users[index].cursor;
-	auto& anchor = users[index].selectAnchor;
+COORD Document::erase(User& user, const bool fromAction) {
+	auto& cursor = user.cursor;
+	auto& anchor = user.selectAnchor;
 	auto cursorPos = cursor.position();
 	if (cursorPos.Y > data.size()) {
 		return cursorPos;
 	}
-
+	std::string erasedText;
 	if (anchor.has_value()) {
 		cursorPos = eraseTextBetween(cursorPos, anchor.value().position());
 		anchor.reset();
 	} else if (cursorPos.X > 0) {
+		erasedText = std::string{ data[cursorPos.Y].begin() + cursorPos.X - 1, data[cursorPos.Y].begin() + cursorPos.X };
 		data[cursorPos.Y].erase(data[cursorPos.Y].begin() + cursorPos.X - 1, data[cursorPos.Y].begin() + cursorPos.X);
 		cursorPos.X -= 1;
 	} else {
@@ -117,34 +126,110 @@ COORD Document::erase(const int index) {
 			return cursorPos;
 		}
 		std::string toMoveUpper = data[cursorPos.Y];
-		data[cursorPos.Y - 1].erase(data[cursorPos.Y - 1].end() - 1, data[cursorPos.Y - 1].end() - 0);
+		erasedText = std::string{ data[cursorPos.Y - 1].end() - 1, data[cursorPos.Y - 1].end()};
+		data[cursorPos.Y - 1].erase(data[cursorPos.Y - 1].end() - 1, data[cursorPos.Y - 1].end());
 		data.erase(data.begin() + cursorPos.Y, data.begin() + cursorPos.Y + 1);
 		cursorPos.Y -= 1;
 		cursorPos.X = data[cursorPos.Y].size();
 		data[cursorPos.Y] += toMoveUpper;
 		
 	}
-	auto diff = diffPos(cursorPos, cursor.position());
-	moveAffectedCursors(users[index], diff);
+	auto startPos = cursor.position();
+	auto endPos = cursorPos;
+	auto diff = endPos - startPos;
+	ActionPtr action = std::make_shared<EraseAction>(std::move(startPos), std::move(cursorPos), std::move(erasedText));
+	affectHistory(action, diff, fromAction);
+	if (!fromAction) {
+		user.history.push(action);
+	}
+	moveAffectedCursors(user, diff);
 	adjustCursors();
-	//cursor.setPosition(cursorPos);
 	cursor.setOffset(cursorPos.X);
 	return cursorPos;
 }
 
-COORD Document::erase(const int index, const int eraseSize) {
-	COORD cursorPos{-1, -1};
-	for (int i = 0; i < eraseSize; i++) {
-		cursorPos = erase(index);
+void Document::affectHistory(ActionPtr action, const COORD& diffPos, const bool moveOnly) {
+	for (auto& user : users) {
+		user.history.affect(action, diffPos, moveOnly);
 	}
-	return cursorPos;
+}
+
+COORD Document::erase(const int index, const int eraseSize, const bool fromAction) {
+	if (index < 0 || index >= users.size()) {
+		return COORD{ -1, -1 };
+	}
+	auto& user = users[index];
+	auto startPos = user.cursor.position();
+	auto endPos = user.cursor.position();
+	for (int i = 0; i < eraseSize; i++) {
+		endPos = erase(user, fromAction);
+	}
+	return endPos;
+}
+
+bool Document::undo(const int index) {
+	if (index < 0 || index >= users.size()) {
+		return false;
+	}
+	auto& user = users[index];
+	auto actionOpt = user.history.undo();
+	if (!actionOpt.has_value()) {
+		return false;
+	}
+	auto& action = actionOpt.value();
+	auto type = action->getType();
+	if (type == ActionType::noop) {
+		return false;
+	}
+	auto text = action->getText();
+	auto endPos = COORD{ 0, 0 };
+	user.cursor.setPosition(action->getEndPos());
+	if (type == ActionType::write) {
+		endPos = erase(index, text.size(), true);
+	}
+	else if (type == ActionType::erase) {
+		endPos = write(index, text, true);
+	}
+	else {
+		assert(false && "Unrecognized ActionType. Aborting...");
+	}
+	return true;
+}
+
+bool Document::redo(const int index) {
+	if (index < 0 || index >= users.size()) {
+		return false;
+	}
+	auto& user = users[index];
+	auto actionOpt = user.history.redo();
+	if (!actionOpt.has_value()) {
+		return false;
+	}
+	auto& action = actionOpt.value();
+	auto type = action->getType();
+	if (type == ActionType::noop) {
+		return false;
+	}
+	auto text = action->getText();
+	auto endPos = COORD{ 0, 0 };
+	user.cursor.setPosition(action->getStartPos());
+	if (type == ActionType::write) {
+		endPos = write(index, text, true);
+	}
+	else if (type == ActionType::erase) {
+		endPos = erase(index, text.size(), true);
+	}
+	else {
+		assert(false && "Unrecognized ActionType. Aborting...");
+	}
+	return true;
 }
 
 bool Document::analyzeBackwardMove(User& user, const bool withSelect) {
 	auto& cursor = user.cursor;
 	auto& anchor = user.selectAnchor;
 	if (!withSelect && anchor.has_value()) {
-		if (smallerPos(anchor.value().position(), cursor.position())) {
+		if (anchor.value().position() < cursor.position()) {
 			cursor.setPosition(anchor.value().position());
 		}
 		anchor.reset();
@@ -184,7 +269,7 @@ bool Document::analyzeForwardMove(User& user, const bool withSelect) {
 	auto& cursor = user.cursor;
 	auto& anchor = user.selectAnchor;
 	if (!withSelect && anchor.has_value()) {
-		if (smallerPos(cursor.position(), anchor.value().position())) {
+		if (cursor.position() < anchor.value().position()) {
 			cursor.setPosition(anchor.value().position());
 		}
 		anchor.reset();
@@ -411,7 +496,7 @@ std::string Document::getSelectedText() const {
 	auto& cursor = users[myUserIdx].cursor;
 	auto cursorPos = cursor.position();
 	auto& anchor = users[myUserIdx].selectAnchor;
-	if (!anchor.has_value() || equalPos(cursorPos, anchor.value().position())) {
+	if (!anchor.has_value() || cursorPos == anchor.value().position()) {
 		return "";
 	}
 
@@ -460,10 +545,10 @@ void Document::moveAffectedCursors(User& movedUser, COORD& posDiff) {
 void Document::moveAffectedCursor(Cursor& cursor, COORD& moveStartPos, COORD& posDiff) {
 	auto otherCursorPos = cursor.position();
 	if (otherCursorPos.Y == moveStartPos.Y && otherCursorPos.X >= moveStartPos.X) {
-		cursor.setPosition(sumPos(otherCursorPos, posDiff));
+		cursor.setPosition(otherCursorPos + posDiff);
 	}
 	else if (otherCursorPos.Y > moveStartPos.Y) {
-		cursor.setPosition(sumPos(otherCursorPos, COORD{ 0, posDiff.Y }));
+		cursor.setPosition(otherCursorPos + COORD{ 0, posDiff.Y });
 	}
 }
 

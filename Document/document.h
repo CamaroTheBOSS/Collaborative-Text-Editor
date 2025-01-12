@@ -18,11 +18,13 @@ public:
 	Document(const std::string& text);
 	Document(const std::string& text, const int cursors, const int myUserIdx);
 
-	COORD write(const int cursor, const char letter);
-	COORD write(const int cursor, const std::string& text);
-	COORD erase(const int cursor);
-	COORD erase(const int cursor, const int eraseSize);
+	COORD write(User& user, const char letter, const bool fromAction = false);
+	COORD write(const int cursor, const std::string& text, const bool fromAction = false);
+	COORD erase(User& user, const bool fromAction = false);
+	COORD erase(const int cursor, const int eraseSize, const bool fromAction = false);
 	COORD eraseTextBetween(const COORD& cursorPos1, const COORD& cursorPos2);
+	bool undo(const int cursor);
+	bool redo(const int cursor);
 
 	COORD moveCursorLeft(const int cursor, const bool withSelect);
 	COORD moveCursorRight(const int cursor, const bool withSelect);
@@ -54,6 +56,7 @@ public:
 private:
 	void adjustCursors();
 	void adjustCursor(Cursor& cursor);
+	void affectHistory(ActionPtr action, const COORD& diffPos, const bool moveOnly);
 	void moveAffectedCursors(User& movedUser, COORD& posDiff);
 	void moveAffectedCursor(Cursor& cursor, COORD& moveStartPos, COORD& posDiff);
 	bool analyzeBackwardMove(User& user, const bool withSelect);

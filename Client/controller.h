@@ -20,4 +20,5 @@ private:
 	TCPClient client;
 	Terminal terminal;
 	Repository repo;
+	std::string authToken;
 };

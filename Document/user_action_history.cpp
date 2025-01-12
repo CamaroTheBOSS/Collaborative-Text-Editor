@@ -15,9 +15,9 @@ UserActionHistory& UserActionHistory::operator=(const UserActionHistory& other) 
 }
 
 void UserActionHistory::push(ActionPtr& action) {
-	/*if (inMergeInterval(action) && undoActions.back()->tryMerge(action)) {
+	if (inMergeInterval(action) && undoActions.back()->tryMerge(action)) {
 		return;
-	}*/
+	}
 
 	redoActions = {};
 	if (undoActions.size() >= historyLimit) {
@@ -63,11 +63,11 @@ bool UserActionHistory::inMergeInterval(const ActionPtr& action) const {
 	return !undoActions.empty() && action->getTimestamp() < undoActions.back()->getTimestamp() + mergeIntervalMs;
 }
 
-void UserActionHistory::affect(const ActionPtr& newAction, const COORD& posDiff) {
+void UserActionHistory::affect(const ActionPtr& newAction, const COORD& posDiff, const bool moveOnly) {
 	std::vector<std::pair<std::vector<ActionPtr>::const_iterator, ActionPtr>> newActions;
 	std::vector<std::vector<ActionPtr>::const_iterator> delActions;
 	for (auto actionIt = undoActions.begin(); actionIt != undoActions.end(); actionIt++) {
-		auto result = actionIt->get()->affect(newAction, posDiff);
+		auto result = actionIt->get()->affect(newAction, posDiff, moveOnly);
 		if (result.first) {
 			delActions.push_back(actionIt);
 		}

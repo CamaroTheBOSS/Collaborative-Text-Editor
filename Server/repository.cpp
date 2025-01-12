@@ -24,8 +24,11 @@ Response Repository::process(SOCKET client, msg::Buffer& buffer) {
 		return moveVertical(client, buffer);
 	case msg::Type::selectAll:
 		return moveSelectAll(client, buffer);
+	case msg::Type::undo:
+	case msg::Type::redo:
+		return undoRedo(client, buffer);
 	}
-	assert(false && "Unrecognized msg type. Aborting...");
+	assert(false && "Unrecognized message type, aborting...");
 	return Response{ buffer, {}, msg::Type::error };
 }
 
@@ -174,7 +177,7 @@ Response Repository::moveVertical(SOCKET client, msg::Buffer& buffer) {
 }
 
 Response Repository::moveSelectAll(SOCKET client, msg::Buffer& buffer) {
-	auto msg = msg::MoveSelectAll{};
+	auto msg = msg::ControlMessage{};
 	msg::parse(buffer, 0, msg.type, msg.version, msg.token);
 	int userIdx = findClient(client);
 	std::scoped_lock lock{docLock};
@@ -194,4 +197,24 @@ Response Repository::moveSelectAll(SOCKET client, msg::Buffer& buffer) {
 	unsigned int anchorY = anchor.value_or(COORD{ 0, 0 }).Y;
 	msg::serializeTo(buffer, 0, msg.type, msg.version, userBuff, cursorX, cursorY, anchorSet, anchorX, anchorY);
 	return Response{ buffer, connectedClients, msg::Type::selectAll };
+}
+
+Response Repository::undoRedo(SOCKET client, msg::Buffer& buffer) {
+	auto msg = msg::ControlMessage{};
+	msg::parse(buffer, 0, msg.type, msg.version, msg.token);
+	int userIdx = findClient(client);
+	std::scoped_lock lock{docLock};
+	if (msg.type == msg::Type::undo && !doc.undo(userIdx)) {
+		logger.logInfo("Warning! Cannot", msg.type, "msg from user", userIdx, "with type");
+		return Response{ buffer, {}, msg::Type::error };
+	}
+	else if (msg.type == msg::Type::redo && !doc.redo(userIdx)) {
+		logger.logInfo("Warning! Cannot", msg.type, "msg from user", userIdx, "with type");
+		return Response{ buffer, {}, msg::Type::error };
+	}
+	buffer.clear();
+	logger.logInfo("User", userIdx, msg.type, "action");
+	auto userBuff = static_cast<msg::OneByteInt>(userIdx);
+	msg::serializeTo(buffer, 0, msg.type, msg.version, userBuff);
+	return Response{ buffer, connectedClients, msg.type };
 }
