@@ -33,12 +33,22 @@ COORD Document::write(const int index, const std::string& newText) {
 	}
 	auto parsedLines = parseText(newText);
 	COORD startPos = users[index].cursor.position();
-	COORD endPos = insertText(startPos, parsedLines);
+	COORD endPos = eraseSelectedText(users[index]);
+	endPos = insertText(endPos, parsedLines);
 	COORD diffPos = endPos - startPos;
 	moveAffectedCursors(users[index], diffPos);
 	adjustCursors();
 	users[index].cursor.setOffset(endPos.X);
 	return endPos;
+}
+
+COORD Document::eraseSelectedText(User& user) {
+	COORD pos = user.cursor.position();
+	if (user.selectAnchor.has_value()) {
+		pos = eraseTextBetween(pos, user.selectAnchor.value().position());
+		user.selectAnchor.reset();
+	}
+	return pos;
 }
 
 COORD Document::insertText(COORD pos, const std::vector<std::string_view>& parsedLines) {

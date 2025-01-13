@@ -20,9 +20,6 @@ public:
 	Document(const std::string& text, const int cursors, const int myUserIdx);
 
 	COORD write(const int cursor, const std::string& text);
-	COORD insertText(COORD pos, const std::vector<std::string_view>& parsedLines);
-	std::string& addNewLine(const int col, const std::string_view initText);
-	std::vector<std::string_view> parseText(const std::string& text) const;
 
 	COORD erase(const int cursor);
 	COORD erase(const int cursor, const int eraseSize);
@@ -56,6 +53,11 @@ public:
 	std::string getFilename() const;
 
 private:
+	COORD insertText(COORD pos, const std::vector<std::string_view>& parsedLines);
+	std::string& addNewLine(const int col, const std::string_view initText);
+	std::vector<std::string_view> parseText(const std::string& text) const;
+	COORD eraseSelectedText(User& user);
+
 	void adjustCursors();
 	void adjustCursor(Cursor& cursor);
 	void moveAffectedCursors(User& movedUser, COORD& posDiff);
