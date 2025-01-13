@@ -93,12 +93,15 @@ Response Repository::write(SOCKET client, msg::Buffer& buffer) {
 	msg::parse(buffer, 0, msg.type, msg.version, msg.token, msg.text);
 	int userIdx = findClient(client);
 	std::scoped_lock lock{docLock};
+	COORD cursorPos = doc.getCursorPos(userIdx);
+	unsigned int cursorX = cursorPos.X;
+	unsigned int cursorY = cursorPos.Y;
 	doc.write(userIdx, msg.text);
 	logger.logInfo("user", userIdx, "wrote '" + msg.text + "' to document");
 	buffer.clear();
 	buffer.reserve(30 + msg.text.size());
 	auto userBuff = static_cast<msg::OneByteInt>(userIdx);
-	msg::serializeTo(buffer, 0, msg.type, msg.version, userBuff, msg.text);
+	msg::serializeTo(buffer, 0, msg.type, msg.version, userBuff, msg.text, cursorX, cursorY);
 	return Response{ buffer, connectedClients, msg::Type::write };
 }
 
@@ -107,12 +110,15 @@ Response Repository::erase(SOCKET client, msg::Buffer& buffer) {
 	msg::parse(buffer, 0, msg.type, msg.version, msg.token, msg.eraseSize);
 	int userIdx = findClient(client);
 	std::scoped_lock lock{docLock};
+	COORD cursorPos = doc.getCursorPos(userIdx);
+	unsigned int cursorX = cursorPos.X;
+	unsigned int cursorY = cursorPos.Y;
 	doc.erase(userIdx, msg.eraseSize);
 	logger.logInfo("user", userIdx, "erased", msg.eraseSize, "letters from document");
 	buffer.clear();
 	buffer.reserve(30);
 	auto userBuff = static_cast<msg::OneByteInt>(userIdx);
-	msg::serializeTo(buffer, 0, msg.type, msg.version, userBuff, msg.eraseSize);
+	msg::serializeTo(buffer, 0, msg.type, msg.version, userBuff, msg.eraseSize, cursorX, cursorY);
 	return Response{ buffer, connectedClients, msg::Type::erase };
 }
 
@@ -204,8 +210,52 @@ Response Repository::undoRedo(SOCKET client, msg::Buffer& buffer) {
 	msg::parse(buffer, 0, msg.type, msg.version, msg.token);
 	int userIdx = findClient(client);
 	std::scoped_lock lock{docLock};
-	if (msg.type == msg::Type::undo && !doc.undo(userIdx)) {
-		logger.logInfo("Warning! Cannot", msg.type, "msg from user", userIdx, "with type");
+
+	/*auto type = action->getType();
+	if (type == ActionType::noop) {
+		return false;
+	}
+	auto text = action->getText();
+	auto endPos = COORD{ 0, 0 };
+	user.cursor.setPosition(action->getEndPos());
+	if (type == ActionType::write) {
+		endPos = erase(index, text.size(), true);
+	}
+	else if (type == ActionType::erase) {
+		endPos = write(index, text, true);
+	}
+	else {
+		assert(false && "Unrecognized ActionType. Aborting...");
+	}
+	return true*/
+
+	if (msg.type == msg::Type::undo) {
+		auto action = doc.undo(userIdx);
+		auto type = action->getType();
+		if (type == ActionType::noop) {
+			logger.logInfo("Warning! Cannot", msg.type, "msg from user", userIdx, "with type");
+			return Response{ buffer, {}, msg::Type::error };
+		}
+		auto text = action->getText();
+		auto cursorPos = action->getEndPos();
+		doc.setCursorPos(userIdx, cursorPos);
+		auto endPos = COORD{ 0, 0 };
+		if (type == ActionType::write) {
+			endPos = doc.erase(userIdx, text.size(), true);
+		}
+		else if (type == ActionType::erase) {
+			endPos = doc.write(userIdx, text, true);
+		}
+		else {
+			assert(false && "Unrecognized ActionType. Aborting...");
+		}
+		unsigned int cursorX = cursorPos.X;
+		unsigned int cursorY = cursorPos.Y;
+		doc.write(userIdx, msg.text);
+		logger.logInfo("user", userIdx, "wrote '" + msg.text + "' to document");
+
+
+		
 		return Response{ buffer, {}, msg::Type::error };
 	}
 	else if (msg.type == msg::Type::redo && !doc.redo(userIdx)) {

@@ -63,11 +63,11 @@ bool UserActionHistory::inMergeInterval(const ActionPtr& action) const {
 	return !undoActions.empty() && action->getTimestamp() < undoActions.back()->getTimestamp() + mergeIntervalMs;
 }
 
-void UserActionHistory::affect(const ActionPtr& newAction, const COORD& posDiff, const bool moveOnly) {
+void UserActionHistory::affect(const ActionPtr& newAction, const COORD& posDiff) {
 	std::vector<std::pair<std::vector<ActionPtr>::const_iterator, ActionPtr>> newActions;
 	std::vector<std::vector<ActionPtr>::const_iterator> delActions;
 	for (auto actionIt = undoActions.begin(); actionIt != undoActions.end(); actionIt++) {
-		auto result = actionIt->get()->affect(newAction, posDiff, moveOnly);
+		auto result = actionIt->get()->affect(newAction, posDiff);
 		if (result.first) {
 			delActions.push_back(actionIt);
 		}

@@ -21,22 +21,22 @@ ActionPtr makeEmptyEraseAction() {
 }
 
 void addWriteActionToHistory(UserActionHistory& history, COORD startPos, COORD endPos, std::string txt) {
-	auto diff = diffPos(endPos, startPos);
+	auto diff = endPos - startPos;
 	auto action = makeWriteAction(std::move(startPos), std::move(endPos), std::move(txt));
-	history.affect(action, diff, false);
+	history.affect(action, diff);
 	history.push(action);
 }
 
 void addEraseActionToHistory(UserActionHistory& history, COORD startPos, COORD endPos, std::string txt) {
-	auto diff = diffPos(endPos, startPos);
+	auto diff = endPos - startPos;
 	auto action = makeEraseAction(std::move(startPos), std::move(endPos), std::move(txt));
-	history.affect(action, diff, false);
+	history.affect(action, diff);
 	history.push(action);
 }
 
 void validateAction(ActionPtr action, COORD desiredStartPos, COORD desiredEndPos, std::string desiredTxt) {
-	EXPECT_TRUE(equalPos(action->getStartPos(), desiredStartPos));
-	EXPECT_TRUE(equalPos(action->getEndPos(), desiredEndPos));
+	EXPECT_TRUE(action->getStartPos() == desiredStartPos);
+	EXPECT_TRUE(action->getEndPos() == desiredEndPos);
 	EXPECT_EQ(action->getText(), desiredTxt);
 }
 
@@ -44,8 +44,8 @@ void validateAction(ActionPtr action, COORD desiredStartPos, COORD desiredEndPos
 
 void validUndoAction(UserActionHistory& history, COORD desiredStartPos, COORD desiredEndPos, std::string desiredTxt) {
 	auto action = history.undo().value_or(makeEmptyWriteAction());
-	EXPECT_TRUE(equalPos(action->getStartPos(), desiredStartPos));
-	EXPECT_TRUE(equalPos(action->getEndPos(), desiredEndPos));
+	EXPECT_TRUE(action->getStartPos() == desiredStartPos);
+	EXPECT_TRUE(action->getEndPos() == desiredEndPos);
 	EXPECT_EQ(action->getText(), desiredTxt);
 }
 
@@ -158,8 +158,8 @@ TEST(UserActionHistoryTests, MergeWriteFromRightSideActionsTest) {
 	}
 	auto action = history.undo().value_or(makeEmptyWriteAction());
 	EXPECT_EQ(action->getText(), "test0test1test2");
-	EXPECT_TRUE(equalPos(action->getStartPos(), COORD{0, 0}));
-	EXPECT_TRUE(equalPos(action->getEndPos(), COORD{ 15, 0 }));
+	EXPECT_TRUE(action->getStartPos() == COORD(0, 0));
+	EXPECT_TRUE(action->getEndPos() == COORD(15, 0));
 }
 
 TEST(UserActionHistoryTests, DontMergeWriteFromLeftSideActionsTest) {
@@ -176,8 +176,8 @@ TEST(UserActionHistoryTests, DontMergeWriteFromLeftSideActionsTest) {
 	EXPECT_EQ(history.getUndoActions().size(), nEntries);
 	auto action = history.undo().value_or(makeEmptyWriteAction());
 	EXPECT_EQ(action->getText(), "test0");
-	EXPECT_TRUE(equalPos(action->getStartPos(), COORD{ 0, 0 }));
-	EXPECT_TRUE(equalPos(action->getEndPos(), COORD{ 5, 0 }));
+	EXPECT_TRUE(action->getStartPos() == COORD( 0, 0 ));
+	EXPECT_TRUE(action->getEndPos() == COORD( 5, 0 ));
 }
 
 TEST(UserActionHistoryTests, MergeEraseFromLeftSideActionsTest) {
@@ -194,8 +194,8 @@ TEST(UserActionHistoryTests, MergeEraseFromLeftSideActionsTest) {
 	EXPECT_EQ(history.getUndoActions().size(), 1);
 	auto action = history.undo().value_or(makeEmptyEraseAction());
 	EXPECT_EQ(action->getText(), "test1test2test3");
-	EXPECT_TRUE(equalPos(action->getStartPos(), COORD{ 15, 0 }));
-	EXPECT_TRUE(equalPos(action->getEndPos(), COORD{ 0, 0 }));
+	EXPECT_TRUE(action->getStartPos() == COORD( 15, 0 ));
+	EXPECT_TRUE(action->getEndPos() == COORD( 0, 0 ));
 }
 
 TEST(UserActionHistoryTests, DontMergeEraseFromRightSideActionsTest) {
@@ -212,8 +212,8 @@ TEST(UserActionHistoryTests, DontMergeEraseFromRightSideActionsTest) {
 	EXPECT_EQ(history.getUndoActions().size(), 3);
 	auto action = history.undo().value_or(makeEmptyEraseAction());
 	EXPECT_EQ(action->getText(), "test3");
-	EXPECT_TRUE(equalPos(action->getStartPos(), COORD{ 15, 0 }));
-	EXPECT_TRUE(equalPos(action->getEndPos(), COORD{ 10, 0 }));
+	EXPECT_TRUE(action->getStartPos() == COORD( 15, 0 ));
+	EXPECT_TRUE(action->getEndPos() == COORD( 10, 0 ));
 }
 
 TEST(UserActionHistoryTests, SplitActionTest) {
@@ -224,16 +224,16 @@ TEST(UserActionHistoryTests, SplitActionTest) {
 
 	auto anotherUserAction = makeWriteAction(COORD{ 4, 0 }, COORD{ 8, 0 }, "test");
 	COORD diffPos = COORD{ 4, 0 };
-	history.affect(anotherUserAction, diffPos, false);
+	history.affect(anotherUserAction, diffPos);
 
 	EXPECT_EQ(history.getUndoActions().size(), 2);
 	action = history.undo().value_or(makeEmptyWriteAction());
-	EXPECT_TRUE(equalPos(action->getStartPos(), COORD{ 8, 0 }));
-	EXPECT_TRUE(equalPos(action->getEndPos(), COORD{ 16, 0 }));
+	EXPECT_TRUE(action->getStartPos() == COORD( 8, 0 ));
+	EXPECT_TRUE(action->getEndPos() == COORD( 16, 0 ));
 	EXPECT_EQ(action->getText(), "longtest");
 	action = history.undo().value_or(makeEmptyWriteAction());
-	EXPECT_TRUE(equalPos(action->getStartPos(), COORD{ 0, 0 }));
-	EXPECT_TRUE(equalPos(action->getEndPos(), COORD{ 4, 0 }));
+	EXPECT_TRUE(action->getStartPos() == COORD( 0, 0 ));
+	EXPECT_TRUE(action->getEndPos() == COORD( 4, 0 ));
 	EXPECT_EQ(action->getText(), "very");
 }
 
@@ -245,16 +245,16 @@ TEST(UserActionHistoryTests, SplitActionWithEndlTest) {
 
 	auto anotherUserAction = makeWriteAction(COORD{ 4, 0 }, COORD{ 0, 1 }, "ThisTextIsSoLong\n");
 	COORD diffPos = COORD{ -4, 1 };
-	history.affect(anotherUserAction, diffPos, false);
+	history.affect(anotherUserAction, diffPos);
 
 	EXPECT_EQ(history.getUndoActions().size(), 2);
 	action = history.undo().value_or(makeEmptyWriteAction());
-	EXPECT_TRUE(equalPos(action->getStartPos(), COORD{ 0, 1 }));
-	EXPECT_TRUE(equalPos(action->getEndPos(), COORD{ 2, 2 }));
+	EXPECT_TRUE(action->getStartPos() == COORD( 0, 1 ));
+	EXPECT_TRUE(action->getEndPos() == COORD( 2, 2 ));
 	EXPECT_EQ(action->getText(), "longtest\nxd");
 	action = history.undo().value_or(makeEmptyWriteAction());
-	EXPECT_TRUE(equalPos(action->getStartPos(), COORD{ 0, 0 }));
-	EXPECT_TRUE(equalPos(action->getEndPos(), COORD{ 4, 0 }));
+	EXPECT_TRUE(action->getStartPos() == COORD( 0, 0 ));
+	EXPECT_TRUE(action->getEndPos() == COORD( 4, 0 ));
 	EXPECT_EQ(action->getText(), "very");
 }
 
@@ -266,7 +266,7 @@ TEST(UserActionHistoryTests, a1bcTest) {
 	addWriteActionToHistory(history, COORD{ 1, 0 }, COORD{ 2, 0 }, "1");
 	history.undo();
 	auto action = makeEraseAction(COORD{ 2, 0 }, COORD{ 1, 0 }, "1");
-	history.affect(action, diffPos(action->getEndPos(), action->getStartPos()), true);
+	history.affect(action, action->getEndPos() - action->getStartPos());
 
 	auto& undoActions = history.getUndoActions();
 	EXPECT_EQ(undoActions.size(), 3);
@@ -284,9 +284,9 @@ TEST(UserActionHistoryTests, ActionsWithEndlinesSplitTest) {
 	addWriteActionToHistory(history1, COORD{ 6, 1 }, COORD{ 6, 3 }, "\nthird\nfourth");
 	addWriteActionToHistory(history1, COORD{ 6, 3 }, COORD{ 5, 4 }, "\nfifth");
 	auto action = makeWriteAction(COORD{ 2, 4 }, COORD{6, 4}, "1234");
-	history1.affect(action, COORD{ 4, 0 }, false);
+	history1.affect(action, COORD{ 4, 0 });
 	action = makeWriteAction(COORD{ 6, 3 }, COORD{ 9, 3 }, "123");
-	history1.affect(action, COORD{ 3, 0 }, false);
+	history1.affect(action, COORD{ 3, 0 });
 	auto& undoActions = history1.getUndoActions();
 	EXPECT_EQ(undoActions.size(), 4);
 	if (undoActions.size() == 4) {
@@ -304,7 +304,7 @@ TEST(UserActionHistoryTests, ActionsWithEndlinesNewActionWithEndlineSplitTest) {
 	addWriteActionToHistory(history1, COORD{ 6, 1 }, COORD{ 6, 3 }, "\nthird\nfourth");
 	addWriteActionToHistory(history1, COORD{ 6, 3 }, COORD{ 5, 4 }, "\nfifth");
 	auto action = makeWriteAction(COORD{ 2, 4 }, COORD{ 0, 5 }, "1234\n");
-	history1.affect(action, COORD{ -2, 1 }, false);
+	history1.affect(action, COORD{ -2, 1 });
 	auto& undoActions = history1.getUndoActions();
 	EXPECT_EQ(undoActions.size(), 4);
 	if (undoActions.size() == 4) {
@@ -321,7 +321,7 @@ TEST(UserActionHistoryTests, CutActionFromRightTest) {
 	addWriteActionToHistory(history, COORD{ 0, 0 }, COORD{ 10, 0 }, "testing123");
 
 	auto action = makeEraseAction(COORD{ 12, 0 }, COORD{ 8, 0 }, "23xd");
-	history.affect(action, diffPos(action->getEndPos(), action->getStartPos()), false);
+	history.affect(action, action->getEndPos() - action->getStartPos());
 
 	auto& undoActions = history.getUndoActions();
 	EXPECT_EQ(undoActions.size(), 1);
@@ -336,7 +336,7 @@ TEST(UserActionHistoryTests, CutActionFromLeftTest) {
 	addWriteActionToHistory(history, COORD{ 2, 0 }, COORD{ 12, 0 }, "testing123");
 
 	auto action = makeEraseAction(COORD{ 4, 0 }, COORD{ 0, 0 }, "xdte");
-	history.affect(action, diffPos(action->getEndPos(), action->getStartPos()), false);
+	history.affect(action, action->getEndPos() - action->getStartPos());
 
 	auto& undoActions = history.getUndoActions();
 	EXPECT_EQ(undoActions.size(), 1);
@@ -351,7 +351,7 @@ TEST(UserActionHistoryTests, DeleteActionTest) {
 	addWriteActionToHistory(history, COORD{ 2, 0 }, COORD{ 12, 0 }, "testing123");
 
 	auto action = makeEraseAction(COORD{ 12, 0 }, COORD{ 2, 0 }, "testing123");
-	history.affect(action, diffPos(action->getEndPos(), action->getStartPos()), false);
+	history.affect(action, action->getEndPos() - action->getStartPos());
 
 	auto& undoActions = history.getUndoActions();
 	EXPECT_EQ(undoActions.size(), 0);
@@ -363,11 +363,11 @@ TEST(UserActionHistoryTests, EraseInWriteTest) {
 	addWriteActionToHistory(history, COORD{ 2, 0 }, COORD{ 12, 0 }, "testing123");
 
 	auto action = makeEraseAction(COORD{ 8, 0 }, COORD{ 4, 0 }, "stin");
-	history.affect(action, diffPos(action->getEndPos(), action->getStartPos()), false);
+	history.affect(action, action->getEndPos() - action->getStartPos());
 
 	auto& undoActions = history.getUndoActions();
 	EXPECT_EQ(undoActions.size(), 1);
 	if (undoActions.size() == 1) {
-		validateAction(undoActions[0], COORD{ 0, 0 }, COORD{ 8, 0 }, "teg123");
+		validateAction(undoActions[0], COORD{ 2, 0 }, COORD{ 8, 0 }, "teg123");
 	}
 }

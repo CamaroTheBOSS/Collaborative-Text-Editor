@@ -185,6 +185,8 @@ namespace msg {
 		OneByteInt version;
 		OneByteInt user;
 		std::string text;
+		unsigned int X;
+		unsigned int Y;
 	};
 
 	struct Erase {
@@ -199,6 +201,8 @@ namespace msg {
 		OneByteInt version;
 		OneByteInt user;
 		unsigned int eraseSize;
+		unsigned int X;
+		unsigned int Y;
 	};
 
 	struct MoveHorizontal {

@@ -47,5 +47,5 @@ std::pair<const COORD*, const COORD*> getAscendingOrder(const COORD& pos1, const
 
 bool posBetween(const COORD& pos, const COORD& first, const COORD& second) {
 	auto [left, right] = getAscendingOrder(first, second);
-	return *left <= pos && pos <= *right;
+	return *left < pos && pos < *right;
 }

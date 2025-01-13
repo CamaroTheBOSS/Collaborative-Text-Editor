@@ -65,7 +65,7 @@ COORD Document::write(User& user, const char letter, const bool fromAction) {
 	auto endPos = cursorPos;
 	auto diff = endPos - startPos;
 	ActionPtr action = std::make_shared<WriteAction>(std::move(startPos), std::move(cursorPos), std::string{letter});
-	affectHistory(action, diff, fromAction);
+	affectHistory(action, diff);
 	if (!fromAction) {
 		user.history.push(action);
 	}
@@ -138,7 +138,7 @@ COORD Document::erase(User& user, const bool fromAction) {
 	auto endPos = cursorPos;
 	auto diff = endPos - startPos;
 	ActionPtr action = std::make_shared<EraseAction>(std::move(startPos), std::move(cursorPos), std::move(erasedText));
-	affectHistory(action, diff, fromAction);
+	affectHistory(action, diff);
 	if (!fromAction) {
 		user.history.push(action);
 	}
@@ -148,9 +148,9 @@ COORD Document::erase(User& user, const bool fromAction) {
 	return cursorPos;
 }
 
-void Document::affectHistory(ActionPtr action, const COORD& diffPos, const bool moveOnly) {
+void Document::affectHistory(ActionPtr action, const COORD& diffPos) {
 	for (auto& user : users) {
-		user.history.affect(action, diffPos, moveOnly);
+		user.history.affect(action, diffPos);
 	}
 }
 
@@ -167,17 +167,20 @@ COORD Document::erase(const int index, const int eraseSize, const bool fromActio
 	return endPos;
 }
 
-bool Document::undo(const int index) {
+ActionPtr Document::undo(const int index) {
 	if (index < 0 || index >= users.size()) {
-		return false;
+		return std::make_shared<NoopAction>();
 	}
 	auto& user = users[index];
 	auto actionOpt = user.history.undo();
 	if (!actionOpt.has_value()) {
-		return false;
+		return std::make_shared<NoopAction>();
 	}
-	auto& action = actionOpt.value();
-	auto type = action->getType();
+	return actionOpt.value();
+
+
+
+	/*auto type = action->getType();
 	if (type == ActionType::noop) {
 		return false;
 	}
@@ -193,20 +196,21 @@ bool Document::undo(const int index) {
 	else {
 		assert(false && "Unrecognized ActionType. Aborting...");
 	}
-	return true;
+	return true;*/
 }
 
-bool Document::redo(const int index) {
+ActionPtr Document::redo(const int index) {
 	if (index < 0 || index >= users.size()) {
-		return false;
+		return std::make_shared<NoopAction>();
 	}
 	auto& user = users[index];
-	auto actionOpt = user.history.redo();
+	auto actionOpt = user.history.undo();
 	if (!actionOpt.has_value()) {
-		return false;
+		return std::make_shared<NoopAction>();
 	}
-	auto& action = actionOpt.value();
-	auto type = action->getType();
+	return actionOpt.value();
+
+	/*auto type = action->getType();
 	if (type == ActionType::noop) {
 		return false;
 	}
@@ -222,7 +226,7 @@ bool Document::redo(const int index) {
 	else {
 		assert(false && "Unrecognized ActionType. Aborting...");
 	}
-	return true;
+	return true;*/
 }
 
 bool Document::analyzeBackwardMove(User& user, const bool withSelect) {

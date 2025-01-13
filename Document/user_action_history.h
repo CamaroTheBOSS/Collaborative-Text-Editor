@@ -13,7 +13,7 @@ public:
 	void push(ActionPtr& action);
 	std::optional<ActionPtr> undo();
 	std::optional<ActionPtr> redo();
-	void affect(const ActionPtr& action, const COORD& posDiff, const bool moveOnly);
+	void affect(const ActionPtr& action, const COORD& posDiff);
 	int getHistoryLimit() const;
 	const std::vector<ActionPtr>& getUndoActions() const;
 	const std::vector<ActionPtr>& getRedoActions() const;

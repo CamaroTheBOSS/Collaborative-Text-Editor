@@ -16,7 +16,6 @@ private:
 	bool sync(msg::Buffer& buffer);
 	bool connectNewUser(msg::Buffer& buffer);
 	bool disconnectUser(msg::Buffer& buffer);
-	bool undoRedo(msg::Buffer& buffer);
 
 	Document doc;
 

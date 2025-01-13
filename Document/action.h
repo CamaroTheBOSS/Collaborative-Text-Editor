@@ -20,7 +20,7 @@ public:
 	virtual COORD getStartPos() const = 0;
 	virtual COORD getEndPos() const = 0;
 
-	ModifyResult affect(const ActionPtr& other, const COORD& posDiff, bool moveOnly);
+	ModifyResult affect(const ActionPtr& other, const COORD& posDiff);
 	void setLeft(const COORD newPos);
 	void setRight(const COORD newPos);
 	COORD getLeft() const;
@@ -30,7 +30,6 @@ public:
 	Timestamp getTimestamp() const;
 
 protected:
-	std::pair<int, int> getOffsets(const ActionPtr& other) const;
 	virtual void moveLeftCursor(const ActionPtr& other, const COORD& posDiff) = 0;
 	virtual void moveRightCursor(const ActionPtr& other, const COORD& posDiff) = 0;
 	virtual ModifyResult modify(const ActionPtr& other) = 0;

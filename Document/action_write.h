@@ -9,8 +9,6 @@ public:
 	COORD getStartPos() const override;
 	COORD getEndPos() const override;
 protected:
-	void moveCursorsWriteAction(const ActionPtr& other, const COORD& posDiff);
-	void moveCursorsEraseAction(const ActionPtr& other, const COORD& posDiff);
 	void moveLeftCursor(const ActionPtr& other, const COORD& posDiff) override;
 	void moveRightCursor(const ActionPtr& other, const COORD& posDiff) override;
 	ModifyResult modify(const ActionPtr& other) override;
