@@ -25,11 +25,11 @@ void Renderer::render(Document& doc, const ScrollableScreenBuffer& buffer) const
 }
 
 void Renderer::renderText(const ScrollableScreenBuffer& buffer, const std::vector<std::string>& linesToRender, const COORD& startPos, const COORD& endPos) const {
-    if (!smallerPos(startPos, endPos)) {
+    if (startPos >= endPos) {
         return;
     }
     auto bufferStartPos = buffer.getStartPos();
-    auto renderIndexingBase = diffPos(startPos, bufferStartPos);
+    auto renderIndexingBase = startPos - bufferStartPos;
     if (startPos.Y == endPos.Y) {
         SetConsoleCursorPosition(hConsole, startPos);
         std::cout << linesToRender[renderIndexingBase.Y].substr(renderIndexingBase.X, endPos.X - startPos.X);
@@ -58,11 +58,11 @@ void Renderer::renderCursor(const ScrollableScreenBuffer& buffer, const RenderCu
 }
 
 void Renderer::renderSelection(const std::vector<std::string>& linesToRender, const ScrollableScreenBuffer& buffer, const COORD& cursor, const COORD& anchor, const int color) const {
-    if (equalPos(cursor, anchor)) {
+    if (cursor == anchor) {
         return;
     }
     const COORD* smallerOne; const COORD* biggerOne;
-    if (smallerPos(cursor, anchor)) {
+    if (cursor < anchor) {
         smallerOne = &cursor;
         biggerOne = &anchor;
     }
@@ -72,8 +72,8 @@ void Renderer::renderSelection(const std::vector<std::string>& linesToRender, co
     }
     const COORD startPos = buffer.getStartPos();
     const COORD endPos = buffer.getEndPos();
-    auto& start = smallerPos(*smallerOne, startPos) ? startPos : *smallerOne;
-    auto& end = smallerPos(*biggerOne, endPos) ? *biggerOne : endPos;
+    auto& start = *smallerOne < startPos ? startPos : *smallerOne;
+    auto& end = *biggerOne < endPos ? *biggerOne : endPos;
 
     SetConsoleTextAttribute(hConsole, color);
     SetConsoleCursorPosition(hConsole, start);

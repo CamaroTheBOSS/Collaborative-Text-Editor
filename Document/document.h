@@ -4,12 +4,11 @@
 #include <vector>
 #include <string>
 #include <optional>
-#include "user_action_history.h"
+#include "cursor.h"
 
 struct User {
 	Cursor cursor;
 	std::optional<Cursor> selectAnchor;
-	UserActionHistory history{ std::chrono::milliseconds(1000) };
 };
 
 class Document {

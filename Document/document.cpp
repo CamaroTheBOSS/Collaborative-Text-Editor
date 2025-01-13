@@ -61,7 +61,7 @@ COORD Document::write(const int index, const char letter) {
 		}
 	}
 	auto startPos = cursor.position();
-	auto diff = diffPos(cursorPos, startPos);
+	auto diff = cursorPos - startPos;
 	moveAffectedCursors(users[index], diff);
 	adjustCursors();
 	//cursor.setPosition(cursorPos);
@@ -124,7 +124,7 @@ COORD Document::erase(const int index) {
 		data[cursorPos.Y] += toMoveUpper;
 		
 	}
-	auto diff = diffPos(cursorPos, cursor.position());
+	auto diff = cursorPos - cursor.position();
 	moveAffectedCursors(users[index], diff);
 	adjustCursors();
 	//cursor.setPosition(cursorPos);
@@ -144,7 +144,7 @@ bool Document::analyzeBackwardMove(User& user, const bool withSelect) {
 	auto& cursor = user.cursor;
 	auto& anchor = user.selectAnchor;
 	if (!withSelect && anchor.has_value()) {
-		if (smallerPos(anchor.value().position(), cursor.position())) {
+		if (anchor.value().position() < cursor.position()) {
 			cursor.setPosition(anchor.value().position());
 		}
 		anchor.reset();
@@ -184,7 +184,7 @@ bool Document::analyzeForwardMove(User& user, const bool withSelect) {
 	auto& cursor = user.cursor;
 	auto& anchor = user.selectAnchor;
 	if (!withSelect && anchor.has_value()) {
-		if (smallerPos(cursor.position(), anchor.value().position())) {
+		if (cursor.position() < anchor.value().position()) {
 			cursor.setPosition(anchor.value().position());
 		}
 		anchor.reset();
@@ -411,7 +411,7 @@ std::string Document::getSelectedText() const {
 	auto& cursor = users[myUserIdx].cursor;
 	auto cursorPos = cursor.position();
 	auto& anchor = users[myUserIdx].selectAnchor;
-	if (!anchor.has_value() || equalPos(cursorPos, anchor.value().position())) {
+	if (!anchor.has_value() || cursorPos == anchor.value().position()) {
 		return "";
 	}
 
@@ -460,10 +460,10 @@ void Document::moveAffectedCursors(User& movedUser, COORD& posDiff) {
 void Document::moveAffectedCursor(Cursor& cursor, COORD& moveStartPos, COORD& posDiff) {
 	auto otherCursorPos = cursor.position();
 	if (otherCursorPos.Y == moveStartPos.Y && otherCursorPos.X >= moveStartPos.X) {
-		cursor.setPosition(sumPos(otherCursorPos, posDiff));
+		cursor.setPosition(otherCursorPos + posDiff);
 	}
 	else if (otherCursorPos.Y > moveStartPos.Y) {
-		cursor.setPosition(sumPos(otherCursorPos, COORD{ 0, posDiff.Y }));
+		cursor.setPosition(otherCursorPos + COORD{ 0, posDiff.Y });
 	}
 }
 
