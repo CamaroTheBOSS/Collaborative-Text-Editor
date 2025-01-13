@@ -1,6 +1,7 @@
 #include <algorithm>
 #include "document.h"
 #include "pos_helpers.h"
+#include "line_modifier.h"
 
 #define NOMINMAX
 
@@ -26,58 +27,59 @@ Document::Document(const std::string& text, const int nCursors, const int myUser
 	setText(text);
 }
 
-COORD Document::write(const int index, const char letter) {
+COORD Document::write(const int index, const std::string& newText) {
 	if (index < 0 || index >= users.size()) {
 		return COORD{ -1, -1 };
 	}
-	auto& cursor = users[index].cursor;
-	auto& anchor = users[index].selectAnchor;
-	auto cursorPos = cursor.position();
-	if (cursorPos.Y > data.size()) {
-		return cursorPos;
-	}
-	if (anchor.has_value()) {
-		cursorPos = eraseTextBetween(cursorPos, anchor.value().position());
-		anchor.reset();
-	}
-	if (cursorPos.X >= data[cursorPos.Y].size()) {
-		data[cursorPos.Y] += letter;
-		cursorPos.X += 1;
-		if (letter == '\n') {
-			data.insert(data.begin() + cursorPos.Y + 1, "");
-			cursorPos.Y += 1;
-			cursorPos.X = 0;
-		}
-	}
-	else {
-		data[cursorPos.Y].insert(data[cursorPos.Y].begin() + cursorPos.X, letter);
-		cursorPos.X += 1;
-		if (letter == '\n') {
-			std::string toMoveBelow = data[cursorPos.Y].substr(cursorPos.X, data[cursorPos.Y].size() - cursorPos.X);
-			data[cursorPos.Y].erase(cursorPos.X, data[cursorPos.Y].size() - cursorPos.X);
-			data.insert(data.begin() + cursorPos.Y + 1, toMoveBelow);
-			cursorPos.Y += 1;
-			cursorPos.X = 0;
-		}
-	}
-	auto startPos = cursor.position();
-	auto diff = cursorPos - startPos;
-	moveAffectedCursors(users[index], diff);
+	auto parsedLines = parseText(newText);
+	COORD startPos = users[index].cursor.position();
+	COORD endPos = insertText(startPos, parsedLines);
+	COORD diffPos = endPos - startPos;
+	moveAffectedCursors(users[index], diffPos);
 	adjustCursors();
-	//cursor.setPosition(cursorPos);
-	cursor.setOffset(cursorPos.X);
-	return cursorPos;
+	users[index].cursor.setOffset(endPos.X);
+	return endPos;
 }
 
-COORD Document::write(const int index, const std::string& text) {
-	COORD cursorPos = COORD{ -1, -1 };
-	for (const auto letter : text) {
-		if (letter == '\r') {
-			continue;
-		}
-		cursorPos = write(index, letter);
+COORD Document::insertText(COORD pos, const std::vector<std::string_view>& parsedLines) {
+	if (parsedLines.size() == 1) {
+		pos.X = LineModifier::insert(data[pos.Y], pos.X, parsedLines[0]);
+		return pos;
 	}
-	return cursorPos;
+
+	std::string toMoveDown = LineModifier::cut(data[pos.Y], pos.X);
+	LineModifier::append(data[pos.Y], parsedLines[0]);
+	for (int i = 1; i < parsedLines.size(); i++) {
+		addNewLine(pos.Y + i, parsedLines[i]);
+	}
+	pos.Y += parsedLines.size() - 1;
+	pos.X = data[pos.Y].size();
+	data[pos.Y].append(toMoveDown);
+	return pos;
+}
+
+std::string& Document::addNewLine(const int col, const std::string_view initText) {
+	data.insert(data.cbegin() + col, std::string{ initText });
+	return data[col];
+}
+
+std::vector<std::string_view> Document::parseText(const std::string& text) const {
+	size_t offset = 0;
+	size_t end = text.find('\n');
+	std::vector<std::string_view> parsedLines;
+	if (end == std::string::npos) {
+		parsedLines.push_back(std::string_view{ text });
+		return parsedLines;
+	}
+	do {
+		std::string_view lineText{text.cbegin() + offset, text.cbegin() + end + 1};
+		parsedLines.push_back(lineText);
+		offset = end + 1;
+		end = text.find('\n', offset);
+	} while (end != std::string::npos);
+	std::string_view lineText{text.cbegin() + offset, text.cend()};
+	parsedLines.push_back(lineText);
+	return parsedLines;
 }
 
 COORD Document::eraseTextBetween(const COORD& cursor1, const COORD& cursor2) {

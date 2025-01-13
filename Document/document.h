@@ -11,14 +11,19 @@ struct User {
 	std::optional<Cursor> selectAnchor;
 };
 
+
+
 class Document {
 public:
 	Document();
 	Document(const std::string& text);
 	Document(const std::string& text, const int cursors, const int myUserIdx);
 
-	COORD write(const int cursor, const char letter);
 	COORD write(const int cursor, const std::string& text);
+	COORD insertText(COORD pos, const std::vector<std::string_view>& parsedLines);
+	std::string& addNewLine(const int col, const std::string_view initText);
+	std::vector<std::string_view> parseText(const std::string& text) const;
+
 	COORD erase(const int cursor);
 	COORD erase(const int cursor, const int eraseSize);
 	COORD eraseTextBetween(const COORD& cursorPos1, const COORD& cursorPos2);
