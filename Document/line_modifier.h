@@ -9,5 +9,7 @@ public:
 	static int erase(std::string& line, const int pos, const int n = INT_MAX);
 	static std::string cut(std::string& line, const int left, const int right = INT_MAX);
 	static std::string_view get(std::string& line, const int left, const int right = INT_MAX);
-	static std::pair<int, int> effectiveRange(std::string& line, const int left, const int right);
+	static std::pair<int, int> effectiveRange(const std::string& line, const int left, const int right);
+private:
+	static bool endlPresent(const std::string& line);
 };

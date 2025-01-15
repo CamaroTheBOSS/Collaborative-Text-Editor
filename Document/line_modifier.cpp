@@ -9,6 +9,7 @@ SHORT LineModifier::insert(std::string& line, const int pos, const std::string_v
 }
 
 int LineModifier::append(std::string& line, const std::string_view newText) {
+
 	line.append(std::string{ newText });
 	return line.size();
 }
@@ -40,6 +41,10 @@ std::string_view LineModifier::get(std::string& line, const int left, const int 
 	return std::string_view{line.cbegin() + effLeft, line.cbegin() + effRight};
 }
 
-std::pair<int, int> LineModifier::effectiveRange(std::string& line, const int left, const int right) {
+std::pair<int, int> LineModifier::effectiveRange(const std::string& line, const int left, const int right) {
 	return { (std::max)(0, left), (std::min)(static_cast<int>(line.size()), right) };
+}
+
+bool LineModifier::endlPresent(const std::string& line) {
+	return !line.empty() && line[line.size() - 1] == '\n';
 }

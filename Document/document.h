@@ -9,6 +9,9 @@
 struct User {
 	Cursor cursor;
 	std::optional<Cursor> selectAnchor;
+	bool isSelecting() {
+		return selectAnchor.has_value();
+	}
 };
 
 
@@ -20,11 +23,8 @@ public:
 	Document(const std::string& text, const int cursors, const int myUserIdx);
 
 	COORD write(const int cursor, const std::string& text);
-
-	COORD erase(const int cursor);
 	COORD erase(const int cursor, const int eraseSize);
-	COORD eraseTextBetween(const COORD& cursorPos1, const COORD& cursorPos2);
-
+	
 	COORD moveCursorLeft(const int cursor, const bool withSelect);
 	COORD moveCursorRight(const int cursor, const bool withSelect);
 	COORD moveCursorUp(const int cursor, const int bufferWidth, const bool withSelect);
@@ -56,7 +56,11 @@ private:
 	COORD insertText(COORD pos, const std::vector<std::string_view>& parsedLines);
 	std::string& addNewLine(const int col, const std::string_view initText);
 	std::vector<std::string_view> parseText(const std::string& text) const;
+
+	COORD eraseText(COORD pos, int eraseSize);
+	int eraseLine(const int col);
 	COORD eraseSelectedText(User& user);
+	COORD eraseTextBetween(const COORD& cursorPos1, const COORD& cursorPos2);
 
 	void adjustCursors();
 	void adjustCursor(Cursor& cursor);

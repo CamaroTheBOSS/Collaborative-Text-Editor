@@ -82,7 +82,7 @@ std::vector<std::string_view> Document::parseText(const std::string& text) const
 		return parsedLines;
 	}
 	do {
-		std::string_view lineText{text.cbegin() + offset, text.cbegin() + end + 1};
+		std::string_view lineText{text.cbegin() + offset, text.cbegin() + end};
 		parsedLines.push_back(lineText);
 		offset = end + 1;
 		end = text.find('\n', offset);
@@ -107,49 +107,40 @@ COORD Document::eraseTextBetween(const COORD& cursor1, const COORD& cursor2) {
 	return *smaller;
 }
 
-COORD Document::erase(const int index) {
-	if (index < 0 || index >= users.size()) {
-		return COORD{ -1, -1 };
+COORD Document::eraseText(COORD pos, int eraseSize) {
+	if (eraseSize < pos.X) {
+		pos.X = LineModifier::erase(data[pos.Y], pos.X, eraseSize);
 	}
-	auto& cursor = users[index].cursor;
-	auto& anchor = users[index].selectAnchor;
-	auto cursorPos = cursor.position();
-	if (cursorPos.Y > data.size()) {
-		return cursorPos;
-	}
-
-	if (anchor.has_value()) {
-		cursorPos = eraseTextBetween(cursorPos, anchor.value().position());
-		anchor.reset();
-	} else if (cursorPos.X > 0) {
-		data[cursorPos.Y].erase(data[cursorPos.Y].begin() + cursorPos.X - 1, data[cursorPos.Y].begin() + cursorPos.X);
-		cursorPos.X -= 1;
-	} else {
-		if (cursorPos.Y <= 0) {
-			return cursorPos;
+	else {
+		std::string toMoveUp = LineModifier::cut(data[pos.Y], pos.X);
+		while (pos.Y > 0 && eraseSize > data[pos.Y].size()) {
+			eraseSize -= eraseLine(pos.Y--);
 		}
-		std::string toMoveUpper = data[cursorPos.Y];
-		data[cursorPos.Y - 1].erase(data[cursorPos.Y - 1].end() - 1, data[cursorPos.Y - 1].end() - 0);
-		data.erase(data.begin() + cursorPos.Y, data.begin() + cursorPos.Y + 1);
-		cursorPos.Y -= 1;
-		cursorPos.X = data[cursorPos.Y].size();
-		data[cursorPos.Y] += toMoveUpper;
-		
+		pos.X = LineModifier::erase(data[pos.Y], data[pos.Y].size(), eraseSize);
+		LineModifier::append(data[pos.Y], toMoveUp);
 	}
-	auto diff = cursorPos - cursor.position();
-	moveAffectedCursors(users[index], diff);
-	adjustCursors();
-	//cursor.setPosition(cursorPos);
-	cursor.setOffset(cursorPos.X);
-	return cursorPos;
+	return pos;
+}
+
+int Document::eraseLine(const int col) {
+	int size = data[col].size() + 1;
+	data.erase(data.cbegin() + col);
+	return size;
 }
 
 COORD Document::erase(const int index, const int eraseSize) {
-	COORD cursorPos{-1, -1};
-	for (int i = 0; i < eraseSize; i++) {
-		cursorPos = erase(index);
+	if (index < 0 || index >= users.size()) {
+		return COORD{ -1, -1 };
 	}
-	return cursorPos;
+	COORD startPos = users[index].cursor.position();
+	COORD endPos = users[index].isSelecting() ? 
+		eraseSelectedText(users[index]) : 
+		eraseText(startPos, eraseSize);
+	COORD diffPos = endPos - startPos;
+	moveAffectedCursors(users[index], diffPos);
+	adjustCursors();
+	users[index].cursor.setOffset(endPos.X);
+	return endPos;
 }
 
 bool Document::analyzeBackwardMove(User& user, const bool withSelect) {
@@ -185,7 +176,7 @@ COORD Document::moveCursorLeft(const int index, const bool withSelect) {
 	}
 	else {
 		cursorPos.Y--;
-		cursorPos.X = data[cursorPos.Y].size() - 1;
+		cursorPos.X = data[cursorPos.Y].size();
 	}
 	cursor.setPosition(cursorPos);
 	cursor.setOffset(cursorPos.X);
@@ -221,8 +212,7 @@ COORD Document::moveCursorRight(const int index, const bool withSelect) {
 	if (cursorPos.Y == data.size() - 1 && cursorPos.X == data[cursorPos.Y].size()) {
 		return cursorPos;
 	}
-	bool endlPresent = !data[cursorPos.Y].empty() && data[cursorPos.Y][data[cursorPos.Y].size() - 1] == '\n';
-	if (cursorPos.X < data[cursorPos.Y].size() - endlPresent) {
+	if (cursorPos.X < data[cursorPos.Y].size()) {
 		cursorPos.X++;
 	}
 	else {
@@ -251,7 +241,7 @@ COORD Document::moveCursorUp(const int index, const int bufferWidth, const bool 
 			cursorPos.Y--;
 		}
 		int perfectCursorPos = data[cursorPos.Y].size() / bufferWidth * bufferWidth + offset;
-		cursorPos.X = (std::min)(perfectCursorPos, (int)data[cursorPos.Y].size() - 1);
+		cursorPos.X = (std::min)(perfectCursorPos, (int)data[cursorPos.Y].size());
 	}
 	cursor.setPosition(cursorPos);
 	return cursorPos;
@@ -267,14 +257,12 @@ COORD Document::moveCursorDown(const int index, const int bufferWidth, const boo
 	cursor.setOffset(cursor.offset() % bufferWidth);
 	auto offset = cursor.offset();
 	if (data[cursorPos.Y].size() > (cursorPos.X / bufferWidth + 1) * bufferWidth) {
-		bool endlPresent = !data[cursorPos.Y].empty() && data[cursorPos.Y][data[cursorPos.Y].size() - 1] == '\n';
-		cursorPos.X = (std::min)(cursorPos.X + bufferWidth, (int)data[cursorPos.Y].size() - endlPresent);
+		cursorPos.X = (std::min)(cursorPos.X + bufferWidth, (int)data[cursorPos.Y].size());
 	}
 	else if (cursorPos.Y != data.size() - 1) {
 		cursorPos.Y++;
-		bool endlPresent = !data[cursorPos.Y].empty() && data[cursorPos.Y][data[cursorPos.Y].size() - 1] == '\n';
 		int perfectCursorPos = (data[cursorPos.Y].size() % bufferWidth) / bufferWidth * bufferWidth + offset;
-		cursorPos.X = (std::min)(perfectCursorPos, (int)data[cursorPos.Y].size() - endlPresent);
+		cursorPos.X = (std::min)(perfectCursorPos, (int)data[cursorPos.Y].size());
 	}
 	cursor.setPosition(cursorPos);
 	return cursorPos;
@@ -431,9 +419,9 @@ std::string Document::getSelectedText() const {
 	if (smaller->Y == bigger->Y) {
 		return data[smaller->Y].substr(smaller->X, bigger->X - smaller->X);
 	}
-	std::string text = data[smaller->Y].substr(smaller->X, data[smaller->Y].size() - smaller->X);
+	std::string text = data[smaller->Y].substr(smaller->X, data[smaller->Y].size() - smaller->X) + "\n";
 	for (int row = smaller->Y + 1; row < bigger->Y; row++ ) {
-		text += data[row];
+		text += data[row] + "\n";
 	}
 	text += data[bigger->Y].substr(0, bigger->X);
 	return text;
