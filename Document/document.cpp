@@ -373,13 +373,6 @@ char Document::getCharPointedByCursor(const int cursor) const {
 	return data[cursorPos.Y][cursorPos.X];
 }
 
-void Document::setMyCursor(const int index) {
-	if (index < 0 || index >= users.size()) {
-		return;
-	}
-	myUserIdx = index;
-}
-
 std::vector<COORD> Document::getCursorPositions() const {
 	std::vector<COORD> positions;
 	for (const auto& user : users) {

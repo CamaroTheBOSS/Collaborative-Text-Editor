@@ -22,27 +22,25 @@ public:
 	Document(const std::string& text);
 	Document(const std::string& text, const int cursors, const int myUserIdx);
 
-	COORD write(const int cursor, const std::string& text);
-	COORD erase(const int cursor, const int eraseSize);
+	COORD write(const int index, const std::string& text);
+	COORD erase(const int index, const int eraseSize);
 	
-	COORD moveCursorLeft(const int cursor, const bool withSelect);
-	COORD moveCursorRight(const int cursor, const bool withSelect);
-	COORD moveCursorUp(const int cursor, const int bufferWidth, const bool withSelect);
-	COORD moveCursorDown(const int cursor, const int bufferWidth, const bool withSelect);
-	COORD moveTo(const int cursor, const COORD& newPos, const bool withSelect, const COORD& anchor);
+	COORD moveCursorLeft(const int index, const bool withSelect);
+	COORD moveCursorRight(const int index, const bool withSelect);
+	COORD moveCursorUp(const int index, const int bufferWidth, const bool withSelect);
+	COORD moveCursorDown(const int index, const int bufferWidth, const bool withSelect);
+	COORD moveTo(const int index, const COORD& newPos, const bool withSelect, const COORD& anchor);
 
-	bool isCursorValid(Cursor& cursor);
 	bool addUser();
-	bool eraseUser(const int cursor);
-	bool setCursorPos(const int cursor, const COORD newPos);
-	bool setCursorOffset(const int cursor, const int newOffset);
-	bool setCursorAnchor(const int cursor, const COORD newAnchor);
-	COORD getCursorPos(const int cursor) const;
-	std::optional<COORD> getCursorSelectionAnchor(const int cursor) const;
+	bool eraseUser(const int index);
+	bool setCursorPos(const int index, const COORD newPos);
+	bool setCursorOffset(const int index, const int newOffset);
+	bool setCursorAnchor(const int index, const COORD newAnchor);
+	COORD getCursorPos(const int index) const;
+	std::optional<COORD> getCursorSelectionAnchor(const int index) const;
 	int getMyCursor() const;
 	int getCursorNum() const;
-	char getCharPointedByCursor(const int cursor) const;
-	void setMyCursor(const int cursor);
+	char getCharPointedByCursor(const int index) const;
 	std::vector<COORD> getCursorPositions() const;
 
 	const std::vector<std::string>& get();
@@ -62,6 +60,7 @@ private:
 	COORD eraseSelectedText(User& user);
 	COORD eraseTextBetween(const COORD& cursorPos1, const COORD& cursorPos2);
 
+	bool isCursorValid(Cursor& cursor);
 	void adjustCursors();
 	void adjustCursor(Cursor& cursor);
 	void moveAffectedCursors(User& movedUser, COORD& posDiff);
