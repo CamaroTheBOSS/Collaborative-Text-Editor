@@ -135,15 +135,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="deserializer.cpp" />
     <ClCompile Include="logging.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="repository.cpp" />
+    <ClCompile Include="serializer.cpp" />
     <ClCompile Include="server.cpp" />
     <ClCompile Include="worker.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="deserializer.h" />
     <ClInclude Include="logging.h" />
     <ClInclude Include="repository.h" />
+    <ClInclude Include="serializer.h" />
     <ClInclude Include="server.h" />
     <ClInclude Include="worker.h" />
   </ItemGroup>

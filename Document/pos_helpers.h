@@ -2,6 +2,7 @@
 #include <utility>
 #include <Windows.h>
 
+COORD makeCoord(const int X, const int Y);
 COORD operator-(const COORD& pos1, const COORD& pos2);
 COORD operator+(const COORD& pos1, const COORD& pos2);
 bool operator<(const COORD& pos1, const COORD& pos2);

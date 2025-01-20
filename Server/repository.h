@@ -9,7 +9,7 @@
 #include "document.h"
 
 struct Response {
-	msg::Buffer& buffer;
+	msg::Buffer buffer;
 	std::vector<SOCKET> destinations;
 	msg::Type msgType;
 };

@@ -268,7 +268,7 @@ COORD Document::moveCursorDown(const int index, const int bufferWidth, const boo
 	return cursorPos;
 }
 
-COORD Document::moveTo(const int index, const COORD& newPos, const bool withSelect, const COORD& anchor) {
+COORD Document::moveTo(const int index, const COORD newPos, const COORD anchor, const bool withSelect) {
 	if (index < 0 || index >= users.size() || newPos.Y >= data.size() || newPos.X > data[newPos.Y].size()) {
 		return COORD{-1, -1};
 	}
@@ -316,7 +316,8 @@ bool Document::setCursorPos(const int index, COORD newPos) {
 	if (index < 0 || index >= users.size() || newPos.Y >= data.size() || newPos.X > data[newPos.Y].size()) {
 		return false;
 	}
-	users[index].cursor.setPosition(std::move(newPos));
+	users[index].cursor.setPosition(newPos);
+	users[index].cursor.setOffset(newPos.X);
 	return true;
 }
 
@@ -341,6 +342,10 @@ COORD Document::getCursorPos(const int index) const {
 		return COORD{-1, -1};
 	}
 	return users[index].cursor.position();
+}
+
+COORD Document::getEndPos() const {
+	return COORD{ static_cast<SHORT>(data[data.size() - 1].size()), static_cast<SHORT>(data.size() - 1) };
 }
 
 std::optional<COORD> Document::getCursorSelectionAnchor(const int index) const {

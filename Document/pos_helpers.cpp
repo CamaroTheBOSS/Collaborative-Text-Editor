@@ -1,5 +1,9 @@
 #include "pos_helpers.h"
 
+COORD makeCoord(const int X, const int Y) {
+	return COORD{ static_cast<SHORT>(X), static_cast<SHORT>(Y) };
+}
+
 COORD operator-(const COORD& pos1, const COORD& pos2) {
 	return COORD{ static_cast<SHORT>(pos1.X - pos2.X), static_cast<SHORT>(pos1.Y - pos2.Y) };
 }

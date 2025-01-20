@@ -29,7 +29,7 @@ public:
 	COORD moveCursorRight(const int index, const bool withSelect);
 	COORD moveCursorUp(const int index, const int bufferWidth, const bool withSelect);
 	COORD moveCursorDown(const int index, const int bufferWidth, const bool withSelect);
-	COORD moveTo(const int index, const COORD& newPos, const bool withSelect, const COORD& anchor);
+	COORD moveTo(const int index, const COORD newPos, const COORD anchor, const bool withSelec);
 
 	bool addUser();
 	bool eraseUser(const int index);
@@ -37,6 +37,7 @@ public:
 	bool setCursorOffset(const int index, const int newOffset);
 	bool setCursorAnchor(const int index, const COORD newAnchor);
 	COORD getCursorPos(const int index) const;
+	COORD getEndPos() const;
 	std::optional<COORD> getCursorSelectionAnchor(const int index) const;
 	int getMyCursor() const;
 	int getCursorNum() const;
