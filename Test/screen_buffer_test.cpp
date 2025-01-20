@@ -45,7 +45,7 @@ TEST(RendererTests, CursorSyncOneLinerFilledTest) {
 
 
 TEST(RendererTests, CursorSyncOneLinerFilledWithEndlTest) {
-	Document doc{ "This is oneline tes\n", 1, 0 };
+	Document doc{ "This is oneline test\n", 1, 0 };
 	COORD dPos{ 20, 0 };
 	doc.setCursorPos(0, dPos);
 
@@ -60,7 +60,7 @@ TEST(RendererTests, CursorSyncOneLinerFilledWithEndlTest) {
 
 
 TEST(RendererTests, CursorSyncForLongerLinesTest) {
-	Document doc{ "This is oneline but longer than screen width\n", 4, 0 };
+	Document doc{ "This is oneline but longer than screen widthh\n", 4, 0 };
 	ScrollableScreenBuffer screenBuffer{ SMALL_RECT(0, 0, 20, 20) };
 	
 	std::vector<COORD> testDocPositions = { {5, 0}, {25, 0}, {45, 0}, {0, 1} };

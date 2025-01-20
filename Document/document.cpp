@@ -13,18 +13,20 @@ Document::Document():
 }
 
 Document::Document(const std::string& text):
-	data(),
+	data({""}),
 	users({ User() }) {
-	data.reserve(text.size());
-	setText(text);
+	data.reserve(1024);
+	auto parsedLines = parseText(text);
+	insertText(COORD{ 0, 0 }, parsedLines);
 }
 
 Document::Document(const std::string& text, const int nCursors, const int myUserIdx) :
-	data(),
+	data({""}),
 	myUserIdx(myUserIdx),
 	users(nCursors, User()) {
-	data.reserve(text.size());
-	setText(text);
+	data.reserve(1024);
+	auto parsedLines = parseText(text);
+	insertText(COORD{ 0, 0 }, parsedLines);
 }
 
 COORD Document::write(const int index, const std::string& newText) {
@@ -400,8 +402,9 @@ std::string Document::getLine(const int lineIndex) const {
 std::string Document::getText() const {
 	std::string text;
 	for (const auto& line : data) {
-		text += line;
+		text += line + "\n";
 	}
+	text.erase(text.size() - 1);
 	return text;
 }
 
@@ -423,22 +426,6 @@ std::string Document::getSelectedText() const {
 	}
 	text += data[bigger->Y].substr(0, bigger->X);
 	return text;
-}
-
-void Document::setText(const std::string& txt) {
-	std::vector<std::string> textData;
-	int offset = 0;
-	int endLinePos = 0;
-	while ((endLinePos = txt.find('\n', offset)) != std::string::npos) {
-		textData.emplace_back(txt.substr(offset, endLinePos - offset + 1));
-		offset = endLinePos + 1;
-	}
-	textData.emplace_back(txt.substr(offset, txt.size() - offset));
-	data = std::move(textData);
-	for (auto& user : users) {
-		user.cursor.setPosition(COORD{ 0, 0 });
-		user.cursor.setOffset(0);
-	}
 }
 
 std::string Document::getFilename() const {
