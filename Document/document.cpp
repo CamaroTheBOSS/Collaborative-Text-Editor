@@ -1,6 +1,7 @@
 #include <algorithm>
 #include "document.h"
 #include "pos_helpers.h"
+#include "line_modifier.h"
 
 #define NOMINMAX
 
@@ -12,72 +13,85 @@ Document::Document():
 }
 
 Document::Document(const std::string& text):
-	data(),
+	data({""}),
 	users({ User() }) {
-	data.reserve(text.size());
-	setText(text);
+	data.reserve(1024);
+	auto parsedLines = parseText(text);
+	insertText(COORD{ 0, 0 }, parsedLines);
 }
 
 Document::Document(const std::string& text, const int nCursors, const int myUserIdx) :
-	data(),
+	data({""}),
 	myUserIdx(myUserIdx),
 	users(nCursors, User()) {
-	data.reserve(text.size());
-	setText(text);
+	data.reserve(1024);
+	auto parsedLines = parseText(text);
+	insertText(COORD{ 0, 0 }, parsedLines);
 }
 
-COORD Document::write(const int index, const char letter) {
+COORD Document::write(const int index, const std::string& newText) {
 	if (index < 0 || index >= users.size()) {
 		return COORD{ -1, -1 };
 	}
-	auto& cursor = users[index].cursor;
-	auto& anchor = users[index].selectAnchor;
-	auto cursorPos = cursor.position();
-	if (cursorPos.Y > data.size()) {
-		return cursorPos;
-	}
-	if (anchor.has_value()) {
-		cursorPos = eraseTextBetween(cursorPos, anchor.value().position());
-		anchor.reset();
-	}
-	if (cursorPos.X >= data[cursorPos.Y].size()) {
-		data[cursorPos.Y] += letter;
-		cursorPos.X += 1;
-		if (letter == '\n') {
-			data.insert(data.begin() + cursorPos.Y + 1, "");
-			cursorPos.Y += 1;
-			cursorPos.X = 0;
-		}
-	}
-	else {
-		data[cursorPos.Y].insert(data[cursorPos.Y].begin() + cursorPos.X, letter);
-		cursorPos.X += 1;
-		if (letter == '\n') {
-			std::string toMoveBelow = data[cursorPos.Y].substr(cursorPos.X, data[cursorPos.Y].size() - cursorPos.X);
-			data[cursorPos.Y].erase(cursorPos.X, data[cursorPos.Y].size() - cursorPos.X);
-			data.insert(data.begin() + cursorPos.Y + 1, toMoveBelow);
-			cursorPos.Y += 1;
-			cursorPos.X = 0;
-		}
-	}
-	auto startPos = cursor.position();
-	auto diff = diffPos(cursorPos, startPos);
-	moveAffectedCursors(users[index], diff);
+	auto parsedLines = parseText(newText);
+	COORD startPos = users[index].cursor.position();
+	COORD endPos = eraseSelectedText(users[index]);
+	endPos = insertText(endPos, parsedLines);
+	COORD diffPos = endPos - startPos;
+	moveAffectedCursors(users[index], diffPos);
 	adjustCursors();
-	//cursor.setPosition(cursorPos);
-	cursor.setOffset(cursorPos.X);
-	return cursorPos;
+	users[index].cursor.setOffset(endPos.X);
+	return endPos;
 }
 
-COORD Document::write(const int index, const std::string& text) {
-	COORD cursorPos = COORD{ -1, -1 };
-	for (const auto letter : text) {
-		if (letter == '\r') {
-			continue;
-		}
-		cursorPos = write(index, letter);
+COORD Document::eraseSelectedText(User& user) {
+	COORD pos = user.cursor.position();
+	if (user.selectAnchor.has_value()) {
+		pos = eraseTextBetween(pos, user.selectAnchor.value().position());
+		user.selectAnchor.reset();
 	}
-	return cursorPos;
+	return pos;
+}
+
+COORD Document::insertText(COORD pos, const std::vector<std::string_view>& parsedLines) {
+	if (parsedLines.size() == 1) {
+		pos.X = LineModifier::insert(data[pos.Y], pos.X, parsedLines[0]);
+		return pos;
+	}
+
+	std::string toMoveDown = LineModifier::cut(data[pos.Y], pos.X);
+	LineModifier::append(data[pos.Y], parsedLines[0]);
+	for (int i = 1; i < parsedLines.size(); i++) {
+		addNewLine(pos.Y + i, parsedLines[i]);
+	}
+	pos.Y += parsedLines.size() - 1;
+	pos.X = data[pos.Y].size();
+	data[pos.Y].append(toMoveDown);
+	return pos;
+}
+
+std::string& Document::addNewLine(const int col, const std::string_view initText) {
+	data.insert(data.cbegin() + col, std::string{ initText });
+	return data[col];
+}
+
+std::vector<std::string_view> Document::parseText(const std::string& text) const {
+	size_t offset = 0;
+	size_t end = text.find('\n');
+	std::vector<std::string_view> parsedLines;
+	if (end == std::string::npos) {
+		parsedLines.push_back(std::string_view{ text });
+		return parsedLines;
+	}
+	do {
+		std::string_view lineText{text.cbegin() + offset, text.cbegin() + end};
+		parsedLines.push_back(lineText);
+		offset = end + 1;
+		end = text.find('\n', offset);
+	} while (end != std::string::npos);
+	std::string_view lineText{text.cbegin() + offset, text.cend()};
+	parsedLines.push_back(lineText);
+	return parsedLines;
 }
 
 COORD Document::eraseTextBetween(const COORD& cursor1, const COORD& cursor2) {
@@ -95,56 +109,47 @@ COORD Document::eraseTextBetween(const COORD& cursor1, const COORD& cursor2) {
 	return *smaller;
 }
 
-COORD Document::erase(const int index) {
-	if (index < 0 || index >= users.size()) {
-		return COORD{ -1, -1 };
+COORD Document::eraseText(COORD pos, int eraseSize) {
+	if (eraseSize < pos.X) {
+		pos.X = LineModifier::erase(data[pos.Y], pos.X, eraseSize);
 	}
-	auto& cursor = users[index].cursor;
-	auto& anchor = users[index].selectAnchor;
-	auto cursorPos = cursor.position();
-	if (cursorPos.Y > data.size()) {
-		return cursorPos;
-	}
-
-	if (anchor.has_value()) {
-		cursorPos = eraseTextBetween(cursorPos, anchor.value().position());
-		anchor.reset();
-	} else if (cursorPos.X > 0) {
-		data[cursorPos.Y].erase(data[cursorPos.Y].begin() + cursorPos.X - 1, data[cursorPos.Y].begin() + cursorPos.X);
-		cursorPos.X -= 1;
-	} else {
-		if (cursorPos.Y <= 0) {
-			return cursorPos;
+	else {
+		std::string toMoveUp = LineModifier::cut(data[pos.Y], pos.X);
+		while (pos.Y > 0 && eraseSize > data[pos.Y].size()) {
+			eraseSize -= eraseLine(pos.Y--);
 		}
-		std::string toMoveUpper = data[cursorPos.Y];
-		data[cursorPos.Y - 1].erase(data[cursorPos.Y - 1].end() - 1, data[cursorPos.Y - 1].end() - 0);
-		data.erase(data.begin() + cursorPos.Y, data.begin() + cursorPos.Y + 1);
-		cursorPos.Y -= 1;
-		cursorPos.X = data[cursorPos.Y].size();
-		data[cursorPos.Y] += toMoveUpper;
-		
+		pos.X = LineModifier::erase(data[pos.Y], data[pos.Y].size(), eraseSize);
+		LineModifier::append(data[pos.Y], toMoveUp);
 	}
-	auto diff = diffPos(cursorPos, cursor.position());
-	moveAffectedCursors(users[index], diff);
-	adjustCursors();
-	//cursor.setPosition(cursorPos);
-	cursor.setOffset(cursorPos.X);
-	return cursorPos;
+	return pos;
+}
+
+int Document::eraseLine(const int col) {
+	int size = data[col].size() + 1;
+	data.erase(data.cbegin() + col);
+	return size;
 }
 
 COORD Document::erase(const int index, const int eraseSize) {
-	COORD cursorPos{-1, -1};
-	for (int i = 0; i < eraseSize; i++) {
-		cursorPos = erase(index);
+	if (index < 0 || index >= users.size()) {
+		return COORD{ -1, -1 };
 	}
-	return cursorPos;
+	COORD startPos = users[index].cursor.position();
+	COORD endPos = users[index].isSelecting() ? 
+		eraseSelectedText(users[index]) : 
+		eraseText(startPos, eraseSize);
+	COORD diffPos = endPos - startPos;
+	moveAffectedCursors(users[index], diffPos);
+	adjustCursors();
+	users[index].cursor.setOffset(endPos.X);
+	return endPos;
 }
 
 bool Document::analyzeBackwardMove(User& user, const bool withSelect) {
 	auto& cursor = user.cursor;
 	auto& anchor = user.selectAnchor;
 	if (!withSelect && anchor.has_value()) {
-		if (smallerPos(anchor.value().position(), cursor.position())) {
+		if (anchor.value().position() < cursor.position()) {
 			cursor.setPosition(anchor.value().position());
 		}
 		anchor.reset();
@@ -173,7 +178,7 @@ COORD Document::moveCursorLeft(const int index, const bool withSelect) {
 	}
 	else {
 		cursorPos.Y--;
-		cursorPos.X = data[cursorPos.Y].size() - 1;
+		cursorPos.X = data[cursorPos.Y].size();
 	}
 	cursor.setPosition(cursorPos);
 	cursor.setOffset(cursorPos.X);
@@ -184,7 +189,7 @@ bool Document::analyzeForwardMove(User& user, const bool withSelect) {
 	auto& cursor = user.cursor;
 	auto& anchor = user.selectAnchor;
 	if (!withSelect && anchor.has_value()) {
-		if (smallerPos(cursor.position(), anchor.value().position())) {
+		if (cursor.position() < anchor.value().position()) {
 			cursor.setPosition(anchor.value().position());
 		}
 		anchor.reset();
@@ -209,8 +214,7 @@ COORD Document::moveCursorRight(const int index, const bool withSelect) {
 	if (cursorPos.Y == data.size() - 1 && cursorPos.X == data[cursorPos.Y].size()) {
 		return cursorPos;
 	}
-	bool endlPresent = !data[cursorPos.Y].empty() && data[cursorPos.Y][data[cursorPos.Y].size() - 1] == '\n';
-	if (cursorPos.X < data[cursorPos.Y].size() - endlPresent) {
+	if (cursorPos.X < data[cursorPos.Y].size()) {
 		cursorPos.X++;
 	}
 	else {
@@ -239,7 +243,7 @@ COORD Document::moveCursorUp(const int index, const int bufferWidth, const bool 
 			cursorPos.Y--;
 		}
 		int perfectCursorPos = data[cursorPos.Y].size() / bufferWidth * bufferWidth + offset;
-		cursorPos.X = (std::min)(perfectCursorPos, (int)data[cursorPos.Y].size() - 1);
+		cursorPos.X = (std::min)(perfectCursorPos, (int)data[cursorPos.Y].size());
 	}
 	cursor.setPosition(cursorPos);
 	return cursorPos;
@@ -255,20 +259,18 @@ COORD Document::moveCursorDown(const int index, const int bufferWidth, const boo
 	cursor.setOffset(cursor.offset() % bufferWidth);
 	auto offset = cursor.offset();
 	if (data[cursorPos.Y].size() > (cursorPos.X / bufferWidth + 1) * bufferWidth) {
-		bool endlPresent = !data[cursorPos.Y].empty() && data[cursorPos.Y][data[cursorPos.Y].size() - 1] == '\n';
-		cursorPos.X = (std::min)(cursorPos.X + bufferWidth, (int)data[cursorPos.Y].size() - endlPresent);
+		cursorPos.X = (std::min)(cursorPos.X + bufferWidth, (int)data[cursorPos.Y].size());
 	}
 	else if (cursorPos.Y != data.size() - 1) {
 		cursorPos.Y++;
-		bool endlPresent = !data[cursorPos.Y].empty() && data[cursorPos.Y][data[cursorPos.Y].size() - 1] == '\n';
 		int perfectCursorPos = (data[cursorPos.Y].size() % bufferWidth) / bufferWidth * bufferWidth + offset;
-		cursorPos.X = (std::min)(perfectCursorPos, (int)data[cursorPos.Y].size() - endlPresent);
+		cursorPos.X = (std::min)(perfectCursorPos, (int)data[cursorPos.Y].size());
 	}
 	cursor.setPosition(cursorPos);
 	return cursorPos;
 }
 
-COORD Document::moveTo(const int index, const COORD& newPos, const bool withSelect, const COORD& anchor) {
+COORD Document::moveTo(const int index, const COORD newPos, const COORD anchor, const bool withSelect) {
 	if (index < 0 || index >= users.size() || newPos.Y >= data.size() || newPos.X > data[newPos.Y].size()) {
 		return COORD{-1, -1};
 	}
@@ -316,7 +318,8 @@ bool Document::setCursorPos(const int index, COORD newPos) {
 	if (index < 0 || index >= users.size() || newPos.Y >= data.size() || newPos.X > data[newPos.Y].size()) {
 		return false;
 	}
-	users[index].cursor.setPosition(std::move(newPos));
+	users[index].cursor.setPosition(newPos);
+	users[index].cursor.setOffset(newPos.X);
 	return true;
 }
 
@@ -341,6 +344,10 @@ COORD Document::getCursorPos(const int index) const {
 		return COORD{-1, -1};
 	}
 	return users[index].cursor.position();
+}
+
+COORD Document::getEndPos() const {
+	return COORD{ static_cast<SHORT>(data[data.size() - 1].size()), static_cast<SHORT>(data.size() - 1) };
 }
 
 std::optional<COORD> Document::getCursorSelectionAnchor(const int index) const {
@@ -373,13 +380,6 @@ char Document::getCharPointedByCursor(const int cursor) const {
 	return data[cursorPos.Y][cursorPos.X];
 }
 
-void Document::setMyCursor(const int index) {
-	if (index < 0 || index >= users.size()) {
-		return;
-	}
-	myUserIdx = index;
-}
-
 std::vector<COORD> Document::getCursorPositions() const {
 	std::vector<COORD> positions;
 	for (const auto& user : users) {
@@ -402,8 +402,9 @@ std::string Document::getLine(const int lineIndex) const {
 std::string Document::getText() const {
 	std::string text;
 	for (const auto& line : data) {
-		text += line;
+		text += line + "\n";
 	}
+	text.erase(text.size() - 1);
 	return text;
 }
 
@@ -411,7 +412,7 @@ std::string Document::getSelectedText() const {
 	auto& cursor = users[myUserIdx].cursor;
 	auto cursorPos = cursor.position();
 	auto& anchor = users[myUserIdx].selectAnchor;
-	if (!anchor.has_value() || equalPos(cursorPos, anchor.value().position())) {
+	if (!anchor.has_value() || cursorPos == anchor.value().position()) {
 		return "";
 	}
 
@@ -419,28 +420,12 @@ std::string Document::getSelectedText() const {
 	if (smaller->Y == bigger->Y) {
 		return data[smaller->Y].substr(smaller->X, bigger->X - smaller->X);
 	}
-	std::string text = data[smaller->Y].substr(smaller->X, data[smaller->Y].size() - smaller->X);
+	std::string text = data[smaller->Y].substr(smaller->X, data[smaller->Y].size() - smaller->X) + "\n";
 	for (int row = smaller->Y + 1; row < bigger->Y; row++ ) {
-		text += data[row];
+		text += data[row] + "\n";
 	}
 	text += data[bigger->Y].substr(0, bigger->X);
 	return text;
-}
-
-void Document::setText(const std::string& txt) {
-	std::vector<std::string> textData;
-	int offset = 0;
-	int endLinePos = 0;
-	while ((endLinePos = txt.find('\n', offset)) != std::string::npos) {
-		textData.emplace_back(txt.substr(offset, endLinePos - offset + 1));
-		offset = endLinePos + 1;
-	}
-	textData.emplace_back(txt.substr(offset, txt.size() - offset));
-	data = std::move(textData);
-	for (auto& user : users) {
-		user.cursor.setPosition(COORD{ 0, 0 });
-		user.cursor.setOffset(0);
-	}
 }
 
 std::string Document::getFilename() const {
@@ -460,10 +445,10 @@ void Document::moveAffectedCursors(User& movedUser, COORD& posDiff) {
 void Document::moveAffectedCursor(Cursor& cursor, COORD& moveStartPos, COORD& posDiff) {
 	auto otherCursorPos = cursor.position();
 	if (otherCursorPos.Y == moveStartPos.Y && otherCursorPos.X >= moveStartPos.X) {
-		cursor.setPosition(sumPos(otherCursorPos, posDiff));
+		cursor.setPosition(otherCursorPos + posDiff);
 	}
 	else if (otherCursorPos.Y > moveStartPos.Y) {
-		cursor.setPosition(sumPos(otherCursorPos, COORD{ 0, posDiff.Y }));
+		cursor.setPosition(otherCursorPos + COORD{ 0, posDiff.Y });
 	}
 }
 

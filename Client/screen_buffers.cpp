@@ -53,10 +53,10 @@ COORD ScrollableScreenBuffer::getTerminalCursorPos(Document& doc, const COORD& d
 	int screenWidth = width();
 	COORD terminalCursor{ 0, 0 };
 	for (int i = 0; i <= docCursor.Y; i++) {
-		if (i >= data.size() || data[i].empty()) {
+		if (i >= data.size()) {
 			continue;
 		}
-		bool endlPresent = data[i][data[i].size() - 1] == '\n' && i != docCursor.Y;
+		bool endlPresent = i != docCursor.Y;
 		int base = i != docCursor.Y ? data[i].size() : docCursor.X;
 		terminalCursor.Y += base / screenWidth + endlPresent;
 		if (data[i].size() == screenWidth && endlPresent) {
@@ -86,8 +86,6 @@ std::vector<RenderCursor> ScrollableScreenBuffer::getTerminalCursors(Document& d
 }
 
 TextLines ScrollableScreenBuffer::getTextInBuffer(Document& doc) const {
-	//NOTE i think screenWidth should be screen.width() - 1!!!
-	//THE SAME WITH screenHeight!!!!
 	int tLineCounter = 0;
 	TextLines textLines;
 	int screenWidth = width();
@@ -97,7 +95,7 @@ TextLines ScrollableScreenBuffer::getTextInBuffer(Document& doc) const {
 	for (const auto& line : doc.get()) {
 		int head = 0;
 		int tail = (std::min)((int)line.size(), screenWidth);
-		while (head < tail && tLineCounter <= botBorder) {
+		while (head <= tail && tLineCounter <= botBorder) {
 			if (tLineCounter < topBorder) {
 				head += screenWidth;
 				tail = (std::min)((int)line.size(), tail + screenWidth);
@@ -105,9 +103,6 @@ TextLines ScrollableScreenBuffer::getTextInBuffer(Document& doc) const {
 				continue;
 			}
 			std::string tLine = line.substr(head, tail - head);
-			if (!tLine.empty() && tLine[tLine.size() - 1] == '\n') {
-				tLine[tLine.size() - 1] = ' ';
-			}
 			int spaceCount = screenWidth - tLine.size();
 			tLine += std::string(spaceCount, ' ') + "\n";
 			textLines.emplace_back(std::move(tLine));

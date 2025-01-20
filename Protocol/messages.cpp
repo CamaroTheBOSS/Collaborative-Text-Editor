@@ -59,23 +59,23 @@ namespace msg {
 		return newBuffer;
 	}
 
-	int parseObj(std::string& obj, Buffer& buffer, const int offset) {
+	int parseObj(std::string& obj, const Buffer& buffer, const int offset) {
 		obj = std::string{ buffer.get() + offset };
 		return obj.size() + 1;
 	}
-	int parseObj(unsigned int& obj, Buffer& buffer, const int offset) {
+	int parseObj(unsigned int& obj, const Buffer& buffer, const int offset) {
 		u_long objBuff;
 		memcpy(&objBuff, buffer.get() + offset, sizeof(u_long));
 		obj = static_cast<unsigned int>(ntohl(objBuff));
 		return sizeof(u_long);
 	}
-	int parseObj(Type& obj, Buffer& buffer, const int offset) {
+	int parseObj(Type& obj, const Buffer& buffer, const int offset) {
 		OneByteInt objBuff;
 		memcpy(&objBuff, buffer.get() + offset, sizeof(OneByteInt));
 		obj = static_cast<Type>(objBuff);
 		return sizeof(OneByteInt);
 	}
-	int parseObj(MoveSide& obj, Buffer& buffer, const int offset) {
+	int parseObj(MoveSide& obj, const Buffer& buffer, const int offset) {
 		OneByteInt objBuff;
 		memcpy(&objBuff, buffer.get() + offset, sizeof(OneByteInt));
 		obj = static_cast<MoveSide>(objBuff);

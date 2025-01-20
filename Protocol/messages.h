@@ -113,16 +113,16 @@ namespace msg {
 	Buffer enrich(Buffer& buffer);
 
 	template<typename T>
-	int parseObj(T& obj, Buffer& buffer, const int offset) {
+	int parseObj(T& obj, const Buffer& buffer, const int offset) {
 		memcpy(&obj, buffer.get() + offset, sizeof(T));
 		return sizeof(T);
 	}
-	int parseObj(std::string& obj, Buffer& buffer, const int offset);
-	int parseObj(unsigned int& obj, Buffer& buffer, const int offset); 
-	int parseObj(Type& obj, Buffer& buffer, const int offset);
-	int parseObj(MoveSide& obj, Buffer& buffer, const int offset);
+	int parseObj(std::string& obj, const Buffer& buffer, const int offset);
+	int parseObj(unsigned int& obj, const Buffer& buffer, const int offset); 
+	int parseObj(Type& obj, const Buffer& buffer, const int offset);
+	int parseObj(MoveSide& obj, const Buffer& buffer, const int offset);
 	template<typename T>
-	int parseObj(std::vector<T>& arr, Buffer& buffer, const int offset) {
+	int parseObj(std::vector<T>& arr, const Buffer& buffer, const int offset) {
 		unsigned int arrSize;
 		int pos = offset;
 		pos += parseObj(arrSize, buffer, pos);
@@ -133,7 +133,7 @@ namespace msg {
 		return pos;
 	}
 	template<typename... Args>
-	int parse(Buffer& buffer, int pos, Args&... args) {
+	int parse(const Buffer& buffer, int pos, Args&... args) {
 		([&] {
 			pos += parseObj(args, buffer, pos);
 		} (), ...);
@@ -149,87 +149,87 @@ namespace msg {
 
 	struct Connect {
 		Type type = Type::connect;
-		OneByteInt version;
+		OneByteInt version = 0;
 	};
 
 	struct ConnectResponse {
 		Type type = Type::connect;
-		OneByteInt version;
-		OneByteInt user; // Which user idx you are in doc
+		OneByteInt version = 0;
+		OneByteInt user = 0; // Which user idx you are in doc
 		std::string text; // Whole current state of the document
 		std::vector<unsigned int> cursorPositions;
 	};
 
 	struct Disconnect {
 		Type type = Type::disconnect;
-		OneByteInt version;
+		OneByteInt version = 0;
 	};
 
 	struct DisconnectResponse {
 		Type type = Type::disconnect;
-		OneByteInt version;
-		OneByteInt user;
+		OneByteInt version = 0;
+		OneByteInt user = 0;
 	};
 
 	struct Write {
 		Type type = Type::write;
-		OneByteInt version;
+		OneByteInt version = 0;
 		std::string token;
 		std::string text;
 	};
 
 	struct WriteResponse {
 		Type type = Type::write;
-		OneByteInt version;
-		OneByteInt user;
+		OneByteInt version = 0;
+		OneByteInt user = 0;
 		std::string text;
 	};
 
 	struct Erase {
 		Type type = Type::erase;
-		OneByteInt version;
+		OneByteInt version = 0;
 		std::string token;
-		unsigned int eraseSize;
+		unsigned int eraseSize = 0;
 	};
 
 	struct EraseResponse {
 		Type type = Type::erase;
-		OneByteInt version;
-		OneByteInt user;
-		unsigned int eraseSize;
+		OneByteInt version = 0;
+		OneByteInt user = 0;
+		unsigned int eraseSize = 0;
 	};
 
 	struct MoveHorizontal {
 		Type type = Type::moveHorizontal;
-		OneByteInt version;
+		OneByteInt version = 0;
 		std::string token;
-		MoveSide side;
-		OneByteInt withSelect;
+		MoveSide side = MoveSide::left;
+		OneByteInt withSelect = 0;
 	};
 
 	struct MoveVertical {
 		Type type = Type::moveVertical;
-		OneByteInt version;
+		OneByteInt version = 0;
 		std::string token;
-		MoveSide side;
-		unsigned int clientWidth;
-		OneByteInt withSelect;
+		MoveSide side = MoveSide::up;
+		unsigned int clientWidth = 0;
+		OneByteInt withSelect = 0;
 	};
 
 	struct MoveSelectAll {
 		Type type = Type::selectAll;
-		OneByteInt version;
+		OneByteInt version = 0;
 		std::string token;
 	};
 
 	struct MoveResponse {
 		Type type = Type::moveVertical;
-		OneByteInt version;
-		OneByteInt user;
-		unsigned int X;
-		unsigned int Y;
-		OneByteInt withSelect;
-		unsigned int anchorX;
-		unsigned int anchorY;
+		OneByteInt version = 0;
+		OneByteInt user = 0;
+		unsigned int X = 0;
+		unsigned int Y = 0;
+		OneByteInt withSelect = 0;
+		unsigned int anchorX = 0;
+		unsigned int anchorY = 0;
 	};
 }

@@ -23,7 +23,7 @@ int main() {
 		std::cout << "Connection to server failed!\n";
 		return 0;
 	}
-	if (!controller.requestDocument(std::chrono::milliseconds(500), 3)) {
+	if (!controller.requestDocument(std::chrono::milliseconds(50000), 3)) {
 		std::cout << "Requesting document from the server failed!\n";
 		return 0;
 	}
