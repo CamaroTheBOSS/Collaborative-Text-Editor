@@ -81,9 +81,10 @@ Response Repository::write(SOCKET client, msg::Buffer& buffer) {
 		return Response{ std::move(buffer), {}, msg::Type::error };
 	}
 	std::scoped_lock lock{docLock};
+	COORD startPos = doc.getCursorPos(userIdx);
 	doc.write(userIdx, msg.text);
 	logger.logInfo("User", userIdx, "wrote", msg.text.size(), "letters");
-	auto newBuffer = Serializer::makeWriteResponse(userIdx, msg);
+	auto newBuffer = Serializer::makeWriteResponse(startPos, userIdx, msg);
 	return Response{ std::move(newBuffer), connectedClients, msg::Type::write };
 }
 
@@ -95,9 +96,10 @@ Response Repository::erase(SOCKET client, msg::Buffer& buffer) {
 		return Response{ std::move(buffer), {}, msg::Type::error };
 	}
 	std::scoped_lock lock{docLock};
+	COORD startPos = doc.getCursorPos(userIdx);
 	doc.erase(userIdx, msg.eraseSize);
 	logger.logInfo("User", userIdx, "erased", msg.eraseSize, "letters from document");
-	auto newBuffer = Serializer::makeEraseResponse(userIdx, msg);
+	auto newBuffer = Serializer::makeEraseResponse(startPos, userIdx, msg);
 	return Response{ std::move(newBuffer), connectedClients, msg::Type::erase };
 }
 

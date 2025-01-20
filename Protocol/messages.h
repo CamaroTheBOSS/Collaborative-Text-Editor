@@ -183,6 +183,8 @@ namespace msg {
 		OneByteInt version = 0;
 		OneByteInt user = 0;
 		std::string text;
+		unsigned int X = 0;
+		unsigned int Y = 0;
 	};
 
 	struct Erase {
@@ -197,6 +199,8 @@ namespace msg {
 		OneByteInt version = 0;
 		OneByteInt user = 0;
 		unsigned int eraseSize = 0;
+		unsigned int X = 0;
+		unsigned int Y = 0;
 	};
 
 	struct MoveHorizontal {

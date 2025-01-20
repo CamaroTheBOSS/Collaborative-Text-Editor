@@ -20,17 +20,21 @@ msg::Buffer Serializer::makeDisconnectResponse(const int userIdx, const msg::Dis
 	return buffer;
 }
 
-msg::Buffer Serializer::makeWriteResponse(const int userIdx, const msg::Write& msg) {
+msg::Buffer Serializer::makeWriteResponse(const COORD& startPos, const int userIdx, const msg::Write& msg) {
 	msg::Buffer buffer{static_cast<int>(30 + msg.text.size())};
+	unsigned int cursorX = startPos.X;
+	unsigned int cursorY = startPos.Y;
 	auto userBuff = static_cast<msg::OneByteInt>(userIdx);
-	msg::serializeTo(buffer, 0, msg.type, msg.version, userBuff, msg.text);
+	msg::serializeTo(buffer, 0, msg.type, msg.version, userBuff, msg.text, cursorX, cursorY);
 	return buffer;
 }
 
-msg::Buffer Serializer::makeEraseResponse(const int userIdx, const msg::Erase& msg) {
+msg::Buffer Serializer::makeEraseResponse(const COORD& startPos, const int userIdx, const msg::Erase& msg) {
 	msg::Buffer buffer{30};
+	unsigned int cursorX = startPos.X;
+	unsigned int cursorY = startPos.Y;
 	auto userBuff = static_cast<msg::OneByteInt>(userIdx);
-	msg::serializeTo(buffer, 0, msg.type, msg.version, userBuff, msg.eraseSize);
+	msg::serializeTo(buffer, 0, msg.type, msg.version, userBuff, msg.eraseSize, cursorX, cursorY);
 	return buffer;
 }
 

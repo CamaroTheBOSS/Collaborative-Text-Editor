@@ -68,7 +68,8 @@ bool Repository::disconnectUser(msg::Buffer& buffer) {
 
 bool Repository::write(msg::Buffer& buffer) {
 	msg::WriteResponse msg;
-	parse(buffer, 1, msg.version, msg.user, msg.text);
+	parse(buffer, 1, msg.version, msg.user, msg.text, msg.X, msg.Y);
+	doc.setCursorPos(msg.user, makeCoord(msg.X, msg.Y));
 	doc.write(msg.user, msg.text);
 	logger.logInfo("User", msg.user, "wrote '" + msg.text + "' to document");
 	return true;
@@ -76,7 +77,8 @@ bool Repository::write(msg::Buffer& buffer) {
 
 bool Repository::erase(msg::Buffer& buffer) {
 	msg::EraseResponse msg;
-	parse(buffer, 1, msg.version, msg.user, msg.eraseSize);
+	parse(buffer, 1, msg.version, msg.user, msg.eraseSize, msg.X, msg.Y);
+	doc.setCursorPos(msg.user, makeCoord(msg.X, msg.Y));
 	doc.erase(msg.user, msg.eraseSize);
 	logger.logInfo("User", msg.user, "erased", msg.eraseSize, "from document");
 	return true;
