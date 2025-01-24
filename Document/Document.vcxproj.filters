@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Pliki źródłowe\Actions">
+      <UniqueIdentifier>{06cf1612-c007-4899-8e95-74ae67e10c54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki nagłówkowe\Actions">
+      <UniqueIdentifier>{dc978400-feb2-40c8-9f6f-83f713d464e1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="document.h">
@@ -30,6 +36,15 @@
     <ClInclude Include="line_modifier.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
+    <ClInclude Include="action.h">
+      <Filter>Pliki nagłówkowe\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="action_write.h">
+      <Filter>Pliki nagłówkowe\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="action_erase.h">
+      <Filter>Pliki nagłówkowe\Actions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="document.cpp">
@@ -46,6 +61,15 @@
     </ClCompile>
     <ClCompile Include="line_modifier.cpp">
       <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
+    <ClCompile Include="action.cpp">
+      <Filter>Pliki źródłowe\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="action_write.cpp">
+      <Filter>Pliki źródłowe\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="action_erase.cpp">
+      <Filter>Pliki źródłowe\Actions</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

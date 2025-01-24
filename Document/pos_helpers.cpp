@@ -4,6 +4,16 @@ COORD makeCoord(const int X, const int Y) {
 	return COORD{ static_cast<SHORT>(X), static_cast<SHORT>(Y) };
 }
 
+COORD positionalDiff(const COORD& pos1, const COORD& pos2) {
+	if (pos1.Y == pos2.Y) {
+		return pos1 - pos2;
+	}
+	if (pos1 > pos2) {
+		return COORD{ pos1.X, static_cast<SHORT>(pos1.Y - pos2.Y) };
+	}
+	return COORD{ static_cast<SHORT>(-pos1.X), static_cast<SHORT>(pos1.Y - pos2.Y) };
+}
+
 COORD operator-(const COORD& pos1, const COORD& pos2) {
 	return COORD{ static_cast<SHORT>(pos1.X - pos2.X), static_cast<SHORT>(pos1.Y - pos2.Y) };
 }

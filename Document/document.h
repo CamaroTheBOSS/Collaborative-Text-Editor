@@ -4,11 +4,12 @@
 #include <vector>
 #include <string>
 #include <optional>
-#include "cursor.h"
+#include "user_history.h"
 
 struct User {
 	Cursor cursor;
 	std::optional<Cursor> selectAnchor;
+	UserHistory history;
 	bool isSelecting() {
 		return selectAnchor.has_value();
 	}

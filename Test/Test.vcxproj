@@ -36,6 +36,7 @@
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="action_tests.cpp" />
     <ClCompile Include="document_test.cpp" />
     <ClCompile Include="text_container_test.cpp" />
     <ClCompile Include="framer_test.cpp" />
