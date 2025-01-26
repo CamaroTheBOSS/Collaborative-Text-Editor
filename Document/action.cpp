@@ -1,12 +1,15 @@
 #include "action.h"
 #include "pos_helpers.h"
+#include "parser.h"
 
-Action::Action(COORD& startPos, std::vector<std::string>& text) :
+Action::Action(ActionType type, COORD& startPos, std::vector<std::string>& text) :
+	type(type),
 	start(Cursor(startPos)),
 	text(std::move(text)),
 	timestamp(std::chrono::system_clock::now()) {}
 
-Action::Action(COORD& startPos, std::vector<std::string>& text, Timestamp timestamp):
+Action::Action(ActionType type, COORD& startPos, std::vector<std::string>& text, Timestamp timestamp):
+	type(type),
 	start(Cursor(startPos)),
 	text(std::move(text)),
 	timestamp(timestamp) {}
@@ -22,19 +25,16 @@ COORD Action::getTextSize() const {
 	return textSize;
 }
 
+ActionType Action::getType() const {
+	return type;
+}
+
 COORD Action::getStartPos() const {
 	return start.position();
 }
 
 std::string Action::getText() const {
-	std::string ret;
-	for (const auto& line : text) {
-		ret += line + "\n";
-	}
-	if (!ret.empty()) {
-		ret.erase(ret.size() - 1);
-	}
-	return ret;
+	return Parser::parseVectorToText(text);
 }
 
 Timestamp Action::getTimestamp() const {

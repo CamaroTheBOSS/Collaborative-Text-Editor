@@ -12,17 +12,17 @@
 
 class Worker {
 public:
-	Worker(const std::string& ip, const int port, Repository* repo);
+	Worker(const std::string& ip, const int port, server::Repository* repo);
 	Worker(Worker&& worker) noexcept;
 	Worker(const Worker&) = delete;
 private:
 	bool connectToMaster(const std::string& ip, const int port);
 	void handleConnections();
-	Response shutdownConnection(SOCKET client, msg::Buffer& buffer);
+	server::Response shutdownConnection(SOCKET client, msg::Buffer& buffer);
 	std::vector<msg::Buffer> recvMsg(SOCKET client);
-	Response processMsg(SOCKET client, msg::Buffer& buffer);
-	void sendResponses(Response& response) const;
-	void syncClientState(Response& response) const;
+	server::Response processMsg(SOCKET client, msg::Buffer& buffer);
+	void sendResponses(server::Response& response) const;
+	void syncClientState(server::Response& response) const;
 	
 	friend class Server;
 	std::mutex connSetLock;
@@ -32,6 +32,6 @@ private:
 	SOCKET masterListener = INVALID_SOCKET;
 	std::thread thread;
 
-	Repository* repo;
+	server::Repository* repo;
 	std::unordered_map<SOCKET, Framer> clientFramerMap;
 };

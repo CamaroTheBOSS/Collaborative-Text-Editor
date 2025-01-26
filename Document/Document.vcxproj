@@ -134,9 +134,11 @@
     <ClInclude Include="action_write.h" />
     <ClInclude Include="cursor.h" />
     <ClInclude Include="line_modifier.h" />
+    <ClInclude Include="parser.h" />
     <ClInclude Include="pos_helpers.h" />
     <ClInclude Include="document.h" />
     <ClInclude Include="text_container.h" />
+    <ClInclude Include="user_history.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="action.cpp" />
@@ -144,9 +146,11 @@
     <ClCompile Include="action_write.cpp" />
     <ClCompile Include="cursor.cpp" />
     <ClCompile Include="line_modifier.cpp" />
+    <ClCompile Include="parser.cpp" />
     <ClCompile Include="pos_helpers.cpp" />
     <ClCompile Include="document.cpp" />
     <ClCompile Include="text_container.cpp" />
+    <ClCompile Include="user_history.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

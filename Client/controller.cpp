@@ -51,6 +51,11 @@ bool Controller::processChar(const KeyPack& key) {
     case CTRL_X:
         terminal.setClipboardData(repo.getDoc().getSelectedText());
         return client.sendMsg(msg::Type::erase, version, std::string{""}, static_cast<unsigned int>(1));
+    case CTRL_Z:
+        if (key.shiftPressed) {
+            return client.sendMsg(msg::Type::redo, version, std::string{""});
+        }
+        return client.sendMsg(msg::Type::undo, version, std::string{""});
     case ESC:
         return disconnect();
     }

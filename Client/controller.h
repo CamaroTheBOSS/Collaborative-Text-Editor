@@ -19,5 +19,5 @@ private:
 
 	TCPClient client;
 	Terminal terminal;
-	Repository repo;
+	client::Repository repo;
 };

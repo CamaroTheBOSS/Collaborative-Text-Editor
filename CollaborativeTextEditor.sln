@@ -28,6 +28,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RandomClient", "RandomClien
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Protocol", "Protocol\Protocol.vcxproj", "{678F5027-D666-49F3-8F8F-07BDFBB01944}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestRandomClientServerSync", "TestRandomClientServerSync\TestRandomClientServerSync.vcxproj", "{4E39BC8C-1468-4217-ACFB-D7DE30562C0D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -84,6 +86,14 @@ Global
 		{678F5027-D666-49F3-8F8F-07BDFBB01944}.Release|x64.Build.0 = Release|x64
 		{678F5027-D666-49F3-8F8F-07BDFBB01944}.Release|x86.ActiveCfg = Release|Win32
 		{678F5027-D666-49F3-8F8F-07BDFBB01944}.Release|x86.Build.0 = Release|Win32
+		{4E39BC8C-1468-4217-ACFB-D7DE30562C0D}.Debug|x64.ActiveCfg = Debug|x64
+		{4E39BC8C-1468-4217-ACFB-D7DE30562C0D}.Debug|x64.Build.0 = Debug|x64
+		{4E39BC8C-1468-4217-ACFB-D7DE30562C0D}.Debug|x86.ActiveCfg = Debug|Win32
+		{4E39BC8C-1468-4217-ACFB-D7DE30562C0D}.Debug|x86.Build.0 = Debug|Win32
+		{4E39BC8C-1468-4217-ACFB-D7DE30562C0D}.Release|x64.ActiveCfg = Release|x64
+		{4E39BC8C-1468-4217-ACFB-D7DE30562C0D}.Release|x64.Build.0 = Release|x64
+		{4E39BC8C-1468-4217-ACFB-D7DE30562C0D}.Release|x86.ActiveCfg = Release|Win32
+		{4E39BC8C-1468-4217-ACFB-D7DE30562C0D}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

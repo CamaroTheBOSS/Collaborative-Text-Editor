@@ -61,7 +61,7 @@ void Worker::handleConnections() {
             SOCKET client = listenConnections.fd_array[i];
             auto msgBuffers = recvMsg(client);
             for (auto& msgBuffer : msgBuffers) {
-                Response response = processMsg(client, msgBuffer);
+                server::Response response = processMsg(client, msgBuffer);
                 if (response.msgType == msg::Type::sync) {
                     syncClientState(response);
                 }
@@ -86,7 +86,7 @@ std::vector<msg::Buffer> Worker::recvMsg(const SOCKET client) {
     
 }
 
-Response Worker::processMsg(const SOCKET client, msg::Buffer& buffer) {
+server::Response Worker::processMsg(const SOCKET client, msg::Buffer& buffer) {
     if (buffer.size > 0) {
         return repo->process(client, buffer);
     }
@@ -96,7 +96,7 @@ Response Worker::processMsg(const SOCKET client, msg::Buffer& buffer) {
     return shutdownConnection(client, buffer);
 }
 
-void Worker::syncClientState(Response& response) const {
+void Worker::syncClientState(server::Response& response) const {
     SOCKET lastConnectedClient = response.destinations[response.destinations.size() - 1];
     msg::Buffer msgWithSize = msg::enrich(response.buffer);
     int sendBytes = send(lastConnectedClient, msgWithSize.get(), msgWithSize.size, 0);
@@ -108,7 +108,7 @@ void Worker::syncClientState(Response& response) const {
     msg::serializeTo(response.buffer, 0, msg::Type::connect, static_cast<msg::OneByteInt>(1));
 }
 
-void Worker::sendResponses(Response& response) const {
+void Worker::sendResponses(server::Response& response) const {
     msg::Buffer msgWithSize = msg::enrich(response.buffer);
     for (const auto& dst : response.destinations) {
         int sendBytes = send(dst, msgWithSize.get(), msgWithSize.size, 0);
@@ -118,7 +118,7 @@ void Worker::sendResponses(Response& response) const {
     }
 }
 
-Response Worker::shutdownConnection(const SOCKET client, msg::Buffer& buffer) {
+server::Response Worker::shutdownConnection(const SOCKET client, msg::Buffer& buffer) {
     closesocket(client);
     shutdown(client, SD_SEND);
     logger.logDebug("Closing connection with", client);

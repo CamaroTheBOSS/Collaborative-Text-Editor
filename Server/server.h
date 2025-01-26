@@ -26,6 +26,5 @@ private:
 
 	std::vector<Worker> workers;
 	std::vector<SOCKET> notifiers;
-	Repository repo;
-	//std::shared_ptr<Repository> repo = std::make_shared<Repository>();
+	server::Repository repo;
 };

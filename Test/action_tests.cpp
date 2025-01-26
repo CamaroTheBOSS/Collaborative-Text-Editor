@@ -2,6 +2,7 @@
 #include "action_write.h"
 #include "action_erase.h"
 #include "pos_helpers.h"
+#include "document.h"
 
 using ActionPtr = Action::ActionPtr;
 
@@ -22,7 +23,7 @@ TEST(ActionTests, HappySplitTextTest) {
 	std::vector<std::string> expected{ "ondline", "thirdline" };
 	auto splitText = getSplitText();
 
-	auto action = std::make_unique<WriteAction>(startPos, splitText);
+	ActionPtr action = std::make_unique<WriteAction>(startPos, splitText);
 	auto splittedText = action->splitText(COORD{ 3, 1 });
 	EXPECT_EQ(splittedText, expected);
 	EXPECT_EQ(action->getText(), "firstline\nsec");
@@ -33,7 +34,7 @@ TEST(ActionTests, WrongSplitPointSplitTextTest) {
 	std::vector<std::string> expected;
 	auto splitText = getSplitText();
 
-	auto action = std::make_unique<WriteAction>(startPos, splitText);
+	ActionPtr action = std::make_unique<WriteAction>(startPos, splitText);
 	auto splittedText = action->splitText(COORD{ -1, 1 });
 	EXPECT_EQ(splittedText, expected);
 	splittedText = action->splitText(COORD{ -1, -1 });
@@ -48,7 +49,7 @@ TEST(ActionTests, FirstLineSplitTextTest) {
 	std::vector<std::string> expected{ "stline", "secondline", "thirdline" };
 	auto splitText = getSplitText();
 
-	auto action = std::make_unique<WriteAction>(startPos, splitText);
+	ActionPtr action = std::make_unique<WriteAction>(startPos, splitText);
 	auto splittedText = action->splitText(COORD{ 3, 0 });
 	EXPECT_EQ(splittedText, expected);
 	EXPECT_EQ(action->getText(), "fir");
@@ -59,7 +60,7 @@ TEST(ActionTests, LastLineSplitTextTest) {
 	std::vector<std::string> expected{ "rdline" };
 	auto splitText = getSplitText();
 
-	auto action = std::make_unique<WriteAction>(startPos, splitText);
+	ActionPtr action = std::make_unique<WriteAction>(startPos, splitText);
 	auto splittedText = action->splitText(COORD{ 3, 2 });
 	EXPECT_EQ(splittedText, expected);
 	EXPECT_EQ(action->getText(), "firstline\nsecondline\nthi");
@@ -70,7 +71,7 @@ TEST(ActionTests, FullSplitTextTest) {
 	std::vector<std::string> expected{ "firstline", "secondline", "thirdline" };
 	auto splitText = getSplitText();
 
-	auto action = std::make_unique<WriteAction>(startPos, splitText);
+	ActionPtr action = std::make_unique<WriteAction>(startPos, splitText);
 	auto splittedText = action->splitText(COORD{ 0, 0 });
 	EXPECT_EQ(splittedText, expected);
 	EXPECT_EQ(action->getText(), "");
@@ -81,7 +82,7 @@ TEST(ActionTests, NoSplitTextTest) {
 	std::vector<std::string> expected{};
 	auto splitText = getSplitText();
 
-	auto action = std::make_unique<WriteAction>(startPos, splitText);
+	ActionPtr action = std::make_unique<WriteAction>(startPos, splitText);
 	auto splittedText = action->splitText(COORD{ 9, 2 });
 	EXPECT_EQ(splittedText, expected);
 	EXPECT_EQ(action->getText(), "firstline\nsecondline\nthirdline");
@@ -92,7 +93,7 @@ TEST(ActionTests, LastLetterSplitTextTest) {
 	std::vector<std::string> expected{"e"};
 	auto splitText = getSplitText();
 
-	auto action = std::make_unique<WriteAction>(startPos, splitText);
+	ActionPtr action = std::make_unique<WriteAction>(startPos, splitText);
 	auto splittedText = action->splitText(COORD{ 8, 2 });
 	EXPECT_EQ(splittedText, expected);
 	EXPECT_EQ(action->getText(), "firstline\nsecondline\nthirdlin");
@@ -104,8 +105,8 @@ TEST(ActionTests, WriteWriteAffectFromLeftSideTest) {
 	auto splitText = getSplitText();
 	auto otherSplitText = getOtherSplitText();
 
-	auto action = std::make_shared<WriteAction>(startPos, splitText);
-	auto otherAction = std::make_shared<WriteAction>(otherStartPos, otherSplitText);
+	ActionPtr action = std::make_unique<WriteAction>(startPos, splitText);
+	auto otherAction = std::make_unique<WriteAction>(otherStartPos, otherSplitText);
 	otherAction->affect(action);
 
 	EXPECT_EQ(action->getLeftPos(), COORD(7, 2));
@@ -118,8 +119,8 @@ TEST(ActionTests, WriteWriteAffectFromLeftStartTest) {
 	auto splitText = getSplitText();
 	auto otherSplitText = getOtherSplitText();
 
-	auto action = std::make_shared<WriteAction>(startPos, splitText);
-	auto otherAction = std::make_shared<WriteAction>(otherStartPos, otherSplitText);
+	ActionPtr action = std::make_unique<WriteAction>(startPos, splitText);
+	auto otherAction = std::make_unique<WriteAction>(otherStartPos, otherSplitText);
 	otherAction->affect(action);
 
 	EXPECT_EQ(action->getLeftPos(), COORD(6, 2));
@@ -132,8 +133,8 @@ TEST(ActionTests, WriteWriteAffectFromRightStartTest) {
 	auto splitText = getSplitText();
 	auto otherSplitText = getOtherSplitText();
 
-	auto action = std::make_shared<WriteAction>(startPos, splitText);
-	auto otherAction = std::make_shared<WriteAction>(otherStartPos, otherSplitText);
+	ActionPtr action = std::make_unique<WriteAction>(startPos, splitText);
+	auto otherAction = std::make_unique<WriteAction>(otherStartPos, otherSplitText);
 	otherAction->affect(action);
 
 	EXPECT_EQ(action->getLeftPos(), COORD(5, 0));
@@ -146,8 +147,8 @@ TEST(ActionTests, WriteWriteAffectFromRightSideTest) {
 	auto splitText = getSplitText();
 	auto otherSplitText = getOtherSplitText();
 
-	auto action = std::make_shared<WriteAction>(startPos, splitText);
-	auto otherAction = std::make_shared<WriteAction>(otherStartPos, otherSplitText);
+	ActionPtr action = std::make_unique<WriteAction>(startPos, splitText);
+	auto otherAction = std::make_unique<WriteAction>(otherStartPos, otherSplitText);
 	otherAction->affect(action);
 
 	EXPECT_EQ(action->getLeftPos(), COORD(5, 0));
@@ -160,9 +161,9 @@ TEST(ActionTests, WriteWriteAffectFromCenterTest) {
 	auto splitText = getSplitText();
 	auto otherSplitText = getOtherSplitText();
 
-	auto action = std::make_shared<WriteAction>(startPos, splitText);
-	auto otherAction = std::make_shared<WriteAction>(otherStartPos, otherSplitText);
-	auto newAction = otherAction->affect(action).value();
+	ActionPtr action = std::make_unique<WriteAction>(startPos, splitText);
+	auto otherAction = std::make_unique<WriteAction>(otherStartPos, otherSplitText);
+	auto newAction = otherAction->affect(std::move(action)).value();
 
 	EXPECT_EQ(action->getLeftPos(), COORD(5, 0));
 	EXPECT_EQ(action->getText(), "firstline\nseco");
@@ -176,8 +177,8 @@ TEST(ActionTests, WriteWriteBelowOneLineTest) {
 	auto splitText = getSplitText();
 	auto otherSplitText = getOtherSplitText();
 
-	auto action = std::make_shared<WriteAction>(startPos, splitText);
-	auto otherAction = std::make_shared<WriteAction>(otherStartPos, otherSplitText);
+	ActionPtr action = std::make_unique<WriteAction>(startPos, splitText);
+	auto otherAction = std::make_unique<WriteAction>(otherStartPos, otherSplitText);
 	otherAction->affect(action);
 
 	EXPECT_EQ(action->getLeftPos(), COORD(5, 6));
@@ -190,8 +191,8 @@ TEST(ActionTests, WriteWriteBelowOneLineOnlyOneLineTest) {
 	auto splitText = getSplitText();
 	auto otherSplitText = getOtherShortSplitText();
 
-	auto action = std::make_shared<WriteAction>(startPos, splitText);
-	auto otherAction = std::make_shared<WriteAction>(otherStartPos, otherSplitText);
+	ActionPtr action = std::make_unique<WriteAction>(startPos, splitText);
+	auto otherAction = std::make_unique<WriteAction>(otherStartPos, otherSplitText);
 	otherAction->affect(action);
 
 	EXPECT_EQ(action->getLeftPos(), COORD(5, 4));
@@ -206,8 +207,8 @@ TEST(ActionTests, WriteEraseAffectFromLeftSideTest) {
 	auto splitText = getSplitText();
 	auto otherSplitText = getOtherSplitText();
 
-	auto action = std::make_shared<WriteAction>(startPos, splitText);
-	auto otherAction = std::make_shared<EraseAction>(otherStartPos, otherEndPos, otherSplitText);
+	ActionPtr action = std::make_unique<WriteAction>(startPos, splitText);
+	auto otherAction = std::make_unique<EraseAction>(otherStartPos, otherEndPos, otherSplitText);
 	otherAction->affect(action);
 
 	EXPECT_EQ(action->getLeftPos(), COORD(8, 2));
@@ -221,8 +222,8 @@ TEST(ActionTests, WriteEraseAffectFromLeftSideInOneLineTest) {
 	auto splitText = getSplitText();
 	auto otherSplitText = getOtherShortSplitText();
 
-	auto action = std::make_shared<WriteAction>(startPos, splitText);
-	auto otherAction = std::make_shared<EraseAction>(otherStartPos, otherEndPos, otherSplitText);
+	ActionPtr action = std::make_unique<WriteAction>(startPos, splitText);
+	auto otherAction = std::make_unique<EraseAction>(otherStartPos, otherEndPos, otherSplitText);
 	otherAction->affect(action);
 
 	EXPECT_EQ(action->getLeftPos(), COORD(3, 4));
@@ -236,8 +237,8 @@ TEST(ActionTests, WriteEraseCutFromLeftSideTest) {
 	auto splitText = getSplitText();
 	auto otherSplitText = getOtherSplitText();
 
-	auto action = std::make_shared<WriteAction>(startPos, splitText);
-	auto otherAction = std::make_shared<EraseAction>(otherStartPos, otherEndPos, otherSplitText);
+	ActionPtr action = std::make_unique<WriteAction>(startPos, splitText);
+	auto otherAction = std::make_unique<EraseAction>(otherStartPos, otherEndPos, otherSplitText);
 	otherAction->affect(action);
 
 	EXPECT_EQ(action->getLeftPos(), COORD(4, 3));
@@ -251,8 +252,8 @@ TEST(ActionTests, WriteEraseCutFromCenterTest) {
 	auto splitText = getSplitText();
 	auto otherSplitText = std::vector<std::string>{ "line", "seco" };
 
-	auto action = std::make_shared<WriteAction>(startPos, splitText);
-	auto otherAction = std::make_shared<EraseAction>(otherStartPos, otherEndPos, otherSplitText);
+	ActionPtr action = std::make_unique<WriteAction>(startPos, splitText);
+	auto otherAction = std::make_unique<EraseAction>(otherStartPos, otherEndPos, otherSplitText);
 	otherAction->affect(action);
 
 	EXPECT_EQ(action->getLeftPos(), COORD(14, 4));
@@ -266,8 +267,8 @@ TEST(ActionTests, WriteEraseCutAllTest) {
 	auto splitText = getSplitText();
 	auto otherSplitText = getSplitText();
 
-	auto action = std::make_shared<WriteAction>(startPos, splitText);
-	auto otherAction = std::make_shared<EraseAction>(otherStartPos, otherEndPos, otherSplitText);
+	ActionPtr action = std::make_unique<WriteAction>(startPos, splitText);
+	auto otherAction = std::make_unique<EraseAction>(otherStartPos, otherEndPos, otherSplitText);
 	otherAction->affect(action);
 
 	EXPECT_EQ(action->getLeftPos(), COORD(14, 4));
@@ -281,8 +282,8 @@ TEST(ActionTests, WriteEraseCutAllButMoreTest) {
 	auto splitText = getSplitText();
 	auto otherSplitText = std::vector<std::string>{ "123firstline", "secondline", "thirdline432" };
 
-	auto action = std::make_shared<WriteAction>(startPos, splitText);
-	auto otherAction = std::make_shared<EraseAction>(otherStartPos, otherEndPos, otherSplitText);
+	ActionPtr action = std::make_unique<WriteAction>(startPos, splitText);
+	auto otherAction = std::make_unique<EraseAction>(otherStartPos, otherEndPos, otherSplitText);
 	otherAction->affect(action);
 
 	EXPECT_EQ(action->getText(), "");
@@ -295,8 +296,8 @@ TEST(ActionTests, WriteEraseCutFromRightSideTest) {
 	auto splitText = getSplitText();
 	auto otherSplitText = getOtherSplitText();
 
-	auto action = std::make_shared<WriteAction>(startPos, splitText);
-	auto otherAction = std::make_shared<EraseAction>(otherStartPos, otherEndPos, otherSplitText);
+	ActionPtr action = std::make_unique<WriteAction>(startPos, splitText);
+	auto otherAction = std::make_unique<EraseAction>(otherStartPos, otherEndPos, otherSplitText);
 	otherAction->affect(action);
 
 	EXPECT_EQ(action->getLeftPos(), COORD(14, 4));
@@ -310,8 +311,8 @@ TEST(ActionTests, WriteEraseBelowOneLineTest) {
 	auto splitText = getSplitText();
 	auto otherSplitText = getOtherSplitText();
 
-	auto action = std::make_shared<WriteAction>(startPos, splitText);
-	auto otherAction = std::make_shared<EraseAction>(otherStartPos, otherEndPos, otherSplitText);
+	ActionPtr action = std::make_unique<WriteAction>(startPos, splitText);
+	auto otherAction = std::make_unique<EraseAction>(otherStartPos, otherEndPos, otherSplitText);
 	otherAction->affect(action);
 
 	EXPECT_EQ(action->getLeftPos(), COORD(10, 2));
@@ -325,41 +326,43 @@ TEST(ActionTests, WriteEraseBelowOneLineOnlyOneLineTest) {
 	auto splitText = getSplitText();
 	auto otherSplitText = getOtherShortSplitText();
 
-	auto action = std::make_shared<WriteAction>(startPos, splitText);
-	auto otherAction = std::make_shared<EraseAction>(otherStartPos, otherEndPos, otherSplitText);
+	ActionPtr action = std::make_unique<WriteAction>(startPos, splitText);
+	auto otherAction = std::make_unique<EraseAction>(otherStartPos, otherEndPos, otherSplitText);
 	otherAction->affect(action);
 
 	EXPECT_EQ(action->getLeftPos(), COORD(10, 4));
 	EXPECT_EQ(action->getText(), "firstline\nsecondline\nthirdline");
 }
 
-TEST(ActionTests, EraseWriteAffectFromLeftSideTest) {
+TEST(ActionTests, EraseWriteAffectFromLeftSideNoChangesTest) {
 	COORD startPos = COORD{ 9, 2 };
 	COORD endPos = COORD{ 5, 0 };
 	COORD otherStartPos = COORD{ 5, 2 };
 	auto splitText = getSplitText();
 	auto otherSplitText = getOtherSplitText();
 
-	auto action = std::make_shared<EraseAction>(startPos, endPos, splitText);
-	auto otherAction = std::make_shared<WriteAction>(otherStartPos, otherSplitText);
+	ActionPtr action = std::make_unique<EraseAction>(startPos, endPos, splitText);
+	auto otherAction = std::make_unique<WriteAction>(otherStartPos, otherSplitText);
 	otherAction->affect(action);
 
-	EXPECT_EQ(action->getRightPos(), COORD(10, 4));
+	EXPECT_EQ(action->getLeftPos(), COORD(5, 0));
+	EXPECT_EQ(action->getRightPos(), COORD(9, 2));
 	EXPECT_EQ(action->getText(), "firstline\nsecondline\nthirdline");
 }
 
-TEST(ActionTests, EraseWriteAffectFromLeftStartTest) {
-	COORD startPos = COORD{ 9, 2 };
-	COORD endPos = COORD{ 5, 0 };
-	COORD otherStartPos = COORD{ 9, 2 };
+TEST(ActionTests, EraseWriteAffectFromLeftSideTest) {
+	COORD startPos = COORD{ 9, 4 };
+	COORD endPos = COORD{ 5, 2 };
+	COORD otherStartPos = COORD{ 5, 2 };
 	auto splitText = getSplitText();
 	auto otherSplitText = getOtherSplitText();
 
-	auto action = std::make_shared<EraseAction>(startPos, endPos, splitText);
-	auto otherAction = std::make_shared<WriteAction>(otherStartPos, otherSplitText);
+	ActionPtr action = std::make_unique<EraseAction>(startPos, endPos, splitText);
+	auto otherAction = std::make_unique<WriteAction>(otherStartPos, otherSplitText);
 	otherAction->affect(action);
 
-	EXPECT_EQ(action->getRightPos(), COORD(6, 4));
+	EXPECT_EQ(action->getLeftPos(), COORD(6, 4));
+	EXPECT_EQ(action->getRightPos(), COORD(9, 6));
 	EXPECT_EQ(action->getText(), "firstline\nsecondline\nthirdline");
 }
 
@@ -370,8 +373,8 @@ TEST(ActionTests, EraseWriteAffectFromRightSideTest) {
 	auto splitText = getSplitText();
 	auto otherSplitText = getOtherSplitText();
 
-	auto action = std::make_shared<EraseAction>(startPos, endPos, splitText);
-	auto otherAction = std::make_shared<WriteAction>(otherStartPos, otherSplitText);
+	ActionPtr action = std::make_unique<EraseAction>(startPos, endPos, splitText);
+	auto otherAction = std::make_unique<WriteAction>(otherStartPos, otherSplitText);
 	otherAction->affect(action);
 
 	EXPECT_EQ(action->getRightPos(), COORD(9, 2));
@@ -385,8 +388,8 @@ TEST(ActionTests, EraseWriteAffectBelowOneLineTest) {
 	auto splitText = getSplitText();
 	auto otherSplitText = getOtherSplitText();
 
-	auto action = std::make_shared<EraseAction>(startPos, endPos, splitText);
-	auto otherAction = std::make_shared<WriteAction>(otherStartPos, otherSplitText);
+	ActionPtr action = std::make_unique<EraseAction>(startPos, endPos, splitText);
+	auto otherAction = std::make_unique<WriteAction>(otherStartPos, otherSplitText);
 	otherAction->affect(action);
 
 	EXPECT_EQ(action->getRightPos(), COORD(9, 8));
@@ -400,8 +403,8 @@ TEST(ActionTests, EraseWriteAffectBelowOneLineOnlyOneLineTest) {
 	auto splitText = getSplitText();
 	auto otherSplitText = getOtherShortSplitText();
 
-	auto action = std::make_shared<EraseAction>(startPos, endPos, splitText);
-	auto otherAction = std::make_shared<WriteAction>(otherStartPos, otherSplitText);
+	ActionPtr action = std::make_unique<EraseAction>(startPos, endPos, splitText);
+	auto otherAction = std::make_unique<WriteAction>(otherStartPos, otherSplitText);
 	otherAction->affect(action);
 
 	EXPECT_EQ(action->getRightPos(), COORD(9, 6));
@@ -409,34 +412,19 @@ TEST(ActionTests, EraseWriteAffectBelowOneLineOnlyOneLineTest) {
 }
 
 TEST(ActionTests, EraseEraseAffectFromLeftSideTest) {
-	COORD startPos = COORD{ 9, 5 };
-	COORD endPos = COORD{ 5, 0 };
-	COORD otherStartPos = COORD{ 4, 5 };
+	COORD startPos = COORD{ 9, 10 };
+	COORD endPos = COORD{ 5, 5 };
+	COORD otherStartPos = COORD{ 5, 5 };
 	COORD otherEndPos = COORD{ 6, 3 };
 	auto splitText = getSplitText();
 	auto otherSplitText = getOtherSplitText();
 
-	auto action = std::make_shared<EraseAction>(startPos, endPos, splitText);
-	auto otherAction = std::make_shared<EraseAction>(otherStartPos, otherEndPos, otherSplitText);
+	ActionPtr action = std::make_unique<EraseAction>(startPos, endPos, splitText);
+	auto otherAction = std::make_unique<EraseAction>(otherStartPos, otherEndPos, otherSplitText);
 	otherAction->affect(action);
 
-	EXPECT_EQ(action->getRightPos(), COORD(11, 3));
-	EXPECT_EQ(action->getText(), "firstline\nsecondline\nthirdline");
-}
-
-TEST(ActionTests, EraseEraseAffectFromLeftStartTest) {
-	COORD startPos = COORD{ 9, 5 };
-	COORD endPos = COORD{ 5, 0 };
-	COORD otherStartPos = COORD{ 9, 5 };
-	COORD otherEndPos = COORD{ 6, 3 };
-	auto splitText = getSplitText();
-	auto otherSplitText = getOtherSplitText();
-
-	auto action = std::make_shared<EraseAction>(startPos, endPos, splitText);
-	auto otherAction = std::make_shared<EraseAction>(otherStartPos, otherEndPos, otherSplitText);
-	otherAction->affect(action);
-
-	EXPECT_EQ(action->getRightPos(), COORD(6, 3));
+	EXPECT_EQ(action->getLeftPos(), COORD(6, 3));
+	EXPECT_EQ(action->getRightPos(), COORD(9, 8));
 	EXPECT_EQ(action->getText(), "firstline\nsecondline\nthirdline");
 }
 
@@ -448,11 +436,12 @@ TEST(ActionTests, EraseEraseAffectFromRightSideTest) {
 	auto splitText = getSplitText();
 	auto otherSplitText = getOtherSplitText();
 
-	auto action = std::make_shared<EraseAction>(startPos, endPos, splitText);
-	auto otherAction = std::make_shared<EraseAction>(otherStartPos, otherEndPos, otherSplitText);
+	ActionPtr action = std::make_unique<EraseAction>(startPos, endPos, splitText);
+	auto otherAction = std::make_unique<EraseAction>(otherStartPos, otherEndPos, otherSplitText);
 	otherAction->affect(action);
 
-	EXPECT_EQ(action->getRightPos(), COORD(6, 3));
+	EXPECT_EQ(action->getLeftPos(), COORD(5, 0));
+	EXPECT_EQ(action->getRightPos(), COORD(9, 5));
 	EXPECT_EQ(action->getText(), "firstline\nsecondline\nthirdline");
 }
 
@@ -464,8 +453,8 @@ TEST(ActionTests, EraseEraseAffectBelowOneLineTest) {
 	auto splitText = getSplitText();
 	auto otherSplitText = getOtherSplitText();
 
-	auto action = std::make_shared<EraseAction>(startPos, endPos, splitText);
-	auto otherAction = std::make_shared<EraseAction>(otherStartPos, otherEndPos, otherSplitText);
+	ActionPtr action = std::make_unique<EraseAction>(startPos, endPos, splitText);
+	auto otherAction = std::make_unique<EraseAction>(otherStartPos, otherEndPos, otherSplitText);
 	otherAction->affect(action);
 
 	EXPECT_EQ(action->getRightPos(), COORD(9, 11));
@@ -480,8 +469,8 @@ TEST(ActionTests, EraseEraseAffectBelowOneLineOnlyOneLineTest) {
 	auto splitText = getSplitText();
 	auto otherSplitText = getOtherSplitText();
 
-	auto action = std::make_shared<EraseAction>(startPos, endPos, splitText);
-	auto otherAction = std::make_shared<EraseAction>(otherStartPos, otherEndPos, otherSplitText);
+	ActionPtr action = std::make_unique<EraseAction>(startPos, endPos, splitText);
+	auto otherAction = std::make_unique<EraseAction>(otherStartPos, otherEndPos, otherSplitText);
 	otherAction->affect(action);
 
 	EXPECT_EQ(action->getRightPos(), COORD(9, 16));
@@ -494,9 +483,9 @@ TEST(ActionTests, WriteMergeTest) {
 	auto splitText = getSplitText();
 	auto otherSplitText = getOtherSplitText();
 
-	auto action = std::make_shared<WriteAction>(startPos, splitText);
-	auto otherAction = std::make_shared<WriteAction>(otherStartPos, otherSplitText);
-	EXPECT_TRUE(action->tryMerge(otherAction));
+	ActionPtr action = std::make_unique<WriteAction>(startPos, splitText);
+	auto otherAction = std::make_unique<WriteAction>(otherStartPos, otherSplitText);
+	EXPECT_TRUE(action->tryMerge(std::move(otherAction)));
 
 	EXPECT_EQ(action->getLeftPos(), COORD(5, 0));
 	EXPECT_EQ(action->getRightPos(), COORD(6, 4));
@@ -511,13 +500,11 @@ TEST(ActionTests, EraseMergeTest) {
 	auto splitText = getSplitText();
 	auto otherSplitText = getOtherSplitText();
 
-	auto action = std::make_shared<EraseAction>(startPos, endPos, splitText);
-	auto otherAction = std::make_shared<EraseAction>(otherStartPos, otherEndPos, otherSplitText);
-	EXPECT_TRUE(action->tryMerge(otherAction));
+	ActionPtr action = std::make_unique<EraseAction>(startPos, endPos, splitText);
+	auto otherAction = std::make_unique<EraseAction>(otherStartPos, otherEndPos, otherSplitText);
+	EXPECT_TRUE(action->tryMerge(std::move(otherAction)));
 
 	EXPECT_EQ(action->getRightPos(), COORD(9, 16));
 	EXPECT_EQ(action->getLeftPos(), COORD(6, 12));
 	EXPECT_EQ(action->getText(), "microphones\nheadphones\nmousesfirstline\nsecondline\nthirdline");
 }
-
-

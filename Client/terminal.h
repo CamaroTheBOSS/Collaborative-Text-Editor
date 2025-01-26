@@ -15,6 +15,7 @@
 #define CTRL_C 3
 #define CTRL_V 22
 #define CTRL_X 24
+#define CTRL_Z 26
 
 #define BACKSPACE 8
 #define TABULAR 9

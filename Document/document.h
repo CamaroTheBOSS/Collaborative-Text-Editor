@@ -9,22 +9,40 @@
 struct User {
 	Cursor cursor;
 	std::optional<Cursor> selectAnchor;
-	UserHistory history;
+	UserHistory history{ std::chrono::milliseconds{ 1000 }, 2000 };
 	bool isSelecting() {
 		return selectAnchor.has_value();
 	}
+	User() = default;
+	User(const User& other) = delete;
+	User& operator=(const User& other) = delete;
+	User(User&& other) noexcept :
+		cursor(std::move(other.cursor)),
+		selectAnchor(std::move(other.selectAnchor)),
+		history(std::move(other.history)) {}
+	User& operator=(User&& other) noexcept {
+		cursor = std::move(other.cursor);
+		selectAnchor = std::move(other.selectAnchor);
+		history = std::move(other.history);
+		return *this;
+	}
+	
 };
 
 
 
 class Document {
 public:
+	friend class EraseAction;
+	friend class WriteAction;
 	Document();
 	Document(const std::string& text);
 	Document(const std::string& text, const int cursors, const int myUserIdx);
 
 	COORD write(const int index, const std::string& text);
 	COORD erase(const int index, const int eraseSize);
+	UndoReturn undo(const int index);
+	UndoReturn redo(const int index);
 	
 	COORD moveCursorLeft(const int index, const bool withSelect);
 	COORD moveCursorRight(const int index, const bool withSelect);
@@ -52,14 +70,14 @@ public:
 	std::string getFilename() const;
 
 private:
-	COORD insertText(COORD pos, const std::vector<std::string_view>& parsedLines);
+	COORD insertText(COORD pos, const std::vector<std::string>& parsedLines);
 	std::string& addNewLine(const int col, const std::string_view initText);
-	std::vector<std::string_view> parseText(const std::string& text) const;
 
-	COORD eraseText(COORD pos, int eraseSize);
-	int eraseLine(const int col);
+	void pushAction(User& user, ActionPtr action);
+	COORD eraseText(COORD pos, int eraseSize, std::vector<std::string>& erasedText);
+	std::pair<int, std::string> eraseLine(const int col);
 	COORD eraseSelectedText(User& user);
-	COORD eraseTextBetween(const COORD& cursorPos1, const COORD& cursorPos2);
+	COORD eraseTextBetween(const COORD& cursorPos1, const COORD& cursorPos2, std::vector<std::string>& erasedText);
 
 	bool isCursorValid(Cursor& cursor);
 	void adjustCursors();

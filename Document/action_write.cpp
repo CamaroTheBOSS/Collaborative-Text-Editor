@@ -1,13 +1,23 @@
 #include "action_write.h"
 #include "pos_helpers.h"
+#include "document.h"
+#include "action_erase.h"
+#include "parser.h"
 
 using ActionPtr = WriteAction::ActionPtr;
 
 WriteAction::WriteAction(COORD& startPos, std::vector<std::string>& text):
-	Action(startPos, text) {}
+	Action(ActionType::write, startPos, text) {}
 
 WriteAction::WriteAction(COORD& startPos, std::vector<std::string>& text, Timestamp timestamp):
-	Action(startPos, text, timestamp) {}
+	Action(ActionType::write, startPos, text, timestamp) {}
+
+ActionPtr WriteAction::convertToOppositeAction() const {
+	COORD startPos = getEndPos();
+	COORD endPos = getStartPos();
+	auto textCopy = text;
+	return std::make_unique<EraseAction>(startPos, endPos, textCopy, getTimestamp());
+}
 
 std::optional<ActionPtr> WriteAction::affect(const ActionPtr& other) {
 	return other->affectWrite(*this);
@@ -27,8 +37,8 @@ std::optional<ActionPtr> WriteAction::affectWrite(const Action& other) {
 	}
 	COORD splitPoint = positionalDiff(otherLeft, thisLeft);
 	auto splittedText = splitText(splitPoint);
-	auto newAction = std::make_shared<WriteAction>(otherRight, splittedText, getTimestamp());
-	return std::make_optional<ActionPtr>(newAction);
+	auto newAction = std::make_unique<WriteAction>(otherRight, splittedText, getTimestamp());
+	return std::make_optional<ActionPtr>(std::move(newAction));
 }
 
 std::optional<ActionPtr> WriteAction::affectErase(const Action& other) {
@@ -44,7 +54,7 @@ std::optional<ActionPtr> WriteAction::affectErase(const Action& other) {
 	COORD leftSplitPoint = positionalDiff(otherLeft, thisLeft);
 	auto rightSplittedText = splitText(rightSplitPoint);
 	auto middleSplittedText = splitText(leftSplitPoint);
-	if (thisLeft < otherRight) {
+	if (thisLeft <= otherRight) {
 		text = thisLeft >= otherLeft ? rightSplittedText : mergeText(text, rightSplittedText);
 	}
 
@@ -67,6 +77,16 @@ bool WriteAction::tryMerge(const ActionPtr& other) {
 	}
 	text = std::move(mergeText(text, other->text));
 	return true;
+}
+
+UndoReturn WriteAction::undo(const int userIdx, Document& doc) const {
+	COORD startPos = (std::min)(doc.getEndPos(), getEndPos());
+	std::vector<std::string> erasedText;
+	COORD endPos = doc.eraseText(startPos, getText().size(), erasedText);
+	COORD diffPos = endPos - startPos;
+	doc.moveAffectedCursors(doc.users[userIdx], diffPos);
+	doc.adjustCursors();
+	return {ActionType::erase, startPos, endPos, Parser::parseVectorToText(erasedText)};
 }
 
 COORD WriteAction::getLeftPos() const {

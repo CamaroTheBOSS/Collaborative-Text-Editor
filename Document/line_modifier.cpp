@@ -14,30 +14,30 @@ int LineModifier::append(std::string& line, const std::string_view newText) {
 	return line.size();
 }
 
-int LineModifier::erase(std::string& line, const int pos, const int n) {
+std::pair<int, std::string> LineModifier::erase(std::string& line, const int pos, const int n) {
 	if (pos <= 0 || pos > line.size() || n <= 0) {
-		return pos;
+		return { pos, "" };
 	}
 	const int nLetters = (std::min)(pos, n);
-	line.erase(line.cbegin() + pos - nLetters, line.cbegin() + pos);
-	return pos - nLetters;
+	auto erasedText = LineModifier::cut(line, pos - nLetters, pos);
+	return { pos - nLetters, std::move(erasedText) };
 }
 
 std::string LineModifier::cut(std::string& line, const int left, const int right) {
-	if (left >= right || line.empty()) {
+	auto [effLeft, effRight] = effectiveRange(line, left, right);
+	if (effLeft >= effRight || line.empty()) {
 		return "";
 	}
-	auto [effLeft, effRight] = effectiveRange(line, left, right);
 	std::string str{line.cbegin() + effLeft, line.cbegin() + effRight};
 	line.erase(line.cbegin() + effLeft, line.cbegin() + effRight);
 	return str;
 }
 
 std::string_view LineModifier::get(std::string& line, const int left, const int right) {
-	if (left >= right || line.empty()) {
+	auto [effLeft, effRight] = effectiveRange(line, left, right);
+	if (effLeft >= effRight || line.empty()) {
 		return "";
 	}
-	auto [effLeft, effRight] = effectiveRange(line, left, right);
 	return std::string_view{line.cbegin() + effLeft, line.cbegin() + effRight};
 }
 
