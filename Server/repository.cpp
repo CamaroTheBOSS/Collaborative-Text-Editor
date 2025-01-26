@@ -14,6 +14,8 @@ namespace server {
 		switch (type) {
 		case msg::Type::masterNotification:
 			return masterNotification(client, buffer);
+		case msg::Type::masterClose:
+			return masterClose(client, buffer);
 		case msg::Type::sync:
 			return connectUserToDoc(client, buffer);
 		case msg::Type::disconnect:
@@ -75,7 +77,12 @@ namespace server {
 
 	Response Repository::masterNotification(SOCKET client, msg::Buffer& buffer) const {
 		logger.logDebug("Thread", std::this_thread::get_id(), "got new connection!");
-		return Response{ std::move(buffer), {} };
+		return Response{ std::move(buffer), {}, msg::Type::masterNotification };
+	}
+
+	Response Repository::masterClose(SOCKET client, msg::Buffer& buffer) const {
+		logger.logDebug("Thread", std::this_thread::get_id(), "got msg from master to close itself!");
+		return Response{ std::move(buffer), {}, msg::Type::masterClose };
 	}
 
 	Response Repository::write(SOCKET client, msg::Buffer& buffer) {

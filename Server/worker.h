@@ -14,8 +14,11 @@ class Worker {
 public:
 	Worker(const std::string& ip, const int port, server::Repository* repo);
 	Worker(Worker&& worker) noexcept;
+	Worker& operator=(Worker&& worker) noexcept;
 	Worker(const Worker&) = delete;
+	Worker& operator=(const Worker&) = delete;
 private:
+	void close();
 	bool connectToMaster(const std::string& ip, const int port);
 	void handleConnections();
 	server::Response shutdownConnection(SOCKET client, msg::Buffer& buffer);
@@ -25,6 +28,7 @@ private:
 	void syncClientState(server::Response& response) const;
 	
 	friend class Server;
+	bool opened = true;
 	std::mutex connSetLock;
 	FD_SET connections;
 

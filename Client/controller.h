@@ -4,6 +4,7 @@
 #include "terminal.h"
 
 class Controller {
+	friend class SyncTester;
 public:
 	bool connect(const std::string& ip, const int port);
 	bool disconnect();

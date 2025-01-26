@@ -3,6 +3,8 @@
 
 #include "tcp_client.h"
 
+using namespace client;
+
 bool TCPClient::connectServer(const std::string& ip, const int port) {
     std::chrono::seconds waitTime{1};
     std::this_thread::sleep_for(waitTime);

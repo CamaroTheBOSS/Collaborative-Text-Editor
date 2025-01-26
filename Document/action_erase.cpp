@@ -64,7 +64,8 @@ bool EraseAction::tryMerge(const ActionPtr& other) {
 }
 
 UndoReturn EraseAction::undo(const int userIdx, Document& doc) const {
-	COORD startPos = (std::min)((std::max)(COORD{0, 0}, getEndPos()), doc.getEndPos());
+	doc.setCursorPos(userIdx, (std::min)((std::max)(COORD{ 0, 0 }, getEndPos()), doc.getEndPos()));
+	COORD startPos = doc.getCursorPos(userIdx);
 	COORD endPos = doc.insertText(startPos, text);
 	COORD diffPos = endPos - startPos;
 	doc.moveAffectedCursors(doc.users[userIdx], diffPos);

@@ -16,6 +16,7 @@ namespace msg {
 	enum class Type {
 		// Commands
 		masterNotification,
+		masterClose,
 		registration,
 		login,
 		create,

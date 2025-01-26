@@ -22,12 +22,14 @@ namespace server {
 	};
 
 	class Repository {
+		friend class SyncTester;
 	public:
 		Response process(SOCKET client, msg::Buffer& buffer);
 	private:
 		Response connectUserToDoc(SOCKET client, msg::Buffer& buffer);
 		Response disconnectUserFromDoc(SOCKET client, msg::Buffer& buffer);
 		Response masterNotification(SOCKET client, msg::Buffer& buffer) const;
+		Response masterClose(SOCKET client, msg::Buffer& buffer) const;
 		Response write(SOCKET client, msg::Buffer& buffer);
 		Response erase(SOCKET client, msg::Buffer& buffer);
 		Response moveHorizontal(SOCKET client, msg::Buffer& buffer);

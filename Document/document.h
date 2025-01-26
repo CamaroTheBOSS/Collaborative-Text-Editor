@@ -30,9 +30,10 @@ struct User {
 };
 
 
-
+class SyncTester;
 class Document {
 public:
+	friend class SyncTester;
 	friend class EraseAction;
 	friend class WriteAction;
 	Document();

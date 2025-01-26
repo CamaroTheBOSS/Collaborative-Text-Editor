@@ -4,7 +4,9 @@
 #include "controller.h"
 #include "logging.h"
 
+using namespace client;
 constexpr msg::OneByteInt version = 1;
+
 
 bool Controller::connect(const std::string& ip, const int port) {
     return client.connectServer(ip, port);

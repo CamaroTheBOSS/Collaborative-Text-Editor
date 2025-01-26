@@ -1,4 +1,7 @@
 #pragma once
 #include "logger.h"
 
-extern logs::Logger logger;
+namespace client {
+	extern logs::Logger logger;
+}
+

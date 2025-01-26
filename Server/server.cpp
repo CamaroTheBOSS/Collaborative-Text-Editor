@@ -3,10 +3,14 @@
 #include "server.h"
 #include "logging.h"
 
+using namespace server;
+
 constexpr int msgBufferSize = 6;
 constexpr char notifyType = static_cast<char>(msg::Type::masterNotification);
+constexpr char closeType = static_cast<char>(msg::Type::masterClose);
 constexpr char version = 1;
 constexpr char notifyMsgBuffer[msgBufferSize] = { 0, 0, 0, 2, notifyType, version }; // (0002 = length)
+constexpr char closeMsgBuffer[msgBufferSize] = { 0, 0, 0, 2, closeType, version }; // (0002 = length)
 
 Server::Server(std::string ip, const int port) :
 	ip(ip),
@@ -38,7 +42,8 @@ bool Server::open(const int nWorkers) {
 
 void Server::start() {
 	logger.logDebug("Listening for connections...");
-	while (true) {
+	state = State::opened;
+	while (state == State::opened) {
 		SOCKET newConnection = accept(listenSocket, nullptr, nullptr);
 		if (newConnection == INVALID_SOCKET) {
 			logger.logError(WSAGetLastError(), ": Error when accepting new connection");
@@ -58,10 +63,34 @@ void Server::start() {
 		}
 		logger.logDebug("Connection", newConnection, "has been forwarded to thread", id);
 	}
+	state = State::closed;
 }
 
 bool Server::close() {
-	return true;
+	logger.logDebug("Got signal for close. Closing server...");
+	state = State::closing;
+	bool success = true;
+	SOCKET client = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if (client == INVALID_SOCKET) {
+		logger.logError(WSAGetLastError(), ": Error when creating socket for server closing!");
+		closesocket(client);
+		success = false;
+	}
+	sockaddr_in srvAddress;
+	srvAddress.sin_family = AF_INET;
+	srvAddress.sin_port = htons(port);
+	std::wstring ipStr{ip.begin(), ip.end()};
+	InetPton(AF_INET, ipStr.c_str(), &srvAddress.sin_addr.s_addr);
+	if (connect(client, reinterpret_cast<SOCKADDR*>(&srvAddress), sizeof(srvAddress))) {
+		logger.logError(WSAGetLastError(), ": Error when notifying server for closing!");
+		success = false;
+	}
+	if (int closed = closeWorkers(); closed < workers.size()) {
+		logger.logError(WSAGetLastError(), ": Error when closing workers. Closed only", closed, "/", workers.size(), "|", workers.size() - closed, "dangling workers are present!");
+		success = false;
+	}
+	closesocket(listenSocket);
+	return success;
 }
 
 int Server::selectWorker() {
@@ -75,6 +104,23 @@ int Server::selectWorker() {
 		}
 	}
 	return leastConnsWorker;
+}
+
+int Server::closeWorkers() {
+	int closed = 0;
+	for (int i = workers.size() - 1; i >= 0; i--) {
+		auto id = workers[i].thread.get_id();
+		int sendBytes = send(notifiers[i], closeMsgBuffer, msgBufferSize, 0);
+		if (sendBytes < 0) {
+			logger.logError(WSAGetLastError(), ": Error when notifying thread", id, "for close");
+			continue;
+		}
+		if (workers[i].thread.joinable()) {
+			workers[i].thread.join();
+		}
+		closed++;
+	}
+	return closed;
 }
 
 void Server::initWorkers(const int nWorkers) {

@@ -6,6 +6,7 @@
 
 namespace client {
 	class Repository {
+		friend class SyncTester;
 	public:
 		bool processMsg(msg::Buffer& buffer);
 		bool saveDoc() const;

@@ -25,11 +25,15 @@
 struct KeyPack {
 	int keyCode;
 	bool shiftPressed;
+	std::string str() const {
+		return "(" + std::to_string(keyCode) + (shiftPressed ? ", shift)" : ")");
+	}
 };
 
 class Terminal {
 public:
 	Terminal();
+	~Terminal();
 	KeyPack readChar() const;
 	void render(Document& doc);
 	unsigned int getDocBufferWidth() const;

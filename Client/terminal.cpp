@@ -5,6 +5,8 @@
 #include "terminal.h"
 #include "logging.h"
 
+using namespace client;
+
 constexpr int rightMargin = 5;
 
 bool screenBuffersEqual(const SMALL_RECT& first, const SMALL_RECT& second) {
@@ -33,6 +35,23 @@ Terminal::Terminal() {
         SetConsoleCursorInfo(hConsole, &cursorInfo);
     }
     resizeScreenBufferIfNeeded();
+}
+
+Terminal::~Terminal() {
+    DWORD currMode;
+    DWORD features = (
+        ENABLE_LINE_INPUT |
+        ENABLE_ECHO_INPUT |
+        ENABLE_INSERT_MODE |
+        ENABLE_MOUSE_INPUT |
+        ENABLE_PROCESSED_INPUT |
+        ENABLE_QUICK_EDIT_MODE |
+        ENABLE_WINDOW_INPUT |
+        ENABLE_VIRTUAL_TERMINAL_INPUT
+        );
+    auto stdInput = GetStdHandle(STD_INPUT_HANDLE);
+    GetConsoleMode(stdInput, &currMode);
+    SetConsoleMode(stdInput, currMode | features);
 }
 
 bool Terminal::resizeScreenBufferIfNeeded() {

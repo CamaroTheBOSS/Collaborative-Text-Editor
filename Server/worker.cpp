@@ -4,9 +4,11 @@
 #include "worker.h"
 #include "logging.h"
 
+using namespace server;
+
 constexpr int defaultBuffSize = 128;
 
-Worker::Worker(const std::string& ip, const int port, Repository* repo):
+Worker::Worker(const std::string& ip, const int port, server::Repository* repo):
     repo(repo) {
     std::scoped_lock lock{connSetLock};
     FD_ZERO(&connections);
@@ -20,6 +22,15 @@ Worker::Worker(Worker&& worker) noexcept :
     masterAddress(std::move(worker.masterAddress)),
     repo(worker.repo) {
     thread = std::thread{ &Worker::handleConnections, this };
+}
+
+Worker& Worker::operator=(Worker&& worker) noexcept {
+    masterListener = std::move(worker.masterListener);
+    connections = std::move(worker.connections);
+    masterAddress = std::move(worker.masterAddress);
+    repo = std::move(worker.repo);
+    thread = std::move(worker.thread);
+    return *this;
 }
 
 bool Worker::connectToMaster(const std::string& ip, const int port) {
@@ -47,7 +58,7 @@ bool Worker::connectToMaster(const std::string& ip, const int port) {
 }
 
 void Worker::handleConnections() {
-    while (true) {
+    while (opened) {
         FD_SET listenConnections;
         {
             std::scoped_lock lock{connSetLock};
@@ -65,10 +76,22 @@ void Worker::handleConnections() {
                 if (response.msgType == msg::Type::sync) {
                     syncClientState(response);
                 }
+                if (response.msgType == msg::Type::masterClose) {
+                    opened = false;
+                }
                 sendResponses(response);
             }
         }
     }
+    close();
+}
+
+void Worker::close() {
+    std::scoped_lock lock{connSetLock};
+    for (int i = 0; i < connections.fd_count; i++) {
+        closesocket(connections.fd_array[i]);
+    }
+    closesocket(masterListener);
 }
 
 std::vector<msg::Buffer> Worker::recvMsg(const SOCKET client) {

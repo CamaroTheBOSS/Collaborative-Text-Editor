@@ -23,10 +23,10 @@ public:
 		msg::Buffer msgWithSize = msg::enrich(buffer);
 		int sentBytes = send(client, msgWithSize.get(), msgWithSize.size, 0);
 		if (sentBytes <= 0) {
-			logger.logError(WSAGetLastError(), ": Send error!");
+			client::logger.logError(WSAGetLastError(), ": Send error!");
 			return false;
 		}
-		logger.logDebug("Send message with args:", args...);
+		client::logger.logDebug("Send message with args:", args...);
 		return true;
 	}	
 

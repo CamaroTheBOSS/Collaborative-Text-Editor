@@ -80,7 +80,8 @@ bool WriteAction::tryMerge(const ActionPtr& other) {
 }
 
 UndoReturn WriteAction::undo(const int userIdx, Document& doc) const {
-	COORD startPos = (std::min)(doc.getEndPos(), getEndPos());
+	doc.setCursorPos(userIdx, (std::min)(doc.getEndPos(), getEndPos()));
+	COORD startPos = doc.getCursorPos(userIdx);
 	std::vector<std::string> erasedText;
 	COORD endPos = doc.eraseText(startPos, getText().size(), erasedText);
 	COORD diffPos = endPos - startPos;

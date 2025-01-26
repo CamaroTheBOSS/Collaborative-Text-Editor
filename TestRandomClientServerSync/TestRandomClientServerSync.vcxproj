@@ -147,11 +147,25 @@
     </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="args.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="serverthread.cpp" />
+    <ClCompile Include="sync_tester.cpp" />
+    <ClCompile Include="test_client.cpp" />
+    <ClCompile Include="test_server.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="serverthread.h" />
+    <ClInclude Include="args.h" />
+    <ClInclude Include="sync_tester.h" />
+    <ClInclude Include="test_client.h" />
+    <ClInclude Include="test_server.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Client\Client.vcxproj">
+      <Project>{c6b1bf4f-d67b-4e55-8406-844f408affa2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Server\Server.vcxproj">
+      <Project>{17b3342d-55ff-40b6-917d-eaf43c7fe265}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
