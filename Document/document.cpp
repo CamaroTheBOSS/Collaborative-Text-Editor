@@ -52,16 +52,19 @@ COORD Document::write(const int index, const std::string& newText) {
 }
 
 COORD Document::eraseSelectedText(User& user) {
-	COORD startPos = user.cursor.position();
+	COORD userPos = user.cursor.position();
 	if (!user.selectAnchor.has_value()) {
-		return startPos;
+		return userPos;
 	}
 	std::vector<std::string> erasedText;
-	COORD endPos = eraseTextBetween(startPos, user.selectAnchor.value().position(), erasedText);
+	COORD endPos = eraseTextBetween(userPos, user.selectAnchor.value().position(), erasedText);
+	COORD startPos = endPos != userPos ? userPos : user.selectAnchor.value().position();
 	user.selectAnchor.reset();
 	COORD diffPos = endPos - startPos;
 	moveAffectedCursors(user, diffPos);
 	adjustCursors();
+	user.cursor.setPosition(endPos);
+	user.cursor.setOffset(endPos.X);
 	ActionPtr action = std::make_unique<EraseAction>(startPos, endPos, erasedText);
 	pushAction(user, std::move(action));
 	return endPos;
@@ -90,10 +93,14 @@ std::string& Document::addNewLine(const int col, const std::string_view initText
 }
 
 void Document::pushAction(User& user, ActionPtr action) {
-	for (auto& other : users) {
-		other.history.affect(action);
-	}
+	affectHistories(*action);
 	user.history.push(action);
+}
+
+void Document::affectHistories(const Action& newAction) {
+	for (auto& other : users) {
+		other.history.affect(newAction);
+	}
 }
 
 COORD Document::eraseTextBetween(const COORD& cursor1, const COORD& cursor2, std::vector<std::string>& erasedText) {
@@ -171,7 +178,13 @@ UndoReturn Document::undo(const int index) {
 	if (!action.has_value()) {
 		return { ActionType::noop };
 	}
-	return action.value()->undo(index, *this);
+	auto [performedAction, ret] = action.value()->undo(index, *this);
+	COORD diff = ret.endPos - ret.startPos;
+	moveAffectedCursors(users[index], diff);
+	adjustCursors();
+	affectHistories(*performedAction);
+	users[index].history.pushToRedo(performedAction);
+	return ret;
 }
 
 UndoReturn Document::redo(const int index) {
@@ -182,7 +195,13 @@ UndoReturn Document::redo(const int index) {
 	if (!action.has_value()) {
 		return { ActionType::noop };
 	}
-	return action.value()->undo(index, *this);
+	auto [performedAction, ret] = action.value()->undo(index, *this);
+	COORD diff = ret.endPos - ret.startPos;
+	moveAffectedCursors(users[index], diff);
+	adjustCursors();
+	affectHistories(*performedAction);
+	users[index].history.pushToUndo(performedAction);
+	return ret;
 }
 
 bool Document::analyzeBackwardMove(User& user, const bool withSelect) {

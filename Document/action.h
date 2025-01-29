@@ -8,16 +8,19 @@
 
 using Timestamp = std::chrono::time_point<std::chrono::system_clock>;
 enum class ActionType {write, erase, noop};
+
 struct UndoReturn {
 	ActionType type;
 	COORD startPos;
 	COORD endPos;
 	std::string text;
 };
+
 class Document;
 class Action {
 public:
 	using ActionPtr = std::unique_ptr<Action>;
+	using UndoPair = std::pair<ActionPtr, UndoReturn>;
 	friend class WriteAction;
 	friend class EraseAction;
 
@@ -26,9 +29,9 @@ public:
 	Action(ActionType type, COORD& leftPos, std::vector<std::string>& text, Timestamp timestamp);
 	
 	virtual ActionPtr convertToOppositeAction() const = 0;
-	virtual std::optional<ActionPtr> affect(const ActionPtr& other) = 0;
+	virtual std::optional<ActionPtr> affect(Action& other) const = 0;
 	virtual bool tryMerge(const ActionPtr& other) = 0;
-	virtual UndoReturn undo(const int userIdx, Document& doc) const = 0;
+	virtual UndoPair undo(const int userIdx, Document& doc) const = 0;
 	virtual COORD getLeftPos() const = 0;
 	virtual COORD getRightPos() const = 0;
 	virtual COORD getEndPos() const = 0;

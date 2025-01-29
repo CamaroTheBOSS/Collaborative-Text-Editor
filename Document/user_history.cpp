@@ -37,7 +37,6 @@ std::optional<ActionPtr> UserHistory::undo() {
 	if (undoActions.empty()) {
 		return {};
 	}
-	redoActions.emplace_back(undoActions.back()->convertToOppositeAction());
 	std::optional<ActionPtr> opt{ std::move(undoActions.back()) };
 	undoActions.pop_back();
 	return opt;
@@ -47,10 +46,16 @@ std::optional<ActionPtr> UserHistory::redo() {
 	if (redoActions.empty()) {
 		return {};
 	}
-	undoActions.emplace_back(redoActions.back()->convertToOppositeAction());
 	std::optional<ActionPtr> opt{ std::move(redoActions.back()) };
 	redoActions.pop_back();
 	return opt;
+}
+
+void UserHistory::pushToRedo(ActionPtr& newAction) {
+	redoActions.emplace_back(std::move(newAction));
+}
+void UserHistory::pushToUndo(ActionPtr& newAction) {
+	undoActions.emplace_back(std::move(newAction));
 }
 
 const std::vector<ActionPtr>& UserHistory::getUndoActions() const {
@@ -65,17 +70,22 @@ bool UserHistory::inMergeInterval(const ActionPtr& action) const {
 	return !undoActions.empty() && action->getTimestamp() < undoActions.back()->getTimestamp() + mergeIntervalMs;
 }
 
-void UserHistory::affect(const ActionPtr& newAction) {
+void UserHistory::affect(const Action& newAction) {
+	_affect(undoActions, newAction);
+	_affect(redoActions, newAction);
+}
+
+void UserHistory::_affect(std::vector<ActionPtr>& actions, const Action& newAction) {
 	int i = 0;
-	while (i < undoActions.size()) {
+	while (i < actions.size()) {
 		int current = i;
-		auto result = newAction->affect(undoActions[i]);
+		auto result = newAction.affect(*actions[i]);
 		if (result.has_value()) {
-			undoActions.insert(undoActions.cbegin() + current + 1, std::move(result.value()));
+			actions.insert(actions.cbegin() + current + 1, std::move(result.value()));
 			i++;
 		}
-		if (undoActions[current]->getTextSize() <= COORD{0, 1}) {
-			undoActions.erase(undoActions.cbegin() + current);
+		if (actions[current]->getTextSize() <= COORD{0, 1}) {
+			actions.erase(actions.cbegin() + current);
 			i--;
 		}
 		i++;

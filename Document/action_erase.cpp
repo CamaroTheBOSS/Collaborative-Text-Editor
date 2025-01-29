@@ -20,8 +20,8 @@ ActionPtr EraseAction::convertToOppositeAction() const {
 	return std::make_unique<WriteAction>(startPos, textCopy);
 }
 
-std::optional<ActionPtr> EraseAction::affect(const ActionPtr& other) {
-	return other->affectErase(*this);
+std::optional<ActionPtr> EraseAction::affect(Action& other) const {
+	return other.affectErase(*this);
 }
 
 std::optional<ActionPtr> EraseAction::affectWrite(const Action& other) {
@@ -41,8 +41,8 @@ std::optional<ActionPtr> EraseAction::affectErase(const Action& other) {
 	COORD otherEnd = other.getEndPos();
 	if (otherEnd <= thisEnd && otherStart >= thisEnd) {
 		end.setPosition(otherEnd);
-		if (thisEnd == thisStart) {
-			start.setPosition(COORD{ static_cast<SHORT>(otherEnd.X - (thisStart.X - thisEnd.X)), thisStart.Y });
+		if (thisEnd.Y == thisStart.Y) {
+			start.setPosition(COORD{ static_cast<SHORT>(otherEnd.X + (thisStart.X - thisEnd.X)), thisStart.Y });
 		}
 		else {
 			start.setPosition(COORD{ thisStart.X, static_cast<SHORT>(thisStart.Y - (thisEnd.Y - otherEnd.Y)) });
@@ -63,14 +63,15 @@ bool EraseAction::tryMerge(const ActionPtr& other) {
 	return true;
 }
 
-UndoReturn EraseAction::undo(const int userIdx, Document& doc) const {
+Action::UndoPair EraseAction::undo(const int userIdx, Document& doc) const {
 	doc.setCursorPos(userIdx, (std::min)((std::max)(COORD{ 0, 0 }, getEndPos()), doc.getEndPos()));
 	COORD startPos = doc.getCursorPos(userIdx);
 	COORD endPos = doc.insertText(startPos, text);
 	COORD diffPos = endPos - startPos;
-	doc.moveAffectedCursors(doc.users[userIdx], diffPos);
-	doc.adjustCursors();
-	return { ActionType::write, startPos, endPos, Parser::parseVectorToText(text) };;
+	UndoReturn undoReturn{ ActionType::write, startPos, endPos, Parser::parseVectorToText(text) };
+	auto textCopy = text;
+	ActionPtr action = std::move(std::make_unique<WriteAction>(startPos, textCopy));
+	return std::make_pair<ActionPtr, UndoReturn>(std::move(action), std::move(undoReturn));
 }
 
 COORD EraseAction::getLeftPos() const {

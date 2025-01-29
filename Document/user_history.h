@@ -13,12 +13,15 @@ public:
 	UserHistory& operator=(UserHistory&& other) noexcept;
 
 	void push(ActionPtr& newAction);
-	void affect(const ActionPtr& newAction);
+	void pushToRedo(ActionPtr& newAction);
+	void pushToUndo(ActionPtr& newAction);
+	void affect(const Action& newAction);
 	std::optional<ActionPtr> undo();
 	std::optional<ActionPtr> redo();
 	const std::vector<ActionPtr>& getUndoActions() const;
 	const std::vector<ActionPtr>& getRedoActions() const;
 private:
+	void _affect(std::vector<ActionPtr>& actions, const Action& newAction);
 	bool inMergeInterval(const ActionPtr& action) const;
 
 	std::vector<ActionPtr> undoActions;

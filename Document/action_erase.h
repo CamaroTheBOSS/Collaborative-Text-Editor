@@ -10,9 +10,9 @@ public:
 	EraseAction(COORD& leftPos, COORD& endPos, std::vector<std::string>& text, Timestamp timestamp);
 
 	ActionPtr convertToOppositeAction() const override;
-	std::optional<ActionPtr> affect(const ActionPtr& other) override;
+	std::optional<ActionPtr> affect(Action& other) const override;
 	bool tryMerge(const ActionPtr& other) override;
-	UndoReturn undo(const int userIdx, Document& doc) const override;
+	Action::UndoPair undo(const int userIdx, Document& doc) const override;
 	COORD getLeftPos() const override;
 	COORD getRightPos() const override;
 	COORD getEndPos() const override;

@@ -29,7 +29,6 @@ struct User {
 	
 };
 
-
 class SyncTester;
 class Document {
 public:
@@ -71,6 +70,7 @@ public:
 	std::string getFilename() const;
 
 private:
+	void affectHistories(const Action& newAction);
 	COORD insertText(COORD pos, const std::vector<std::string>& parsedLines);
 	std::string& addNewLine(const int col, const std::string_view initText);
 
