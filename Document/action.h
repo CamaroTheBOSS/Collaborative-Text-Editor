@@ -29,7 +29,7 @@ public:
 	Action(ActionType type, COORD& leftPos, std::vector<std::string>& text, Timestamp timestamp);
 	
 	virtual ActionPtr convertToOppositeAction() const = 0;
-	virtual std::optional<ActionPtr> affect(Action& other) const = 0;
+	virtual std::optional<ActionPtr> affect(Action& other, const bool moveOnly) const = 0;
 	virtual bool tryMerge(const ActionPtr& other) = 0;
 	virtual UndoPair undo(const int userIdx, Document& doc) const = 0;
 	virtual COORD getLeftPos() const = 0;
@@ -44,8 +44,8 @@ public:
 	std::vector<std::string> splitText(const COORD& splitPoint);
 	std::vector<std::string>& mergeText(std::vector<std::string>& firstText, std::vector<std::string>& otherText);
 protected:
-	virtual std::optional<ActionPtr> affectWrite(const Action& other) = 0;
-	virtual std::optional<ActionPtr> affectErase(const Action& other) = 0;
+	virtual std::optional<ActionPtr> affectWrite(const Action& other, const bool moveOnly) = 0;
+	virtual std::optional<ActionPtr> affectErase(const Action& other, const bool moveOnly) = 0;
 	virtual void move(const COORD& otherStartPos, const COORD& diff) = 0;
 
 	ActionType type{ActionType::noop};

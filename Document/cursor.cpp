@@ -22,3 +22,7 @@ COORD Cursor::position() const {
 int Cursor::offset() const {
 	return _offset;
 }
+
+bool Cursor::operator==(const Cursor& other) const {
+	return _pos.X == other._pos.X && _pos.Y == other._pos.Y && _offset == other._offset;
+}

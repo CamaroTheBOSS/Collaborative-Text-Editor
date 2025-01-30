@@ -20,11 +20,11 @@ ActionPtr EraseAction::convertToOppositeAction() const {
 	return std::make_unique<WriteAction>(startPos, textCopy);
 }
 
-std::optional<ActionPtr> EraseAction::affect(Action& other) const {
-	return other.affectErase(*this);
+std::optional<ActionPtr> EraseAction::affect(Action& other, const bool moveOnly) const {
+	return other.affectErase(*this, moveOnly);
 }
 
-std::optional<ActionPtr> EraseAction::affectWrite(const Action& other) {
+std::optional<ActionPtr> EraseAction::affectWrite(const Action& other, const bool moveOnly) {
 	COORD thisEnd = getEndPos();
 	COORD otherStart = other.getStartPos();
 	COORD otherEnd = other.getEndPos();
@@ -34,7 +34,7 @@ std::optional<ActionPtr> EraseAction::affectWrite(const Action& other) {
 	return {};
 }
 
-std::optional<ActionPtr> EraseAction::affectErase(const Action& other) {
+std::optional<ActionPtr> EraseAction::affectErase(const Action& other, const bool moveOnly) {
 	COORD thisStart = getStartPos();
 	COORD thisEnd = getEndPos();
 	COORD otherStart = other.getStartPos();

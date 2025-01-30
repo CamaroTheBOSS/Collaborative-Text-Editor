@@ -19,11 +19,11 @@ ActionPtr WriteAction::convertToOppositeAction() const {
 	return std::make_unique<EraseAction>(startPos, endPos, textCopy, getTimestamp());
 }
 
-std::optional<ActionPtr> WriteAction::affect(Action& other) const {
-	return other.affectWrite(*this);
+std::optional<ActionPtr> WriteAction::affect(Action& other, const bool moveOnly) const {
+	return other.affectWrite(*this, moveOnly);
 }
 
-std::optional<ActionPtr> WriteAction::affectWrite(const Action& other) {
+std::optional<ActionPtr> WriteAction::affectWrite(const Action& other, const bool moveOnly) {
 	COORD thisLeft = getLeftPos();
 	COORD thisRight = getRightPos();
 	COORD otherLeft = other.getLeftPos();
@@ -35,13 +35,16 @@ std::optional<ActionPtr> WriteAction::affectWrite(const Action& other) {
 		move(otherLeft, otherRight - otherLeft);
 		return {};
 	}
+	if (moveOnly) {
+		return {};
+	}
 	COORD splitPoint = positionalDiff(otherLeft, thisLeft);
 	auto splittedText = splitText(splitPoint);
 	auto newAction = std::make_unique<WriteAction>(otherRight, splittedText, getTimestamp());
 	return std::make_optional<ActionPtr>(std::move(newAction));
 }
 
-std::optional<ActionPtr> WriteAction::affectErase(const Action& other) {
+std::optional<ActionPtr> WriteAction::affectErase(const Action& other, const bool moveOnly) {
 	COORD thisLeft = getLeftPos();
 	COORD thisRight = getRightPos();
 	COORD otherLeft = other.getLeftPos();
@@ -50,12 +53,14 @@ std::optional<ActionPtr> WriteAction::affectErase(const Action& other) {
 		return {};
 	}
 	//Update text if needed
-	COORD rightSplitPoint = positionalDiff(otherRight, thisLeft);
-	COORD leftSplitPoint = positionalDiff(otherLeft, thisLeft);
-	auto rightSplittedText = splitText(rightSplitPoint);
-	auto middleSplittedText = splitText(leftSplitPoint);
-	if (thisLeft <= otherRight) {
-		text = thisLeft >= otherLeft ? rightSplittedText : mergeText(text, rightSplittedText);
+	if (!moveOnly) {
+		COORD rightSplitPoint = positionalDiff(otherRight, thisLeft);
+		COORD leftSplitPoint = positionalDiff(otherLeft, thisLeft);
+		auto rightSplittedText = splitText(rightSplitPoint);
+		auto middleSplittedText = splitText(leftSplitPoint);
+		if (thisLeft <= otherRight) {
+			text = thisLeft >= otherLeft ? rightSplittedText : mergeText(text, rightSplittedText);
+		}
 	}
 
 	//Move if needed

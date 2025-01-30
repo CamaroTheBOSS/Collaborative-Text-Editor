@@ -40,18 +40,19 @@ COORD Document::write(const int index, const std::string& newText) {
 	}
 	auto parsedLines = Parser::parseTextToVector(newText);
 	COORD startPos = users[index].cursor.position();
-	COORD endPos = eraseSelectedText(users[index]);
+	COORD endPos = eraseSelectedText(index);
 	endPos = insertText(endPos, parsedLines);
 	COORD diffPos = endPos - startPos;
 	moveAffectedCursors(users[index], diffPos);
 	adjustCursors();
 	users[index].cursor.setOffset(endPos.X);
 	ActionPtr action = std::make_unique<WriteAction>(startPos, parsedLines);
-	pushAction(users[index], std::move(action));
+	pushAction(index, std::move(action));
 	return endPos;
 }
 
-COORD Document::eraseSelectedText(User& user) {
+COORD Document::eraseSelectedText(const int userIdx) {
+	auto& user = users[userIdx];
 	COORD userPos = user.cursor.position();
 	if (!user.selectAnchor.has_value()) {
 		return userPos;
@@ -66,7 +67,7 @@ COORD Document::eraseSelectedText(User& user) {
 	user.cursor.setPosition(endPos);
 	user.cursor.setOffset(endPos.X);
 	ActionPtr action = std::make_unique<EraseAction>(startPos, endPos, erasedText);
-	pushAction(user, std::move(action));
+	pushAction(userIdx, std::move(action));
 	return endPos;
 }
 
@@ -92,14 +93,14 @@ std::string& Document::addNewLine(const int col, const std::string_view initText
 	return data[col];
 }
 
-void Document::pushAction(User& user, ActionPtr action) {
-	affectHistories(*action);
-	user.history.push(action);
+void Document::pushAction(const int userIdx, ActionPtr action) {
+	affectHistories(userIdx, *action);
+	users[userIdx].history.push(action);
 }
 
-void Document::affectHistories(const Action& newAction) {
-	for (auto& other : users) {
-		other.history.affect(newAction);
+void Document::affectHistories(const int userIdx, const Action& newAction) {
+	for (int i = 0; i < users.size(); i++) {
+		users[i].history.affect(newAction, i == userIdx);
 	}
 }
 
@@ -156,7 +157,7 @@ COORD Document::erase(const int index, const int eraseSize) {
 		return COORD{ -1, -1 };
 	}
 	if (users[index].isSelecting()) {
-		return eraseSelectedText(users[index]);
+		return eraseSelectedText(index);
 	}
 	std::vector<std::string> erasedText;
 	COORD startPos = users[index].cursor.position();
@@ -166,7 +167,7 @@ COORD Document::erase(const int index, const int eraseSize) {
 	adjustCursors();
 	users[index].cursor.setOffset(endPos.X);
 	ActionPtr action = std::make_unique<EraseAction>(startPos, endPos, erasedText);
-	pushAction(users[index], std::move(action));
+	pushAction(index, std::move(action));
 	return endPos;
 }
 
@@ -182,7 +183,7 @@ UndoReturn Document::undo(const int index) {
 	COORD diff = ret.endPos - ret.startPos;
 	moveAffectedCursors(users[index], diff);
 	adjustCursors();
-	affectHistories(*performedAction);
+	affectHistories(index ,*performedAction);
 	users[index].history.pushToRedo(performedAction);
 	return ret;
 }
@@ -199,7 +200,7 @@ UndoReturn Document::redo(const int index) {
 	COORD diff = ret.endPos - ret.startPos;
 	moveAffectedCursors(users[index], diff);
 	adjustCursors();
-	affectHistories(*performedAction);
+	affectHistories(index, *performedAction);
 	users[index].history.pushToUndo(performedAction);
 	return ret;
 }

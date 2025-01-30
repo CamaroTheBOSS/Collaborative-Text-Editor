@@ -70,16 +70,16 @@ bool UserHistory::inMergeInterval(const ActionPtr& action) const {
 	return !undoActions.empty() && action->getTimestamp() < undoActions.back()->getTimestamp() + mergeIntervalMs;
 }
 
-void UserHistory::affect(const Action& newAction) {
-	_affect(undoActions, newAction);
-	_affect(redoActions, newAction);
+void UserHistory::affect(const Action& newAction, const bool moveOnly) {
+	_affect(undoActions, newAction, moveOnly);
+	//_affect(redoActions, newAction, moveOnly);
 }
 
-void UserHistory::_affect(std::vector<ActionPtr>& actions, const Action& newAction) {
+void UserHistory::_affect(std::vector<ActionPtr>& actions, const Action& newAction, const bool moveOnly) {
 	int i = 0;
 	while (i < actions.size()) {
 		int current = i;
-		auto result = newAction.affect(*actions[i]);
+		auto result = newAction.affect(*actions[i], moveOnly);
 		if (result.has_value()) {
 			actions.insert(actions.cbegin() + current + 1, std::move(result.value()));
 			i++;

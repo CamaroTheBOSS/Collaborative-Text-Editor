@@ -26,7 +26,6 @@ struct User {
 		history = std::move(other.history);
 		return *this;
 	}
-	
 };
 
 class SyncTester;
@@ -70,14 +69,14 @@ public:
 	std::string getFilename() const;
 
 private:
-	void affectHistories(const Action& newAction);
+	void affectHistories(const int userIdx, const Action& newAction);
 	COORD insertText(COORD pos, const std::vector<std::string>& parsedLines);
 	std::string& addNewLine(const int col, const std::string_view initText);
 
-	void pushAction(User& user, ActionPtr action);
+	void pushAction(const int userIdx, ActionPtr action);
 	COORD eraseText(COORD pos, int eraseSize, std::vector<std::string>& erasedText);
 	std::pair<int, std::string> eraseLine(const int col);
-	COORD eraseSelectedText(User& user);
+	COORD eraseSelectedText(const int userIdx);
 	COORD eraseTextBetween(const COORD& cursorPos1, const COORD& cursorPos2, std::vector<std::string>& erasedText);
 
 	bool isCursorValid(Cursor& cursor);

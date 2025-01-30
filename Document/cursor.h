@@ -9,6 +9,7 @@ public:
 	void setOffset(int newOffset);
 	COORD position() const;
 	int offset() const;
+	bool operator==(const Cursor& other) const;
 
 private:
 	COORD _pos;
