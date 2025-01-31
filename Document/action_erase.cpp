@@ -3,42 +3,37 @@
 #include "document.h"
 #include "action_write.h"
 #include "parser.h"
+#include <assert.h>
 
 using ActionPtr = EraseAction::ActionPtr;
 
-EraseAction::EraseAction(COORD& startPos, COORD& endPos, std::vector<std::string>& text) :
-	Action(ActionType::erase, startPos, text),
+EraseAction::EraseAction(const COORD& startPos, const COORD& endPos, std::vector<std::string>& text, TextContainer* target, Storage<ActionPtr>* eraseRegistry) :
+	Action(ActionType::erase, startPos, text, target, eraseRegistry),
 	end(endPos) {}
 
-EraseAction::EraseAction(COORD& startPos, COORD& endPos, std::vector<std::string>& text, Timestamp timestamp) :
-	Action(ActionType::erase, startPos, text, timestamp),
+EraseAction::EraseAction(const COORD& startPos, const COORD& endPos, TextContainer& text, TextContainer* target, const Timestamp timestamp, Storage<ActionPtr>* eraseRegistry) :
+	Action(ActionType::erase, startPos, text, target, timestamp, eraseRegistry),
 	end(endPos) {}
 
-ActionPtr EraseAction::convertToOppositeAction() const {
-	auto startPos = getEndPos();
-	auto textCopy = text;
-	return std::make_unique<WriteAction>(startPos, textCopy);
+EraseAction::EraseAction(const COORD& startPos, const COORD& endPos, TextContainer& text, TextContainer* target, const Timestamp timestamp, const bool isChild, Storage<ActionPtr>* eraseRegistry) :
+	Action(ActionType::erase, startPos, text, target, timestamp, isChild, eraseRegistry),
+	end(endPos) {}
+
+AffectPair EraseAction::affect(Action& other) {
+	return other.affectErase(*this);
 }
 
-void EraseAction::addUndoHook(ActionSptr& action, const int token) {
-	undoHooks.emplace_back(std::make_pair(action, token));
-}
-
-std::optional<ActionPtr> EraseAction::affect(Action& other, const bool moveOnly, const bool fromUndo) {
-	return other.affectErase(*this, moveOnly, fromUndo);
-}
-
-std::optional<ActionPtr> EraseAction::affectWrite(Action& other, const bool moveOnly, const bool fromUndo) {
+AffectPair EraseAction::affectWrite(Action& other) {
 	COORD thisEnd = getEndPos();
 	COORD otherStart = other.getStartPos();
 	COORD otherEnd = other.getEndPos();
-	if ((fromUndo && otherStart <= thisEnd) || otherStart < thisEnd) {
+	if ((other.isChild() && otherStart <= thisEnd) || otherStart < thisEnd) {
 		move(otherStart, otherEnd - otherStart);
 	}
 	return {};
 }
 
-std::optional<ActionPtr> EraseAction::affectErase(Action& other, const bool moveOnly, const bool fromUndo) {
+AffectPair EraseAction::affectErase(Action& other) {
 	COORD thisStart = getStartPos();
 	COORD thisEnd = getEndPos();
 	COORD otherStart = other.getStartPos();
@@ -59,22 +54,25 @@ std::optional<ActionPtr> EraseAction::affectErase(Action& other, const bool move
 }
 
 bool EraseAction::tryMerge(const ActionPtr& other) {
-	if (dynamic_cast<EraseAction*>(other.get()) == nullptr || getEndPos() != other->getStartPos() || moved) {
+	if (other->getType() != ActionType::erase || getEndPos() != other->getStartPos()) {
 		return false;
 	}
-	text = std::move(mergeText(other->text, text));
-	end = other->getEndPos();
+	container = other->container.merge(container);
+	end.setPosition(other->getEndPos());
 	return true;
 }
 
-Action::UndoPair EraseAction::undo(const int userIdx, Document& doc) const {
-	doc.setCursorPos(userIdx, (std::min)((std::max)(COORD{ 0, 0 }, getEndPos()), doc.getEndPos()));
-	COORD startPos = doc.getCursorPos(userIdx);
-	COORD endPos = doc.insertText(startPos, text);
-	COORD diffPos = endPos - startPos;
-	UndoReturn undoReturn{ ActionType::write, startPos, endPos, Parser::parseVectorToText(text) };
-	auto textCopy = text;
-	ActionPtr action = std::move(std::make_unique<WriteAction>(startPos, textCopy));
+Action::UndoPair EraseAction::undo() {
+	if (target == nullptr) {
+		return {};
+	}
+	COORD startPos = target->validatePos(getEndPos());
+	if (startPos == COORD{-1, -1}) {
+		COORD startPos = target->validatePos(getEndPos());
+	}
+	COORD endPos = target->insert(startPos, container.get());
+	UndoReturn undoReturn{ ActionType::write, startPos, endPos, container.getText()};
+	ActionPtr action = std::move(std::make_unique<WriteAction>(startPos, container, target, getTimestamp(), true, eraseRegistry));
 	return std::make_pair<ActionPtr, UndoReturn>(std::move(action), std::move(undoReturn));
 }
 
@@ -90,6 +88,20 @@ COORD EraseAction::getEndPos() const {
 	return getLeftPos();
 }
 
+void EraseAction::triggerRelatedActions() {
+	if (eraseRegistry == nullptr) {
+		return;
+	}
+	for (const auto& key : relationshipRegistry) {
+		auto it = eraseRegistry->find(key);
+		if (it == eraseRegistry->cend()) {
+			continue;
+		}
+		it->second->undo();
+		eraseRegistry->erase(it);
+	}
+}
+
 void EraseAction::move(const COORD& otherStartPos, const COORD& diff) {
 	auto thisStartPos = getStartPos();
 	auto thisEndPos = getEndPos();
@@ -101,11 +113,9 @@ void EraseAction::move(const COORD& otherStartPos, const COORD& diff) {
 		else {
 			start.setPosition(start.position() + COORD{ 0, diff.Y });
 		}
-		moved = true;
 	}
 	else if (otherStartPos.Y < thisEndPos.Y) {
 		start.setPosition(start.position() + COORD{ 0, diff.Y });
 		end.setPosition(end.position() + COORD{ 0, diff.Y });
-		moved = true;
 	}
 }

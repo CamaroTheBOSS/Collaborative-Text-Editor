@@ -33,7 +33,7 @@ std::string LineModifier::cut(std::string& line, const int left, const int right
 	return str;
 }
 
-std::string_view LineModifier::get(std::string& line, const int left, const int right) {
+std::string_view LineModifier::get(const std::string& line, const int left, const int right) {
 	auto [effLeft, effRight] = effectiveRange(line, left, right);
 	if (effLeft >= effRight || line.empty()) {
 		return "";

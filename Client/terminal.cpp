@@ -71,12 +71,7 @@ bool Terminal::resizeScreenBufferIfNeeded() {
     docBuffer.right = newScreenInfo.srWindow.Right - 10;
     docBuffer.left = newScreenInfo.srWindow.Left + 10;
     screenInfo = std::move(newScreenInfo);
-
-    //system("cls") breaks winsock2 recv somehow? Need to use approach with printf;
-    printf(
-        "\033[2J"       // clear the screen
-        "\033[1;1H"     // move cursor home
-    );
+    clear();
     return true;
 }
 
@@ -90,6 +85,12 @@ KeyPack Terminal::readChar() const {
         return { keyCode, shiftPressed };
 	}
     return { '\0', false };
+}
+
+void Terminal::clear() const {
+    //system("cls") breaks winsock2 recv somehow? Need to use approach with printf;
+    printf("\033[2J"); // clear the screen          
+    printf("\033[1;1H"); // move cursor home
 }
 
 void Terminal::render(Document& doc) {

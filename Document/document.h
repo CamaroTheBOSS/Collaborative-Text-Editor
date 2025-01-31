@@ -4,39 +4,32 @@
 #include <vector>
 #include <string>
 #include <optional>
-#include "user_history.h"
+#include "text_container.h"
+#include "history_manager.h"
 
 struct User {
 	Cursor cursor;
 	std::optional<Cursor> selectAnchor;
-	UserHistory history{ std::chrono::milliseconds{ 1000 }, 2000 };
 	bool isSelecting() {
 		return selectAnchor.has_value();
-	}
-	User() = default;
-	User(const User& other) = delete;
-	User& operator=(const User& other) = delete;
-	User(User&& other) noexcept :
-		cursor(std::move(other.cursor)),
-		selectAnchor(std::move(other.selectAnchor)),
-		history(std::move(other.history)) {}
-	User& operator=(User&& other) noexcept {
-		cursor = std::move(other.cursor);
-		selectAnchor = std::move(other.selectAnchor);
-		history = std::move(other.history);
-		return *this;
 	}
 };
 
 class SyncTester;
 class Document {
 public:
+	friend class ActionHistory;
 	friend class SyncTester;
 	friend class EraseAction;
 	friend class WriteAction;
 	Document();
 	Document(const std::string& text);
 	Document(const std::string& text, const int cursors, const int myUserIdx);
+	Document(const std::string& text, const int cursors, const int myUserIdx, const history::HistoryManagerOptions& historyManagerOptions);
+	Document(Document&&) noexcept;
+	Document& operator=(Document&&) noexcept;
+	Document(const Document&) = delete;
+	Document& operator=(const Document&) = delete;
 
 	COORD write(const int index, const std::string& text);
 	COORD erase(const int index, const int eraseSize);
@@ -52,7 +45,6 @@ public:
 	bool addUser();
 	bool eraseUser(const int index);
 	bool setCursorPos(const int index, const COORD newPos);
-	bool setCursorOffset(const int index, const int newOffset);
 	bool setCursorAnchor(const int index, const COORD newAnchor);
 	COORD getCursorPos(const int index) const;
 	COORD getEndPos() const;
@@ -62,24 +54,16 @@ public:
 	char getCharPointedByCursor(const int index) const;
 	std::vector<COORD> getCursorPositions() const;
 
-	const std::vector<std::string>& get();
+	const std::vector<std::string>& get() const;
 	std::string getLine(const int lineIndex) const;
 	std::string getText() const;
 	std::string getSelectedText() const;
 	std::string getFilename() const;
 
 private:
-	void affectHistories(const int userIdx, Action& newAction, const bool fromUndo);
-	COORD insertText(COORD pos, const std::vector<std::string>& parsedLines);
-	std::string& addNewLine(const int col, const std::string_view initText);
-
-	void pushAction(const int userIdx, ActionPtr action, const bool fromUndo = false);
-	COORD eraseText(COORD pos, int eraseSize, std::vector<std::string>& erasedText);
-	std::pair<int, std::string> eraseLine(const int col);
+	bool validateUserIdx(const int index) const;
 	COORD eraseSelectedText(const int userIdx);
-	COORD eraseTextBetween(const COORD& cursorPos1, const COORD& cursorPos2, std::vector<std::string>& erasedText);
 
-	bool isCursorValid(Cursor& cursor);
 	void adjustCursors();
 	void adjustCursor(Cursor& cursor);
 	void moveAffectedCursors(User& movedUser, COORD& posDiff);
@@ -89,7 +73,8 @@ private:
 	std::string filename = "document.txt";
 	std::vector<User> users;
 
-	std::vector<std::string> data;
+	TextContainer container;
+	history::HistoryManager historyManager;
 	int myUserIdx;
 
 };

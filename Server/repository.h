@@ -22,6 +22,7 @@ namespace server {
 	};
 
 	class Repository {
+		friend class TestServer;
 		friend class SyncTester;
 	public:
 		Response process(SOCKET client, msg::Buffer& buffer);

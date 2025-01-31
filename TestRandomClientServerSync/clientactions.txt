@@ -1,0 +1,2065 @@
+1. (ERROR)
+2. (WRITE "
+testb
+a1")
+Cursor positions:(0, 0) ->(2, 2)
+3. (WRITE "cinomatographystunningly
+testpleasure
+bamper")
+Cursor positions:(2, 2) ->(6, 4)
+4. (MOVEHORIZONTAL)
+Cursor positions:(6, 4) ->(6, 4)
+5. (WRITE "cinomatography
+stickybamper
+cinomatography")
+Cursor positions:(6, 4) ->(14, 6)
+6. (WRITE "perplexitness
+test
+platonicextravaganza
+extravaganza
+")
+Cursor positions:(14, 6) ->(0, 10)
+7. (ERASE 1)
+Cursor positions:(0, 10) ->(12, 9)
+8. (WRITE "extravaganzaa
+")
+Cursor positions:(12, 9) ->(0, 10)
+9. (WRITE "bamper
+1
+!?
+bparaphrase
+")
+Cursor positions:(0, 10) ->(0, 14)
+10. (MOVEHORIZONTAL)
+Cursor positions:(0, 14) ->(11, 13)
+11. (WRITE "starbucks
+")
+Cursor positions:(11, 13) ->(0, 14)
+12. (MOVEVERTICAL)
+Cursor positions:(0, 14) ->(0, 13)
+13. (WRITE "bamper2
+")
+Cursor positions:(0, 13) ->(0, 14)
+14. (WRITE "cinomatography!?!?
+")
+Cursor positions:(0, 14) ->(0, 15)
+15. (WRITE "acinomatography
+cinomatography!?")
+Cursor positions:(0, 15) ->(16, 16)
+16. (WRITE "wisconsin
+")
+Cursor positions:(16, 16) ->(0, 17)
+17. (WRITE "!?
+2
+pleasurecinomatographysticky
+pleasure")
+Cursor positions:(0, 17) ->(8, 20)
+18. (WRITE "platonicpleasurecinomatography
+wisconsin")
+Cursor positions:(8, 20) ->(9, 21)
+19. (MOVEHORIZONTAL)
+Cursor positions:(9, 21) ->(10, 21)
+20. (MOVEHORIZONTAL)
+Cursor positions:(10, 21) ->(11, 21)
+21. (WRITE "extravaganzavoid
+pleasure")
+Cursor positions:(11, 21) ->(8, 22)
+22. (WRITE "testparaphrase
+creatively
+extravaganzastarbucks
+paraphrase
+")
+Cursor positions:(8, 22) ->(0, 26)
+23. (WRITE "voidparaphrase
+extravaganza
+sticky
+")
+Cursor positions:(0, 26) ->(0, 29)
+24. (WRITE "cinomatography
+")
+Cursor positions:(0, 29) ->(0, 30)
+25. (WRITE "cinomatography
+voidparaphrase")
+Cursor positions:(0, 30) ->(14, 31)
+26. (MOVEHORIZONTAL)
+Cursor positions:(14, 31) ->(15, 31)
+27. (ERASE 1)
+Cursor positions:(15, 31) ->(14, 31)
+28. (WRITE "testpleasure
+extravaganzavoid
+")
+Cursor positions:(14, 31) ->(0, 33)
+29. (WRITE "sticky
+!?stunningly
+wisconsin
+a
+")
+Cursor positions:(0, 33) ->(0, 37)
+30. (WRITE "cinomatography
+")
+Cursor positions:(0, 37) ->(0, 38)
+31. (WRITE "2pleasure
+2
+")
+Cursor positions:(0, 38) ->(0, 40)
+32. (MOVEVERTICAL)
+Cursor positions:(0, 40) ->(0, 41)
+33. (WRITE "1voidbpleasure")
+Cursor positions:(0, 41) ->(14, 41)
+34. (WRITE "pleasurewisconsinstunningly
+b!?wisconsin")
+Cursor positions:(14, 41) ->(12, 42)
+35. (WRITE "void
+stunningly!?
+")
+Cursor positions:(12, 42) ->(0, 44)
+36. (WRITE "void
+extravaganzacreatively
+wisconsinb")
+Cursor positions:(0, 44) ->(10, 46)
+37. (WRITE "cinomatography")
+Cursor positions:(10, 46) ->(24, 46)
+38. (WRITE "2
+")
+Cursor positions:(24, 46) ->(0, 47)
+39. (WRITE "platonic
+")
+Cursor positions:(0, 47) ->(0, 48)
+40. (WRITE "perplexitness")
+Cursor positions:(0, 48) ->(13, 48)
+41. (WRITE "a1")
+Cursor positions:(13, 48) ->(15, 48)
+42. (ERASE 1)
+Cursor positions:(15, 48) ->(14, 48)
+43. (MOVEVERTICAL)
+Cursor positions:(14, 48) ->(0, 49)
+44. (WRITE "stunningly2
+stickystarbucksstunningly
+1
+")
+Cursor positions:(0, 49) ->(0, 52)
+45. (ERASE 1)
+Cursor positions:(0, 52) ->(1, 51)
+46. (WRITE "starbucks
+wisconsin
+test")
+Cursor positions:(1, 51) ->(4, 53)
+47. (WRITE "b
+")
+Cursor positions:(4, 53) ->(0, 54)
+48. (WRITE "creativelyplatonic
+!?a")
+Cursor positions:(0, 54) ->(3, 55)
+49. (ERASE 1)
+Cursor positions:(3, 55) ->(2, 55)
+50. (WRITE "paraphrasea")
+Cursor positions:(2, 55) ->(13, 55)
+51. (WRITE "b
+")
+Cursor positions:(13, 55) ->(0, 56)
+52. (WRITE "pleasure
+cinomatography
+!?
+a")
+Cursor positions:(0, 56) ->(1, 59)
+53. (ERASE 1)
+Cursor positions:(1, 59) ->(0, 59)
+54. (ERASE 1)
+Cursor positions:(0, 59) ->(2, 58)
+55. (WRITE "bampercreativelyparaphrase
+void
+cinomatography
+")
+Cursor positions:(2, 58) ->(0, 61)
+56. (WRITE "starbucksvoid
+stickystarbuckspleasurecinomatography")
+Cursor positions:(0, 61) ->(37, 62)
+57. (ERASE 1)
+Cursor positions:(37, 62) ->(36, 62)
+58. (WRITE "1bbpleasure
+cinomatography")
+Cursor positions:(36, 62) ->(14, 63)
+59. (MOVEVERTICAL)
+Cursor positions:(14, 63) ->(14, 62)
+60. (ERASE 1)
+Cursor positions:(14, 62) ->(13, 62)
+61. (WRITE "pleasure")
+Cursor positions:(13, 62) ->(21, 62)
+62. (WRITE "test
+cinomatographywisconsinextravaganza
+stunningly")
+Cursor positions:(21, 62) ->(10, 64)
+63. (WRITE "bampertest
+wisconsin
+bperplexitnesstest
+")
+Cursor positions:(10, 64) ->(0, 67)
+64. (WRITE "bamperstunninglytest
+extravaganza")
+Cursor positions:(0, 67) ->(12, 68)
+65. (ERASE 1)
+Cursor positions:(12, 68) ->(11, 68)
+66. (WRITE "starbucks
+abamperplatoniccinomatography")
+Cursor positions:(11, 68) ->(29, 69)
+67. (WRITE "paraphrase
+!?a
+1
+2
+bamper
+")
+Cursor positions:(29, 69) ->(0, 74)
+68. (WRITE "wisconsin
+paraphrase
+")
+Cursor positions:(0, 74) ->(0, 76)
+69. (WRITE "paraphrase
+")
+Cursor positions:(0, 76) ->(0, 77)
+70. (ERASE 1)
+Cursor positions:(0, 77) ->(10, 76)
+71. (WRITE "sticky
+void")
+Cursor positions:(10, 76) ->(4, 77)
+72. (WRITE "bampertest
+starbucks")
+Cursor positions:(4, 77) ->(9, 78)
+73. (WRITE "bamper
+platonic
+")
+Cursor positions:(9, 78) ->(0, 80)
+74. (WRITE "testparaphraseextravaganza")
+Cursor positions:(0, 80) ->(26, 80)
+75. (MOVEVERTICAL)
+Cursor positions:(26, 80) ->(14, 81)
+76. (MOVEHORIZONTAL)
+Cursor positions:(14, 81) ->(14, 81)
+77. (ERASE 1)
+Cursor positions:(14, 81) ->(13, 81)
+78. (WRITE "extravaganzapleasure
+")
+Cursor positions:(13, 81) ->(0, 82)
+79. (MOVEHORIZONTAL)
+Cursor positions:(0, 82) ->(33, 81)
+80. (ERASE 1)
+Cursor positions:(33, 81) ->(32, 81)
+81. (WRITE "bamper
+")
+Cursor positions:(32, 81) ->(0, 82)
+82. (ERASE 1)
+Cursor positions:(0, 82) ->(38, 81)
+83. (WRITE "starbucksparaphrasecreatively2
+")
+Cursor positions:(38, 81) ->(0, 82)
+84. (WRITE "extravaganza
+platonicwisconsin
+1sticky
+")
+Cursor positions:(0, 82) ->(0, 85)
+85. (MOVEHORIZONTAL)
+Cursor positions:(0, 85) ->(0, 86)
+86. (WRITE "wisconsin
+test
+")
+Cursor positions:(0, 86) ->(0, 88)
+87. (WRITE "sticky
+2bampersticky")
+Cursor positions:(0, 88) ->(13, 89)
+88. (WRITE "22
+extravaganza
+bamperstarbucks")
+Cursor positions:(13, 89) ->(15, 91)
+89. (WRITE "extravaganzaparaphrase
+")
+Cursor positions:(15, 91) ->(0, 92)
+90. (WRITE "starbucks")
+Cursor positions:(0, 92) ->(9, 92)
+91. (ERASE 1)
+Cursor positions:(9, 92) ->(8, 92)
+92. (WRITE "paraphrase
+")
+Cursor positions:(8, 92) ->(0, 93)
+93. (WRITE "extravaganza
+")
+Cursor positions:(0, 93) ->(0, 94)
+94. (ERASE 1)
+Cursor positions:(0, 94) ->(12, 93)
+95. (WRITE "a
+void
+
+")
+Cursor positions:(12, 93) ->(0, 96)
+96. (MOVEHORIZONTAL)
+Cursor positions:(0, 96) ->(0, 95)
+97. (WRITE "starbucks
+test
+")
+Cursor positions:(0, 95) ->(0, 97)
+98. (WRITE "creatively
+starbucks
+paraphrase
+")
+Cursor positions:(0, 97) ->(0, 100)
+99. (WRITE "test
+test2platonic
+paraphrasepleasure
+")
+Cursor positions:(0, 100) ->(0, 103)
+100. (WRITE "perplexitnesstestb
+cinomatographypleasure
+")
+Cursor positions:(0, 103) ->(0, 105)
+101. (WRITE "2
+perplexitness
+platonic
+stunningly
+stickyextravaganza")
+Cursor positions:(0, 105) ->(18, 109)
+102. (WRITE "creatively
+")
+Cursor positions:(18, 109) ->(0, 110)
+103. (MOVEVERTICAL)
+Cursor positions:(0, 110) ->(0, 111)
+104. (WRITE "extravaganza
+platonic
+platonic")
+Cursor positions:(0, 111) ->(8, 113)
+105. (WRITE "wisconsin!?
+sticky
+!?2starbucks")
+Cursor positions:(8, 113) ->(12, 115)
+106. (ERASE 1)
+Cursor positions:(12, 115) ->(11, 115)
+107. (WRITE "sticky
+creativelytest
+sticky2a
+")
+Cursor positions:(11, 115) ->(0, 118)
+108. (MOVEHORIZONTAL)
+Cursor positions:(0, 118) ->(8, 117)
+109. (WRITE "paraphrase
+cinomatography
+2
+creatively
+")
+Cursor positions:(8, 117) ->(0, 121)
+110. (ERASE 1)
+Cursor positions:(0, 121) ->(10, 120)
+111. (WRITE "void")
+Cursor positions:(10, 120) ->(14, 120)
+112. (MOVEVERTICAL)
+Cursor positions:(14, 120) ->(0, 121)
+113. (WRITE "platonicstickyvoidstunningly")
+Cursor positions:(0, 121) ->(28, 121)
+114. (WRITE "platonicparaphrasetest
+stunningly
+bamper")
+Cursor positions:(28, 121) ->(6, 123)
+115. (ERASE 1)
+Cursor positions:(6, 123) ->(5, 123)
+116. (WRITE "a
+")
+Cursor positions:(5, 123) ->(0, 124)
+117. (WRITE "wisconsinwisconsinvoidperplexitnessperplexitness
+")
+Cursor positions:(0, 124) ->(0, 125)
+118. (WRITE "sticky
+sticky
+sticky
+sticky
+stunningly")
+Cursor positions:(0, 125) ->(10, 129)
+119. (MOVEVERTICAL)
+Cursor positions:(10, 129) ->(6, 128)
+120. (WRITE "
+paraphrase
+bstarbucks
+
+pleasure
+")
+Cursor positions:(6, 128) ->(0, 133)
+121. (WRITE "paraphrase
+extravaganza
+")
+Cursor positions:(0, 133) ->(0, 135)
+122. (ERASE 1)
+Cursor positions:(0, 135) ->(12, 134)
+123. (ERASE 1)
+Cursor positions:(12, 134) ->(11, 134)
+124. (WRITE "starbucks
+cinomatography
+")
+Cursor positions:(11, 134) ->(0, 136)
+125. (WRITE "creatively
+!?
+perplexitness
+wisconsinstarbuckssticky")
+Cursor positions:(0, 136) ->(24, 139)
+126. (WRITE "b
+!?
+stunningly
+test
+perplexitness")
+Cursor positions:(24, 139) ->(13, 143)
+127. (MOVEVERTICAL)
+Cursor positions:(13, 143) ->(4, 142)
+128. (WRITE "test
+cinomatography
+voidbamper
+")
+Cursor positions:(4, 142) ->(0, 145)
+129. (WRITE "stunningly
+test")
+Cursor positions:(0, 145) ->(4, 146)
+130. (ERASE 1)
+Cursor positions:(4, 146) ->(3, 146)
+131. (WRITE "test
+")
+Cursor positions:(3, 146) ->(0, 147)
+132. (WRITE "wisconsin
+platonic
+stickystarbucks
+!?")
+Cursor positions:(0, 147) ->(2, 150)
+133. (MOVEHORIZONTAL)
+Cursor positions:(2, 150) ->(0, 151)
+134. (WRITE "pleasure
+cinomatography
+")
+Cursor positions:(0, 151) ->(0, 153)
+135. (WRITE "cinomatography")
+Cursor positions:(0, 153) ->(14, 153)
+136. (WRITE "cinomatography
+stunningly
+cinomatography2
+a2")
+Cursor positions:(14, 153) ->(2, 156)
+137. (WRITE "extravaganza")
+Cursor positions:(2, 156) ->(14, 156)
+138. (WRITE "stunningly
+1creatively")
+Cursor positions:(14, 156) ->(11, 157)
+139. (WRITE "sticky
+void!?ab
+paraphrase")
+Cursor positions:(11, 157) ->(10, 159)
+140. (WRITE "wisconsin
+perplexitness
+")
+Cursor positions:(10, 159) ->(0, 161)
+141. (WRITE "1
+test
+paraphrase
+")
+Cursor positions:(0, 161) ->(0, 164)
+142. (WRITE "a
+")
+Cursor positions:(0, 164) ->(0, 165)
+143. (WRITE "extravaganza")
+Cursor positions:(0, 165) ->(12, 165)
+144. (WRITE "1
+perplexitness
+paraphrasestunninglystarbucksplatonic
+")
+Cursor positions:(12, 165) ->(0, 168)
+145. (WRITE "perplexitnessparaphrase")
+Cursor positions:(0, 168) ->(23, 168)
+146. (WRITE "sticky
+stickyb
+paraphrase")
+Cursor positions:(23, 168) ->(10, 170)
+147. (WRITE "1
+stickystarbucks
+!?
+extravaganza")
+Cursor positions:(10, 170) ->(12, 173)
+148. (WRITE "pleasureplatonic
+")
+Cursor positions:(12, 173) ->(0, 174)
+149. (MOVEHORIZONTAL)
+Cursor positions:(0, 174) ->(28, 173)
+150. (ERASE 1)
+Cursor positions:(28, 173) ->(27, 173)
+151. (WRITE "cinomatography
+sticky
+perplexitnessplatonic
+paraphrase
+wisconsin")
+Cursor positions:(27, 173) ->(9, 177)
+152. (MOVEHORIZONTAL)
+Cursor positions:(9, 177) ->(0, 178)
+153. (WRITE "btestwisconsin
+starbucks
+sticky
+")
+Cursor positions:(0, 178) ->(0, 181)
+154. (WRITE "!?wisconsinplatonic
+void
+")
+Cursor positions:(0, 181) ->(0, 183)
+155. (WRITE "2")
+Cursor positions:(0, 183) ->(1, 183)
+156. (ERASE 1)
+Cursor positions:(1, 183) ->(0, 183)
+157. (WRITE "pleasurevoid
+")
+Cursor positions:(0, 183) ->(0, 184)
+158. (WRITE "paraphrase
+test")
+Cursor positions:(0, 184) ->(4, 185)
+159. (MOVEVERTICAL)
+Cursor positions:(4, 185) ->(4, 184)
+160. (ERASE 1)
+Cursor positions:(4, 184) ->(3, 184)
+161. (WRITE "pleasure!?")
+Cursor positions:(3, 184) ->(13, 184)
+162. (WRITE "
+bplatonic
+")
+Cursor positions:(13, 184) ->(0, 186)
+163. (WRITE "1platonicstarbucksplatonic
+pleasure
+")
+Cursor positions:(0, 186) ->(0, 188)
+164. (WRITE "stunninglybamper")
+Cursor positions:(0, 188) ->(16, 188)
+165. (WRITE "
+")
+Cursor positions:(16, 188) ->(0, 189)
+166. (WRITE "perplexitness")
+Cursor positions:(0, 189) ->(13, 189)
+167. (ERASE 1)
+Cursor positions:(13, 189) ->(12, 189)
+168. (WRITE "bamper
+bcreatively")
+Cursor positions:(12, 189) ->(11, 190)
+169. (WRITE "bamper
+")
+Cursor positions:(11, 190) ->(0, 191)
+170. (ERASE 1)
+Cursor positions:(0, 191) ->(17, 190)
+171. (MOVEHORIZONTAL)
+Cursor positions:(17, 190) ->(18, 190)
+172. (WRITE "starbucks
+wisconsin!?
+creativelycinomatography")
+Cursor positions:(18, 190) ->(24, 192)
+173. (WRITE "test
+paraphrasecreatively
+stickya1")
+Cursor positions:(24, 192) ->(8, 194)
+174. (WRITE "void
+pleasure
+stickyb
+2a
+")
+Cursor positions:(8, 194) ->(0, 198)
+175. (MOVEHORIZONTAL)
+Cursor positions:(0, 198) ->(2, 197)
+176. (WRITE "void
+b
+")
+Cursor positions:(2, 197) ->(0, 199)
+177. (MOVEHORIZONTAL)
+Cursor positions:(0, 199) ->(0, 200)
+178. (ERASE 1)
+Cursor positions:(0, 200) ->(0, 199)
+179. (ERASE 1)
+Cursor positions:(0, 199) ->(1, 198)
+180. (WRITE "
+paraphrase
+1pleasure
+")
+Cursor positions:(1, 198) ->(0, 201)
+181. (WRITE "!?bamper
+pleasure")
+Cursor positions:(0, 201) ->(8, 202)
+182. (ERASE 1)
+Cursor positions:(8, 202) ->(7, 202)
+183. (ERASE 1)
+Cursor positions:(7, 202) ->(6, 202)
+184. (MOVEHORIZONTAL)
+Cursor positions:(6, 202) ->(5, 202)
+185. (MOVEVERTICAL)
+Cursor positions:(5, 202) ->(5, 201)
+186. (WRITE "wisconsinbamper
+paraphrase
+creativelyperplexitness
+!?
+")
+Cursor positions:(5, 201) ->(0, 205)
+187. (WRITE "!?
+")
+Cursor positions:(0, 205) ->(0, 206)
+188. (MOVEHORIZONTAL)
+Cursor positions:(0, 206) ->(2, 205)
+189. (WRITE "pleasure
+
+paraphrase
+bamper1
+")
+Cursor positions:(2, 205) ->(0, 209)
+190. (ERASE 1)
+Cursor positions:(0, 209) ->(7, 208)
+191. (WRITE "a
+creatively")
+Cursor positions:(7, 208) ->(10, 209)
+192. (ERASE 1)
+Cursor positions:(10, 209) ->(9, 209)
+193. (ERASE 1)
+Cursor positions:(9, 209) ->(8, 209)
+194. (WRITE "testextravaganza
+")
+Cursor positions:(8, 209) ->(0, 210)
+195. (WRITE "2b")
+Cursor positions:(0, 210) ->(2, 210)
+196. (WRITE "test
+stickybamperstunningly")
+Cursor positions:(2, 210) ->(22, 211)
+197. (WRITE "void!?
+testcinomatography")
+Cursor positions:(22, 211) ->(18, 212)
+198. (WRITE "extravaganza
+bamper
+paraphrasesticky")
+Cursor positions:(18, 212) ->(16, 214)
+199. (WRITE "bb1
+extravaganza
+perplexitness
+cinomatography
+")
+Cursor positions:(16, 214) ->(0, 218)
+200. (WRITE "awisconsin
+cinomatography
+pleasure
+1stunningly")
+Cursor positions:(0, 218) ->(11, 221)
+201. (ERASE 1)
+Cursor positions:(11, 221) ->(10, 221)
+202. (ERASE 1)
+Cursor positions:(10, 221) ->(9, 221)
+203. (MOVEVERTICAL)
+Cursor positions:(9, 221) ->(3, 222)
+204. (MOVEVERTICAL)
+Cursor positions:(3, 222) ->(9, 223)
+205. (MOVEHORIZONTAL)
+Cursor positions:(9, 223) ->(8, 223)
+206. (WRITE "perplexitness
+a
+testcinomatography
+")
+Cursor positions:(8, 223) ->(0, 226)
+207. (WRITE "bamper
+")
+Cursor positions:(0, 226) ->(0, 227)
+208. (WRITE "stunningly
+sticky
+")
+Cursor positions:(0, 227) ->(0, 229)
+209. (WRITE "creatively
+test
+2platonic
+starbucksa
+")
+Cursor positions:(0, 229) ->(0, 233)
+210. (WRITE "1
+perplexitness
+!?
+b")
+Cursor positions:(0, 233) ->(1, 236)
+211. (WRITE "creatively")
+Cursor positions:(1, 236) ->(11, 236)
+212. (ERASE 1)
+Cursor positions:(11, 236) ->(10, 236)
+213. (WRITE "2
+")
+Cursor positions:(10, 236) ->(0, 237)
+214. (ERASE 1)
+Cursor positions:(0, 237) ->(11, 236)
+215. (WRITE "bplatonic
+")
+Cursor positions:(11, 236) ->(0, 237)
+216. (WRITE "1bamper
+")
+Cursor positions:(0, 237) ->(0, 238)
+217. (MOVEVERTICAL)
+Cursor positions:(0, 238) ->(0, 239)
+218. (WRITE "perplexitness
+testperplexitness")
+Cursor positions:(0, 239) ->(17, 240)
+219. (WRITE "!?!?
+sticky
+void")
+Cursor positions:(17, 240) ->(4, 242)
+220. (ERASE 1)
+Cursor positions:(4, 242) ->(3, 242)
+221. (WRITE "a
+!?wisconsin
+")
+Cursor positions:(3, 242) ->(0, 244)
+222. (WRITE "sticky
+extravaganzaextravaganza1
+")
+Cursor positions:(0, 244) ->(0, 246)
+223. (MOVEVERTICAL)
+Cursor positions:(0, 246) ->(0, 247)
+224. (WRITE "bamper
+cinomatography
+!?starbucksplatonic
+2")
+Cursor positions:(0, 247) ->(1, 250)
+225. (WRITE "bamper!?
+")
+Cursor positions:(1, 250) ->(0, 251)
+226. (WRITE "1
+test
+b
+creatively
+platonic")
+Cursor positions:(0, 251) ->(8, 255)
+227. (WRITE "sticky
+pleasurepleasure1")
+Cursor positions:(8, 255) ->(17, 256)
+228. (WRITE "starbucks")
+Cursor positions:(17, 256) ->(26, 256)
+229. (WRITE "pleasure
+1
+wisconsin")
+Cursor positions:(26, 256) ->(9, 258)
+230. (WRITE "extravaganza1
+sticky
+bamper
+")
+Cursor positions:(9, 258) ->(0, 261)
+231. (WRITE "platonicstunninglystunninglywisconsin
+platonic
+")
+Cursor positions:(0, 261) ->(0, 263)
+232. (WRITE "bpleasure
+!?
+extravaganza")
+Cursor positions:(0, 263) ->(12, 265)
+233. (MOVEHORIZONTAL)
+Cursor positions:(12, 265) ->(11, 265)
+234. (WRITE "b
+stickyperplexitnesscinomatography
+")
+Cursor positions:(11, 265) ->(0, 267)
+235. (WRITE "sticky")
+Cursor positions:(0, 267) ->(6, 267)
+236. (WRITE "sticky
+bamper
+wisconsin
+stunningly")
+Cursor positions:(6, 267) ->(10, 270)
+237. (WRITE "bamper
+test
+sticky")
+Cursor positions:(10, 270) ->(6, 272)
+238. (MOVEVERTICAL)
+Cursor positions:(6, 272) ->(4, 271)
+239. (WRITE "cinomatography")
+Cursor positions:(4, 271) ->(18, 271)
+240. (WRITE "starbucks")
+Cursor positions:(18, 271) ->(27, 271)
+241. (WRITE "starbucksplatonic2
+a
+a")
+Cursor positions:(27, 271) ->(1, 273)
+242. (ERASE 1)
+Cursor positions:(1, 273) ->(0, 273)
+243. (WRITE "pleasuresticky
+a
+a")
+Cursor positions:(0, 273) ->(1, 275)
+244. (WRITE "void
+stickyperplexitness
+")
+Cursor positions:(1, 275) ->(0, 277)
+245. (WRITE "starbucks
+cinomatography
+platonic
+2bamper")
+Cursor positions:(0, 277) ->(7, 280)
+246. (MOVEHORIZONTAL)
+Cursor positions:(7, 280) ->(0, 281)
+247. (WRITE "
+a
+stunninglycinomatography
+paraphraseplatonic
+")
+Cursor positions:(0, 281) ->(0, 285)
+248. (WRITE "1starbucksperplexitnessextravaganza")
+Cursor positions:(0, 285) ->(35, 285)
+249. (WRITE "void
+2
+sticky2
+void")
+Cursor positions:(35, 285) ->(4, 288)
+250. (WRITE "creatively")
+Cursor positions:(4, 288) ->(14, 288)
+251. (WRITE "starbuckscreatively
+extravaganza
+")
+Cursor positions:(14, 288) ->(0, 290)
+252. (WRITE "abamper
+")
+Cursor positions:(0, 290) ->(0, 291)
+253. (MOVEHORIZONTAL)
+Cursor positions:(0, 291) ->(7, 290)
+254. (WRITE "pleasureperplexitness")
+Cursor positions:(7, 290) ->(28, 290)
+255. (WRITE "b
+")
+Cursor positions:(28, 290) ->(0, 291)
+256. (ERASE 1)
+Cursor positions:(0, 291) ->(29, 290)
+257. (MOVEVERTICAL)
+Cursor positions:(29, 290) ->(12, 289)
+258. (WRITE "paraphrase1
+paraphrase")
+Cursor positions:(12, 289) ->(10, 290)
+259. (WRITE "platonicvoid!?cinomatography")
+Cursor positions:(10, 290) ->(38, 290)
+260. (WRITE "1
+")
+Cursor positions:(38, 290) ->(0, 291)
+261. (WRITE "bamperparaphrase
+extravaganza")
+Cursor positions:(0, 291) ->(12, 292)
+262. (WRITE "perplexitnessstunninglyplatonic
+cinomatography
+")
+Cursor positions:(12, 292) ->(0, 294)
+263. (WRITE "creatively!?extravaganzatest
+paraphrase")
+Cursor positions:(0, 294) ->(10, 295)
+264. (WRITE "bamperextravaganza!?!?testpleasure
+")
+Cursor positions:(10, 295) ->(0, 296)
+265. (WRITE "extravaganza
+perplexitness")
+Cursor positions:(0, 296) ->(13, 297)
+266. (MOVEHORIZONTAL)
+Cursor positions:(13, 297) ->(12, 297)
+267. (WRITE "voidb
+")
+Cursor positions:(12, 297) ->(0, 298)
+268. (WRITE "extravaganza")
+Cursor positions:(0, 298) ->(12, 298)
+269. (WRITE "test
+stickycreatively
+pleasure2
+")
+Cursor positions:(12, 298) ->(0, 301)
+270. (MOVEVERTICAL)
+Cursor positions:(0, 301) ->(0, 300)
+271. (ERASE 1)
+Cursor positions:(0, 300) ->(16, 299)
+272. (WRITE "paraphrase
+test")
+Cursor positions:(16, 299) ->(4, 300)
+273. (WRITE "bamper
+")
+Cursor positions:(4, 300) ->(0, 301)
+274. (ERASE 1)
+Cursor positions:(0, 301) ->(10, 300)
+275. (WRITE "cinomatographytestpleasureextravaganza
+")
+Cursor positions:(10, 300) ->(0, 301)
+276. (WRITE "paraphrase
+pleasure")
+Cursor positions:(0, 301) ->(8, 302)
+277. (ERASE 1)
+Cursor positions:(8, 302) ->(7, 302)
+278. (WRITE "a
+starbucks
+pleasure")
+Cursor positions:(7, 302) ->(8, 304)
+279. (ERASE 1)
+Cursor positions:(8, 304) ->(7, 304)
+280. (WRITE "sticky
+
+extravaganzaplatonicstunningly
+perplexitness")
+Cursor positions:(7, 304) ->(13, 307)
+281. (WRITE "pleasureasticky")
+Cursor positions:(13, 307) ->(28, 307)
+282. (MOVEHORIZONTAL)
+Cursor positions:(28, 307) ->(27, 307)
+283. (WRITE "bamperperplexitnesspleasure
+1
+")
+Cursor positions:(27, 307) ->(0, 309)
+284. (WRITE "2perplexitnesscinomatography
+")
+Cursor positions:(0, 309) ->(0, 310)
+285. (MOVEVERTICAL)
+Cursor positions:(0, 310) ->(0, 309)
+286. (WRITE "test
+extravaganzabamper2
+cinomatography
+platonic
+")
+Cursor positions:(0, 309) ->(0, 313)
+287. (WRITE "platonic
+starbucks
+sticky
+
+")
+Cursor positions:(0, 313) ->(0, 317)
+288. (WRITE "stunninglya
+b
+stunningly
+")
+Cursor positions:(0, 317) ->(0, 320)
+289. (WRITE "stunningly
+pleasureperplexitnesstest
+paraphrase")
+Cursor positions:(0, 320) ->(10, 322)
+290. (WRITE "2stunninglyextravaganza
+sticky
+wisconsinpleasure")
+Cursor positions:(10, 322) ->(17, 324)
+291. (WRITE "1
+creativelybamper
+test
+")
+Cursor positions:(17, 324) ->(0, 327)
+292. (WRITE "wisconsin
+2
+")
+Cursor positions:(0, 327) ->(0, 329)
+293. (MOVEHORIZONTAL)
+Cursor positions:(0, 329) ->(1, 329)
+294. (WRITE "stunningly")
+Cursor positions:(1, 329) ->(11, 329)
+295. (MOVEHORIZONTAL)
+Cursor positions:(11, 329) ->(10, 329)
+296. (WRITE "testwisconsin
+wisconsinstarbucks
+a
+paraphrase")
+Cursor positions:(10, 329) ->(10, 332)
+297. (ERASE 1)
+Cursor positions:(10, 332) ->(9, 332)
+298. (WRITE "paraphrase
+
+")
+Cursor positions:(9, 332) ->(0, 334)
+299. (WRITE "1
+platonic
+cinomatography
+")
+Cursor positions:(0, 334) ->(0, 337)
+300. (WRITE "extravaganza
+testb
+creativelybamper")
+Cursor positions:(0, 337) ->(16, 339)
+301. (WRITE "perplexitness
+2extravaganzaplatonic
+starbucksextravaganza")
+Cursor positions:(16, 339) ->(21, 341)
+302. (WRITE "wisconsin!?cinomatography
+pleasuresticky
+wisconsin
+")
+Cursor positions:(21, 341) ->(0, 344)
+303. (MOVEVERTICAL)
+Cursor positions:(0, 344) ->(0, 345)
+304. (WRITE "void
+2
+")
+Cursor positions:(0, 345) ->(0, 347)
+305. (WRITE "b
+bamperextravaganza
+sticky
+b
+test
+")
+Cursor positions:(0, 347) ->(0, 352)
+306. (WRITE "bamper
+platonic
+bamper")
+Cursor positions:(0, 352) ->(6, 354)
+307. (WRITE "pleasure
+")
+Cursor positions:(6, 354) ->(0, 355)
+308. (ERASE 1)
+Cursor positions:(0, 355) ->(14, 354)
+309. (WRITE "b
+creatively
+starbucks
+paraphrasestarbuckscreatively")
+Cursor positions:(14, 354) ->(29, 357)
+310. (WRITE "starbucks
+paraphrasebamperab")
+Cursor positions:(29, 357) ->(18, 358)
+311. (MOVEVERTICAL)
+Cursor positions:(18, 358) ->(18, 357)
+312. (WRITE "stunningly
+wisconsin")
+Cursor positions:(18, 357) ->(9, 358)
+313. (ERASE 1)
+Cursor positions:(9, 358) ->(8, 358)
+314. (WRITE "2")
+Cursor positions:(8, 358) ->(9, 358)
+315. (WRITE "teststickyextravaganza
+stunningly
+")
+Cursor positions:(9, 358) ->(0, 360)
+316. (WRITE "bamperextravaganza
+platonic
+wisconsin2
+pleasure")
+Cursor positions:(0, 360) ->(8, 363)
+317. (MOVEVERTICAL)
+Cursor positions:(8, 363) ->(8, 364)
+318. (MOVEHORIZONTAL)
+Cursor positions:(8, 364) ->(9, 364)
+319. (WRITE "extravaganza
+extravaganza
+paraphrase")
+Cursor positions:(9, 364) ->(10, 366)
+320. (ERASE 1)
+Cursor positions:(10, 366) ->(9, 366)
+321. (ERASE 1)
+Cursor positions:(9, 366) ->(8, 366)
+322. (MOVEHORIZONTAL)
+Cursor positions:(8, 366) ->(9, 366)
+323. (MOVEHORIZONTAL)
+Cursor positions:(9, 366) ->(8, 366)
+324. (WRITE "platonictest1starbucksstunningly
+stunningly")
+Cursor positions:(8, 366) ->(10, 367)
+325. (MOVEHORIZONTAL)
+Cursor positions:(10, 367) ->(9, 367)
+326. (WRITE "wisconsin
+1
+bamper
+testperplexitness
+void
+")
+Cursor positions:(9, 367) ->(0, 372)
+327. (WRITE "stunningly
+bbamperextravaganzaperplexitnesssticky
+")
+Cursor positions:(0, 372) ->(0, 374)
+328. (WRITE "cinomatography
+b
+voidstickywisconsinparaphrase")
+Cursor positions:(0, 374) ->(29, 376)
+329. (WRITE "testbstarbucks
+platonic")
+Cursor positions:(29, 376) ->(8, 377)
+330. (ERASE 1)
+Cursor positions:(8, 377) ->(7, 377)
+331. (WRITE "2pleasure
+!?stunningly2
+
+")
+Cursor positions:(7, 377) ->(0, 380)
+332. (WRITE "2")
+Cursor positions:(0, 380) ->(1, 380)
+333. (WRITE "creativelyb
+paraphrase
+")
+Cursor positions:(1, 380) ->(0, 382)
+334. (ERASE 1)
+Cursor positions:(0, 382) ->(10, 381)
+335. (WRITE "sticky2!?perplexitness
+paraphrase")
+Cursor positions:(10, 381) ->(10, 382)
+336. (WRITE "void
+!?creatively1bstunningly")
+Cursor positions:(10, 382) ->(24, 383)
+337. (WRITE "2
+teststunningly
+stunningly
+wisconsin")
+Cursor positions:(24, 383) ->(9, 386)
+338. (WRITE "sticky
+paraphrase!?
+wisconsin
+bamper
+void")
+Cursor positions:(9, 386) ->(4, 390)
+339. (WRITE "wisconsinwisconsin")
+Cursor positions:(4, 390) ->(22, 390)
+340. (ERASE 1)
+Cursor positions:(22, 390) ->(21, 390)
+341. (WRITE "extravaganzacinomatography
+a
+wisconsinavoid")
+Cursor positions:(21, 390) ->(14, 392)
+342. (MOVEHORIZONTAL)
+Cursor positions:(14, 392) ->(13, 392)
+343. (ERASE 1)
+Cursor positions:(13, 392) ->(12, 392)
+344. (MOVEHORIZONTAL)
+Cursor positions:(12, 392) ->(13, 392)
+345. (WRITE "bamper
+starbucks
+starbucks
+")
+Cursor positions:(13, 392) ->(0, 395)
+346. (WRITE "paraphrase
+bpleasurevoid")
+Cursor positions:(0, 395) ->(13, 396)
+347. (WRITE "2
+1cinomatographyperplexitness
+")
+Cursor positions:(13, 396) ->(0, 398)
+348. (WRITE "platonic
+bamperb")
+Cursor positions:(0, 398) ->(7, 399)
+349. (WRITE "awisconsinpleasure
+!?
+")
+Cursor positions:(7, 399) ->(0, 401)
+350. (WRITE "pleasure
+creatively
+cinomatographyextravaganza
+1
+")
+Cursor positions:(0, 401) ->(0, 405)
+351. (ERASE 1)
+Cursor positions:(0, 405) ->(1, 404)
+352. (WRITE "2platonic
+a2
+pleasure
+b")
+Cursor positions:(1, 404) ->(1, 407)
+353. (MOVEHORIZONTAL)
+Cursor positions:(1, 407) ->(2, 407)
+354. (WRITE "testwisconsinpleasurevoid
+")
+Cursor positions:(2, 407) ->(0, 408)
+355. (WRITE "sticky
+1
+
+pleasure")
+Cursor positions:(0, 408) ->(8, 411)
+356. (WRITE "wisconsin
+perplexitness
+bamper
+creatively
+paraphrase")
+Cursor positions:(8, 411) ->(10, 415)
+357. (WRITE "perplexitness!?")
+Cursor positions:(10, 415) ->(25, 415)
+358. (WRITE "a
+pleasure
+stunningly
+starbuckscinomatography
+")
+Cursor positions:(25, 415) ->(0, 419)
+359. (WRITE "pleasuretest
+cinomatography
+bamper
+paraphrase
+")
+Cursor positions:(0, 419) ->(0, 423)
+360. (MOVEHORIZONTAL)
+Cursor positions:(0, 423) ->(1, 423)
+361. (WRITE "stunningly
+!?perplexitnessbamperb")
+Cursor positions:(1, 423) ->(22, 424)
+362. (MOVEVERTICAL)
+Cursor positions:(22, 424) ->(11, 423)
+363. (WRITE "void
+cinomatography
+")
+Cursor positions:(11, 423) ->(0, 425)
+364. (WRITE "void!?cinomatography")
+Cursor positions:(0, 425) ->(20, 425)
+365. (WRITE "platonicplatonicextravaganza
+")
+Cursor positions:(20, 425) ->(0, 426)
+366. (ERASE 1)
+Cursor positions:(0, 426) ->(48, 425)
+367. (WRITE "bextravaganza
+creatively
+sticky
+void
+")
+Cursor positions:(48, 425) ->(0, 429)
+368. (MOVEHORIZONTAL)
+Cursor positions:(0, 429) ->(0, 430)
+369. (MOVEHORIZONTAL)
+Cursor positions:(0, 430) ->(1, 430)
+370. (WRITE "creativelysticky
+starbucks")
+Cursor positions:(1, 430) ->(9, 431)
+371. (ERASE 1)
+Cursor positions:(9, 431) ->(8, 431)
+372. (ERASE 1)
+Cursor positions:(8, 431) ->(7, 431)
+373. (WRITE "2paraphrase
+cinomatography2
+wisconsin
+void")
+Cursor positions:(7, 431) ->(4, 434)
+374. (MOVEHORIZONTAL)
+Cursor positions:(4, 434) ->(3, 434)
+375. (MOVEHORIZONTAL)
+Cursor positions:(3, 434) ->(4, 434)
+376. (MOVEVERTICAL)
+Cursor positions:(4, 434) ->(4, 433)
+377. (ERASE 1)
+Cursor positions:(4, 433) ->(3, 433)
+378. (WRITE "")
+Cursor positions:(3, 433) ->(4, 436)
+379. (MOVEHORIZONTAL)
+Cursor positions:(4, 436) ->(5, 436)
+380. (WRITE "!?")
+Cursor positions:(5, 436) ->(7, 436)
+381. (WRITE "platonic
+1wisconsinsticky
+cinomatography
+bamper")
+Cursor positions:(7, 436) ->(6, 439)
+382. (ERASE 1)
+Cursor positions:(6, 439) ->(5, 439)
+383. (ERASE 1)
+Cursor positions:(5, 439) ->(4, 439)
+384. (MOVEHORIZONTAL)
+Cursor positions:(4, 439) ->(5, 439)
+385. (ERASE 1)
+Cursor positions:(5, 439) ->(4, 439)
+386. (WRITE "2
+")
+Cursor positions:(4, 439) ->(0, 440)
+387. (WRITE "bamperstarbucks
+pleasure
+platonic
+")
+Cursor positions:(0, 440) ->(0, 443)
+388. (WRITE "starbucks2test
+1
+bampera")
+Cursor positions:(0, 443) ->(7, 445)
+389. (MOVEVERTICAL)
+Cursor positions:(7, 445) ->(1, 444)
+390. (WRITE "platonic
+wisconsin
+")
+Cursor positions:(1, 444) ->(0, 446)
+391. (WRITE "stickysticky
+2starbucks
+b
+paraphrase
+")
+Cursor positions:(0, 446) ->(0, 450)
+392. (WRITE "2")
+Cursor positions:(0, 450) ->(1, 450)
+393. (MOVEHORIZONTAL)
+Cursor positions:(1, 450) ->(0, 451)
+394. (WRITE "!?starbucks")
+Cursor positions:(0, 451) ->(11, 451)
+395. (WRITE "teststicky
+")
+Cursor positions:(11, 451) ->(0, 452)
+396. (WRITE "stickystarbucks
+void!?b")
+Cursor positions:(0, 452) ->(7, 453)
+397. (WRITE "platonic
+extravaganza
+")
+Cursor positions:(7, 453) ->(0, 455)
+398. (WRITE "cinomatography!?
+!?wisconsin
+1
+bamper
+")
+Cursor positions:(0, 455) ->(0, 459)
+399. (WRITE "!?
+wisconsincreatively
+")
+Cursor positions:(0, 459) ->(0, 461)
+400. (WRITE "perplexitness
+bstarbucks")
+Cursor positions:(0, 461) ->(10, 462)
+401. (WRITE "cinomatographycinomatographyab
+cinomatography")
+Cursor positions:(10, 462) ->(14, 463)
+402. (WRITE "platonic
+perplexitness
+")
+Cursor positions:(14, 463) ->(0, 465)
+403. (WRITE "b
+starbucks")
+Cursor positions:(0, 465) ->(9, 466)
+404. (WRITE "cinomatography
+")
+Cursor positions:(9, 466) ->(0, 467)
+405. (WRITE "pleasurestarbucks
+void
+")
+Cursor positions:(0, 467) ->(0, 469)
+406. (WRITE "starbucks
+1
+
+")
+Cursor positions:(0, 469) ->(0, 472)
+407. (WRITE "1bamper
+2
+testa
+")
+Cursor positions:(0, 472) ->(0, 475)
+408. (WRITE "!?
+1")
+Cursor positions:(0, 475) ->(1, 476)
+409. (ERASE 1)
+Cursor positions:(1, 476) ->(0, 476)
+410. (MOVEHORIZONTAL)
+Cursor positions:(0, 476) ->(2, 475)
+411. (WRITE "extravaganza
+bextravaganzacreatively
+")
+Cursor positions:(2, 475) ->(0, 477)
+412. (MOVEHORIZONTAL)
+Cursor positions:(0, 477) ->(0, 478)
+413. (WRITE "stunninglyvoida
+bamper
+paraphrase
+1
+")
+Cursor positions:(0, 478) ->(0, 482)
+414. (ERASE 1)
+Cursor positions:(0, 482) ->(1, 481)
+415. (WRITE "extravaganza
+1
+sticky
+2
+a
+wisconsin
+")
+Cursor positions:(1, 481) ->(0, 487)
+416. (WRITE "!?1perplexitness
+creatively!?")
+Cursor positions:(0, 487) ->(12, 488)
+417. (ERASE 1)
+Cursor positions:(12, 488) ->(11, 488)
+418. (MOVEVERTICAL)
+Cursor positions:(11, 488) ->(11, 489)
+419. (WRITE "sticky")
+Cursor positions:(11, 489) ->(17, 489)
+420. (WRITE "paraphrase
+wisconsin")
+Cursor positions:(17, 489) ->(9, 490)
+421. (WRITE "stunninglyplatonicpleasure
+perplexitnesspleasurestarbucks")
+Cursor positions:(9, 490) ->(30, 491)
+422. (WRITE "extravaganzacinomatography
+")
+Cursor positions:(30, 491) ->(0, 492)
+423. (WRITE "1
+platonictest
+starbucks2
+")
+Cursor positions:(0, 492) ->(0, 495)
+424. (WRITE "!?
+paraphrase
+cinomatography
+
+sticky
+platonic
+")
+Cursor positions:(0, 495) ->(0, 501)
+425. (WRITE "bampercreatively
+extravaganzapleasure
+paraphrase")
+Cursor positions:(0, 501) ->(10, 503)
+426. (WRITE "starbucks
+bamper
+1
+starbuckstest
+")
+Cursor positions:(10, 503) ->(0, 507)
+427. (WRITE "stunningly
+wisconsin
+a
+platonic
+starbucks
+creatively
+")
+Cursor positions:(0, 507) ->(0, 513)
+428. (WRITE "1
+extravaganzatest
+pleasureplatonic2
+")
+Cursor positions:(0, 513) ->(0, 516)
+429. (WRITE "wisconsin
+!?
+cinomatography
+starbucks
+")
+Cursor positions:(0, 516) ->(0, 520)
+430. (WRITE "wisconsina
+2
+extravaganza
+creatively
+extravaganza")
+Cursor positions:(0, 520) ->(12, 524)
+431. (WRITE "stunningly
+starbucks
+b
+test")
+Cursor positions:(12, 524) ->(4, 527)
+432. (WRITE "stunningly
+perplexitness
+")
+Cursor positions:(4, 527) ->(0, 529)
+433. (MOVEVERTICAL)
+Cursor positions:(0, 529) ->(0, 530)
+434. (WRITE "teststarbucks!?platonicvoid")
+Cursor positions:(0, 530) ->(27, 530)
+435. (MOVEHORIZONTAL)
+Cursor positions:(27, 530) ->(26, 530)
+436. (WRITE "cinomatography
+starbucks
+2
+cinomatographyparaphraseparaphrase")
+Cursor positions:(26, 530) ->(34, 533)
+437. (WRITE "stunningly
+avoid
+!?
+")
+Cursor positions:(34, 533) ->(0, 536)
+438. (ERASE 1)
+Cursor positions:(0, 536) ->(2, 535)
+439. (MOVEVERTICAL)
+Cursor positions:(2, 535) ->(2, 534)
+440. (ERASE 1)
+Cursor positions:(2, 534) ->(1, 534)
+441. (WRITE "starbuckswisconsin1")
+Cursor positions:(1, 534) ->(20, 534)
+442. (WRITE "paraphrase
+")
+Cursor positions:(20, 534) ->(0, 535)
+443. (WRITE "perplexitness1
+platonic
+void
+")
+Cursor positions:(0, 535) ->(0, 538)
+444. (MOVEVERTICAL)
+Cursor positions:(0, 538) ->(0, 537)
+445. (MOVEHORIZONTAL)
+Cursor positions:(0, 537) ->(8, 536)
+446. (WRITE "test
+paraphrase
+stunninglyextravaganza
+stickycinomatography")
+Cursor positions:(8, 536) ->(20, 539)
+447. (MOVEHORIZONTAL)
+Cursor positions:(20, 539) ->(0, 540)
+448. (WRITE "starbucks
+perplexitness
+
+creatively
+wisconsinsticky
+")
+Cursor positions:(0, 540) ->(0, 545)
+449. (MOVEHORIZONTAL)
+Cursor positions:(0, 545) ->(15, 544)
+450. (WRITE "2
+2
+")
+Cursor positions:(15, 544) ->(0, 546)
+451. (ERASE 1)
+Cursor positions:(0, 546) ->(1, 545)
+452. (WRITE "paraphrase
+")
+Cursor positions:(1, 545) ->(0, 546)
+453. (MOVEVERTICAL)
+Cursor positions:(0, 546) ->(0, 547)
+454. (WRITE "pleasure
+void
+perplexitnesscinomatography")
+Cursor positions:(0, 547) ->(27, 549)
+455. (WRITE "!?creativelyperplexitness
+pleasureperplexitness
+1")
+Cursor positions:(27, 549) ->(1, 551)
+456. (WRITE "cinomatographypleasure
+extravaganza
+void
+perplexitnessbamper
+")
+Cursor positions:(1, 551) ->(0, 555)
+457. (WRITE "2creatively
+wisconsin")
+Cursor positions:(0, 555) ->(9, 556)
+458. (ERASE 1)
+Cursor positions:(9, 556) ->(8, 556)
+459. (WRITE "voidperplexitness
+")
+Cursor positions:(8, 556) ->(0, 557)
+460. (MOVEVERTICAL)
+Cursor positions:(0, 557) ->(0, 558)
+461. (WRITE "wisconsin
+stunningly2
+")
+Cursor positions:(0, 558) ->(0, 560)
+462. (WRITE "teststunningly
+a
+")
+Cursor positions:(0, 560) ->(0, 562)
+463. (WRITE "avoidcreatively
+1")
+Cursor positions:(0, 562) ->(1, 563)
+464. (WRITE "void12")
+Cursor positions:(1, 563) ->(7, 563)
+465. (WRITE "
+test")
+Cursor positions:(7, 563) ->(4, 564)
+466. (ERASE 1)
+Cursor positions:(4, 564) ->(3, 564)
+467. (WRITE "b
+cinomatography
+paraphrasecinomatographyperplexitness")
+Cursor positions:(3, 564) ->(37, 566)
+468. (MOVEVERTICAL)
+Cursor positions:(37, 566) ->(4, 567)
+469. (WRITE "1perplexitness
+")
+Cursor positions:(4, 567) ->(0, 568)
+470. (MOVEHORIZONTAL)
+Cursor positions:(0, 568) ->(0, 569)
+471. (WRITE "creatively
+creatively
+2
+")
+Cursor positions:(0, 569) ->(0, 572)
+472. (MOVEHORIZONTAL)
+Cursor positions:(0, 572) ->(1, 571)
+473. (WRITE "stunningly
+")
+Cursor positions:(1, 571) ->(0, 572)
+474. (MOVEHORIZONTAL)
+Cursor positions:(0, 572) ->(11, 571)
+475. (WRITE "perplexitnessparaphrase
+a
+perplexitness
+")
+Cursor positions:(11, 571) ->(0, 574)
+476. (WRITE "!?
+testperplexitness
+stunninglycinomatography
+
+")
+Cursor positions:(0, 574) ->(0, 578)
+477. (WRITE "cinomatography!?stunningly
+")
+Cursor positions:(0, 578) ->(0, 579)
+478. (ERASE 1)
+Cursor positions:(0, 579) ->(26, 578)
+479. (WRITE "extravaganza
+2
+")
+Cursor positions:(26, 578) ->(0, 580)
+480. (WRITE "voidparaphrase!?platonic
+")
+Cursor positions:(0, 580) ->(0, 581)
+481. (WRITE "extravaganzacinomatography
+")
+Cursor positions:(0, 581) ->(0, 582)
+482. (WRITE "starbucks
+2cinomatographystarbucks
+")
+Cursor positions:(0, 582) ->(0, 584)
+483. (ERASE 1)
+Cursor positions:(0, 584) ->(24, 583)
+484. (ERASE 1)
+Cursor positions:(24, 583) ->(23, 583)
+485. (WRITE "cinomatography2
+perplexitnessvoid
+!?
+")
+Cursor positions:(23, 583) ->(0, 586)
+486. (WRITE "stunninglystunninglystarbuckssticky")
+Cursor positions:(0, 586) ->(35, 586)
+487. (WRITE "b
+
+pleasurevoid
+!?
+")
+Cursor positions:(35, 586) ->(0, 590)
+488. (WRITE "stunninglysticky
+bcinomatography")
+Cursor positions:(0, 590) ->(15, 591)
+489. (WRITE "test
+")
+Cursor positions:(15, 591) ->(0, 592)
+490. (WRITE "1pleasurestarbucks2
+stickysticky")
+Cursor positions:(0, 592) ->(12, 593)
+491. (WRITE "wisconsin
+stunninglyextravaganza
+bvoid
+!?
+")
+Cursor positions:(12, 593) ->(0, 597)
+492. (WRITE "starbucksperplexitness
+2
+sticky
+extravaganza
+")
+Cursor positions:(0, 597) ->(0, 601)
+493. (MOVEHORIZONTAL)
+Cursor positions:(0, 601) ->(12, 600)
+494. (WRITE "bamper
+platonic
+cinomatography
+2
+stunningly
+")
+Cursor positions:(12, 600) ->(0, 605)
+495. (WRITE "aparaphrase")
+Cursor positions:(0, 605) ->(11, 605)
+496. (WRITE "a
+perplexitness
+voidcinomatography
+1
+")
+Cursor positions:(11, 605) ->(0, 609)
+497. (WRITE "cinomatography
+pleasure
+creatively!?
+wisconsin
+starbucks")
+Cursor positions:(0, 609) ->(9, 613)
+498. (WRITE "1
+")
+Cursor positions:(9, 613) ->(0, 614)
+499. (ERASE 1)
+Cursor positions:(0, 614) ->(10, 613)
+500. (WRITE "voida
+bamperstarbucksbamperstunningly
+")
+Cursor positions:(10, 613) ->(0, 615)
+501. (WRITE "wisconsin
+1
+12
+1extravaganza
+")
+Cursor positions:(0, 615) ->(0, 619)
+502. (UNDO)
+Cursor positions:(0, 619) ->(10, 613)
+503. (UNDO)
+Cursor positions:(10, 613) ->(0, 614)
+504. (UNDO)
+Cursor positions:(0, 614) ->(12, 600)
+505. (UNDO)
+Cursor positions:(12, 600) ->(12, 600)
+506. (UNDO)
+Cursor positions:(12, 600) ->(23, 583)
+507. (UNDO)
+Cursor positions:(23, 583) ->(24, 583)
+508. (UNDO)
+Cursor positions:(24, 583) ->(0, 584)
+509. (UNDO)
+Cursor positions:(0, 584) ->(26, 578)
+510. (UNDO)
+Cursor positions:(26, 578) ->(0, 579)
+511. (UNDO)
+Cursor positions:(0, 579) ->(11, 571)
+512. (UNDO)
+Cursor positions:(11, 571) ->(11, 571)
+513. (UNDO)
+Cursor positions:(11, 571) ->(1, 571)
+514. (UNDO)
+Cursor positions:(1, 571) ->(1, 571)
+515. (UNDO)
+Cursor positions:(1, 571) ->(0, 569)
+516. (UNDO)
+Cursor positions:(0, 569) ->(4, 567)
+517. (UNDO)
+Cursor positions:(4, 567) ->(3, 564)
+518. (UNDO)
+Cursor positions:(3, 564) ->(4, 564)
+519. (UNDO)
+Cursor positions:(4, 564) ->(0, 558)
+520. (UNDO)
+Cursor positions:(0, 558) ->(8, 556)
+521. (UNDO)
+Cursor positions:(8, 556) ->(9, 556)
+522. (UNDO)
+Cursor positions:(9, 556) ->(0, 547)
+523. (UNDO)
+Cursor positions:(0, 547) ->(1, 545)
+524. (UNDO)
+Cursor positions:(1, 545) ->(0, 546)
+525. (UNDO)
+Cursor positions:(0, 546) ->(15, 544)
+526. (UNDO)
+Cursor positions:(15, 544) ->(15, 544)
+527. (UNDO)
+Cursor positions:(15, 544) ->(0, 540)
+528. (UNDO)
+Cursor positions:(0, 540) ->(8, 536)
+529. (UNDO)
+Cursor positions:(8, 536) ->(0, 537)
+530. (UNDO)
+Cursor positions:(0, 537) ->(8, 536)
+531. (UNDO)
+Cursor positions:(8, 536) ->(1, 534)
+532. (UNDO)
+Cursor positions:(1, 534) ->(2, 534)
+533. (UNDO)
+Cursor positions:(2, 534) ->(0, 536)
+534. (UNDO)
+Cursor positions:(0, 536) ->(2, 534)
+535. (UNDO)
+Cursor positions:(2, 534) ->(26, 530)
+536. (UNDO)
+Cursor positions:(26, 530) ->(0, 531)
+537. (UNDO)
+Cursor positions:(0, 531) ->(0, 530)
+538. (UNDO)
+Cursor positions:(0, 530) ->(11, 489)
+539. (UNDO)
+Cursor positions:(11, 489) ->(12, 488)
+540. (UNDO)
+Cursor positions:(12, 488) ->(1, 481)
+541. (UNDO)
+Cursor positions:(1, 481) ->(0, 482)
+542. (UNDO)
+Cursor positions:(0, 482) ->(0, 478)
+543. (UNDO)
+Cursor positions:(0, 478) ->(2, 475)
+544. (UNDO)
+Cursor positions:(2, 475) ->(1, 476)
+545. (UNDO)
+Cursor positions:(1, 476) ->(2, 475)
+546. (UNDO)
+Cursor positions:(2, 475) ->(0, 451)
+547. (UNDO)
+Cursor positions:(0, 451) ->(1, 444)
+548. (UNDO)
+Cursor positions:(1, 444) ->(1, 445)
+549. (UNDO)
+Cursor positions:(1, 445) ->(1, 444)
+550. (UNDO)
+Cursor positions:(1, 444) ->(4, 439)
+551. (UNDO)
+Cursor positions:(4, 439) ->(5, 439)
+552. (UNDO)
+Cursor positions:(5, 439) ->(6, 439)
+553. (UNDO)
+Cursor positions:(6, 439) ->(7, 439)
+554. (UNDO)
+Cursor positions:(7, 439) ->(5, 436)
+555. (UNDO)
+Cursor positions:(5, 436) ->(3, 433)
+556. (UNDO)
+Cursor positions:(3, 433) ->(4, 433)
+557. (UNDO)
+Cursor positions:(4, 433) ->(7, 433)
+558. (UNDO)
+Cursor positions:(7, 433) ->(4, 433)
+559. (UNDO)
+Cursor positions:(4, 433) ->(7, 431)
+560. (UNDO)
+Cursor positions:(7, 431) ->(8, 431)
+561. (UNDO)
+Cursor positions:(8, 431) ->(9, 431)
+562. (UNDO)
+Cursor positions:(9, 431) ->(1, 430)
+563. (UNDO)
+Cursor positions:(1, 430) ->(48, 425)
+564. (UNDO)
+Cursor positions:(48, 425) ->(0, 426)
+565. (UNDO)
+Cursor positions:(0, 426) ->(11, 423)
+566. (UNDO)
+Cursor positions:(11, 423) ->(10, 424)
+567. (UNDO)
+Cursor positions:(10, 424) ->(3, 424)
+568. (UNDO)
+Cursor positions:(3, 424) ->(11, 423)
+569. (UNDO)
+Cursor positions:(11, 423) ->(1, 423)
+570. (UNDO)
+Cursor positions:(1, 423) ->(2, 407)
+571. (UNDO)
+Cursor positions:(2, 407) ->(1, 404)
+572. (UNDO)
+Cursor positions:(1, 404) ->(0, 405)
+573. (UNDO)
+Cursor positions:(0, 405) ->(13, 392)
+574. (UNDO)
+Cursor positions:(13, 392) ->(13, 392)
+575. (UNDO)
+Cursor positions:(13, 392) ->(13, 392)
+576. (UNDO)
+Cursor positions:(13, 392) ->(21, 390)
+577. (UNDO)
+Cursor positions:(21, 390) ->(22, 390)
+578. (UNDO)
+Cursor positions:(22, 390) ->(10, 381)
+579. (UNDO)
+Cursor positions:(10, 381) ->(0, 382)
+580. (UNDO)
+Cursor positions:(0, 382) ->(7, 377)
+581. (UNDO)
+Cursor positions:(7, 377) ->(8, 377)
+582. (UNDO)
+Cursor positions:(8, 377) ->(9, 367)
+583. (UNDO)
+Cursor positions:(9, 367) ->(9, 367)
+584. (UNDO)
+Cursor positions:(9, 367) ->(8, 366)
+585. (UNDO)
+Cursor positions:(8, 366) ->(9, 366)
+586. (UNDO)
+Cursor positions:(9, 366) ->(10, 366)
+587. (UNDO)
+Cursor positions:(10, 366) ->(9, 364)
+588. (UNDO)
+Cursor positions:(9, 364) ->(8, 358)
+589. (UNDO)
+Cursor positions:(8, 358) ->(9, 358)
+590. (UNDO)
+Cursor positions:(9, 358) ->(18, 357)
+591. (UNDO)
+Cursor positions:(18, 357) ->(12, 358)
+592. (UNDO)
+Cursor positions:(12, 358) ->(9, 358)
+593. (UNDO)
+Cursor positions:(9, 358) ->(18, 357)
+594. (UNDO)
+Cursor positions:(18, 357) ->(14, 354)
+595. (UNDO)
+Cursor positions:(14, 354) ->(0, 355)
+596. (UNDO)
+Cursor positions:(0, 355) ->(0, 345)
+597. (UNDO)
+Cursor positions:(0, 345) ->(9, 332)
+598. (UNDO)
+Cursor positions:(9, 332) ->(10, 332)
+599. (UNDO)
+Cursor positions:(10, 332) ->(10, 329)
+600. (UNDO)
+Cursor positions:(10, 329) ->(10, 329)
+601. (UNDO)
+Cursor positions:(10, 329) ->(1, 329)
+602. (UNDO)
+Cursor positions:(1, 329) ->(0, 309)
+603. (UNDO)
+Cursor positions:(0, 309) ->(1, 309)
+604. (UNDO)
+Cursor positions:(1, 309) ->(0, 309)
+605. (UNDO)
+Cursor positions:(0, 309) ->(27, 307)
+606. (UNDO)
+Cursor positions:(27, 307) ->(29, 307)
+607. (UNDO)
+Cursor positions:(29, 307) ->(7, 304)
+608. (UNDO)
+Cursor positions:(7, 304) ->(8, 304)
+609. (UNDO)
+Cursor positions:(8, 304) ->(7, 302)
+610. (UNDO)
+Cursor positions:(7, 302) ->(8, 302)
+611. (UNDO)
+Cursor positions:(8, 302) ->(10, 300)
+612. (UNDO)
+Cursor positions:(10, 300) ->(0, 301)
+613. (UNDO)
+Cursor positions:(0, 301) ->(16, 299)
+614. (UNDO)
+Cursor positions:(16, 299) ->(0, 300)
+615. (UNDO)
+Cursor positions:(0, 300) ->(2, 300)
+616. (UNDO)
+Cursor positions:(2, 300) ->(12, 297)
+617. (UNDO)
+Cursor positions:(12, 297) ->(0, 298)
+618. (UNDO)
+Cursor positions:(0, 298) ->(12, 289)
+619. (UNDO)
+Cursor positions:(12, 289) ->(0, 292)
+620. (UNDO)
+Cursor positions:(0, 292) ->(7, 291)
+621. (UNDO)
+Cursor positions:(7, 291) ->(7, 291)
+622. (UNDO)
+Cursor positions:(7, 291) ->(0, 291)
+623. (UNDO)
+Cursor positions:(0, 291) ->(0, 290)
+624. (UNDO)
+Cursor positions:(0, 290) ->(0, 281)
+625. (UNDO)
+Cursor positions:(0, 281) ->(0, 273)
+626. (UNDO)
+Cursor positions:(0, 273) ->(1, 273)
+627. (UNDO)
+Cursor positions:(1, 273) ->(4, 271)
+628. (UNDO)
+Cursor positions:(4, 271) ->(0, 273)
+629. (UNDO)
+Cursor positions:(0, 273) ->(4, 271)
+630. (UNDO)
+Cursor positions:(4, 271) ->(11, 265)
+631. (UNDO)
+Cursor positions:(11, 265) ->(0, 266)
+632. (UNDO)
+Cursor positions:(0, 266) ->(0, 247)
+633. (UNDO)
+Cursor positions:(0, 247) ->(3, 242)
+634. (UNDO)
+Cursor positions:(3, 242) ->(4, 242)
+635. (UNDO)
+Cursor positions:(4, 242) ->(0, 239)
+636. (UNDO)
+Cursor positions:(0, 239) ->(11, 236)
+637. (UNDO)
+Cursor positions:(11, 236) ->(0, 237)
+638. (UNDO)
+Cursor positions:(0, 237) ->(10, 236)
+639. (UNDO)
+Cursor positions:(10, 236) ->(11, 236)
+640. (UNDO)
+Cursor positions:(11, 236) ->(8, 223)
+641. (UNDO)
+Cursor positions:(8, 223) ->(10, 221)
+642. (UNDO)
+Cursor positions:(10, 221) ->(11, 221)
+643. (UNDO)
+Cursor positions:(11, 221) ->(8, 209)
+644. (UNDO)
+Cursor positions:(8, 209) ->(9, 209)
+645. (UNDO)
+Cursor positions:(9, 209) ->(10, 209)
+646. (UNDO)
+Cursor positions:(10, 209) ->(7, 208)
+647. (UNDO)
+Cursor positions:(7, 208) ->(0, 209)
+648. (UNDO)
+Cursor positions:(0, 209) ->(2, 205)
+649. (UNDO)
+Cursor positions:(2, 205) ->(2, 205)
+650. (UNDO)
+Cursor positions:(2, 205) ->(5, 201)
+651. (UNDO)
+Cursor positions:(5, 201) ->(7, 202)
+652. (UNDO)
+Cursor positions:(7, 202) ->(8, 202)
+653. (UNDO)
+Cursor positions:(8, 202) ->(5, 201)
+654. (UNDO)
+Cursor positions:(5, 201) ->(1, 198)
+655. (UNDO)
+Cursor positions:(1, 198) ->(0, 199)
+656. (UNDO)
+Cursor positions:(0, 199) ->(0, 200)
+657. (UNDO)
+Cursor positions:(0, 200) ->(2, 197)
+658. (UNDO)
+Cursor positions:(2, 197) ->(2, 197)
+659. (UNDO)
+Cursor positions:(2, 197) ->(18, 190)
+660. (UNDO)
+Cursor positions:(18, 190) ->(0, 191)
+661. (UNDO)
+Cursor positions:(0, 191) ->(12, 189)
+662. (UNDO)
+Cursor positions:(12, 189) ->(13, 189)
+663. (UNDO)
+Cursor positions:(13, 189) ->(3, 184)
+664. (UNDO)
+Cursor positions:(3, 184) ->(4, 184)
+665. (UNDO)
+Cursor positions:(4, 184) ->(0, 186)
+666. (UNDO)
+Cursor positions:(0, 186) ->(4, 185)
+667. (UNDO)
+Cursor positions:(4, 185) ->(2, 185)
+668. (UNDO)
+Cursor positions:(2, 185) ->(4, 184)
+669. (UNDO)
+Cursor positions:(4, 184) ->(0, 183)
+670. (UNDO)
+Cursor positions:(0, 183) ->(1, 183)
+671. (UNDO)
+Cursor positions:(1, 183) ->(0, 178)
+672. (UNDO)
+Cursor positions:(0, 178) ->(27, 173)
+673. (UNDO)
+Cursor positions:(27, 173) ->(28, 173)
+674. (UNDO)
+Cursor positions:(28, 173) ->(28, 173)
+675. (UNDO)
+Cursor positions:(28, 173) ->(0, 151)
+676. (UNDO)
+Cursor positions:(0, 151) ->(3, 146)
+677. (UNDO)
+Cursor positions:(3, 146) ->(4, 146)
+678. (UNDO)
+Cursor positions:(4, 146) ->(4, 142)
+679. (UNDO)
+Cursor positions:(4, 142) ->(2, 144)
+680. (UNDO)
+Cursor positions:(2, 144) ->(4, 142)
+681. (UNDO)
+Cursor positions:(4, 142) ->(11, 134)
+682. (UNDO)
+Cursor positions:(11, 134) ->(12, 134)
+683. (UNDO)
+Cursor positions:(12, 134) ->(0, 135)
+684. (UNDO)
+Cursor positions:(0, 135) ->(6, 128)
+685. (UNDO)
+Cursor positions:(6, 128) ->(0, 131)
+686. (UNDO)
+Cursor positions:(0, 131) ->(2, 129)
+687. (UNDO)
+Cursor positions:(2, 129) ->(5, 123)
+688. (UNDO)
+Cursor positions:(5, 123) ->(6, 123)
+689. (UNDO)
+Cursor positions:(6, 123) ->(0, 121)
+690. (UNDO)
+Cursor positions:(0, 121) ->(10, 120)
+691. (UNDO)
+Cursor positions:(10, 120) ->(0, 121)
+692. (UNDO)
+Cursor positions:(0, 121) ->(8, 117)
+693. (UNDO)
+Cursor positions:(8, 117) ->(8, 117)
+694. (UNDO)
+Cursor positions:(8, 117) ->(11, 115)
+695. (UNDO)
+Cursor positions:(11, 115) ->(12, 115)
+696. (UNDO)
+Cursor positions:(12, 115) ->(0, 111)
+697. (UNDO)
+Cursor positions:(0, 111) ->(0, 95)
+698. (UNDO)
+Cursor positions:(0, 95) ->(0, 95)
+699. (UNDO)
+Cursor positions:(0, 95) ->(12, 93)
+700. (UNDO)
+Cursor positions:(12, 93) ->(0, 94)
+701. (UNDO)
+Cursor positions:(0, 94) ->(8, 92)
+702. (UNDO)
+Cursor positions:(8, 92) ->(9, 92)
+703. (UNDO)
+Cursor positions:(9, 92) ->(0, 86)
+704. (UNDO)
+Cursor positions:(0, 86) ->(38, 81)
+705. (UNDO)
+Cursor positions:(38, 81) ->(0, 82)
+706. (UNDO)
+Cursor positions:(0, 82) ->(32, 81)
+707. (UNDO)
+Cursor positions:(32, 81) ->(33, 81)
+708. (UNDO)
+Cursor positions:(33, 81) ->(33, 81)
+709. (UNDO)
+Cursor positions:(33, 81) ->(13, 81)
+710. (UNDO)
+Cursor positions:(13, 81) ->(13, 81)

@@ -1,4 +1,6 @@
 #include <algorithm>
+#include <assert.h>
+
 #include "document.h"
 #include "parser.h"
 #include "pos_helpers.h"
@@ -9,56 +11,76 @@
 #define NOMINMAX
 
 Document::Document():
-	data({""}),
-	myUserIdx(0) {
+	container(),
+	historyManager() {
 	addUser();
-	data.reserve(1024);
 }
 
 Document::Document(const std::string& text):
-	data({""}) {
+	container(text),
+	historyManager() {
 	addUser();
-	data.reserve(1024);
-	auto parsedLines = Parser::parseTextToVector(text);
-	insertText(COORD{ 0, 0 }, parsedLines);
 }
 
 Document::Document(const std::string& text, const int nCursors, const int myUserIdx) :
-	data({""}),
-	myUserIdx(myUserIdx) {
+	container(text),
+	myUserIdx(myUserIdx),
+	historyManager() {
 	for (int i = 0; i < nCursors; i++) {
-		users.emplace_back(User());
+		addUser();
 	}
-	data.reserve(1024);
-	auto parsedLines = Parser::parseTextToVector(text);
-	insertText(COORD{ 0, 0 }, parsedLines);
+}
+
+Document::Document(const std::string& text, const int nCursors, const int myUserIdx, const history::HistoryManagerOptions& historyManagerOptions):
+	container(text),
+	myUserIdx(myUserIdx),
+	historyManager(historyManagerOptions) {
+	for (int i = 0; i < nCursors; i++) {
+		addUser();
+	}
+}
+
+
+Document::Document(Document&& other) noexcept :
+	container(std::move(other.container)),
+	users(std::move(other.users)),
+	filename(std::move(other.filename)),
+	myUserIdx(other.myUserIdx),
+	historyManager(std::move(other.historyManager)) {}
+
+Document& Document::operator=(Document&& other) noexcept {
+	container = std::move(other.container);
+	users = std::move(other.users);
+	filename = std::move(other.filename);
+	myUserIdx = other.myUserIdx;
+	historyManager = std::move(other.historyManager);
+	return *this;
 }
 
 COORD Document::write(const int index, const std::string& newText) {
-	if (index < 0 || index >= users.size()) {
+	if (!validateUserIdx(index)) {
 		return COORD{ -1, -1 };
 	}
 	auto parsedLines = Parser::parseTextToVector(newText);
 	COORD startPos = users[index].cursor.position();
 	COORD endPos = eraseSelectedText(index);
-	endPos = insertText(endPos, parsedLines);
+	endPos = container.insert(endPos, parsedLines);
 	COORD diffPos = endPos - startPos;
 	moveAffectedCursors(users[index], diffPos);
 	adjustCursors();
 	users[index].cursor.setOffset(endPos.X);
-	ActionPtr action = std::make_unique<WriteAction>(startPos, parsedLines);
-	pushAction(index, std::move(action));
+	historyManager.pushWriteAction(index, startPos, parsedLines, &container);
 	return endPos;
 }
 
-COORD Document::eraseSelectedText(const int userIdx) {
-	auto& user = users[userIdx];
+COORD Document::eraseSelectedText(const int index) {
+	auto& user = users[index];
 	COORD userPos = user.cursor.position();
 	if (!user.selectAnchor.has_value()) {
 		return userPos;
 	}
 	std::vector<std::string> erasedText;
-	COORD endPos = eraseTextBetween(userPos, user.selectAnchor.value().position(), erasedText);
+	COORD endPos = container.eraseBetween(userPos, user.selectAnchor.value().position(), erasedText);
 	COORD startPos = endPos != userPos ? userPos : user.selectAnchor.value().position();
 	user.selectAnchor.reset();
 	COORD diffPos = endPos - startPos;
@@ -66,94 +88,16 @@ COORD Document::eraseSelectedText(const int userIdx) {
 	adjustCursors();
 	user.cursor.setPosition(endPos);
 	user.cursor.setOffset(endPos.X);
-	ActionPtr action = std::make_unique<EraseAction>(startPos, endPos, erasedText);
-	pushAction(userIdx, std::move(action));
+	historyManager.pushEraseAction(index, startPos, endPos, erasedText, &container);
 	return endPos;
 }
 
-COORD Document::insertText(COORD pos, const std::vector<std::string>& parsedLines) {
-	if (parsedLines.size() == 1) {
-		pos.X = LineModifier::insert(data[pos.Y], pos.X, parsedLines[0]);
-		return pos;
-	}
-
-	std::string toMoveDown = LineModifier::cut(data[pos.Y], pos.X);
-	LineModifier::append(data[pos.Y], parsedLines[0]);
-	for (int i = 1; i < parsedLines.size(); i++) {
-		addNewLine(pos.Y + i, parsedLines[i]);
-	}
-	pos.Y += parsedLines.size() - 1;
-	pos.X = data[pos.Y].size();
-	data[pos.Y].append(toMoveDown);
-	return pos;
-}
-
-std::string& Document::addNewLine(const int col, const std::string_view initText) {
-	data.insert(data.cbegin() + col, std::string{ initText });
-	return data[col];
-}
-
-void Document::pushAction(const int userIdx, ActionPtr action, const bool fromUndo) {
-	affectHistories(userIdx, *action, fromUndo);
-	users[userIdx].history.push(action);
-}
-
-void Document::affectHistories(const int userIdx, Action& newAction, const bool fromUndo) {
-	for (int i = 0; i < users.size(); i++) {
-		users[i].history.affect(newAction, i == userIdx, fromUndo);
-	}
-}
-
-COORD Document::eraseTextBetween(const COORD& cursor1, const COORD& cursor2, std::vector<std::string>& erasedText) {
-	auto [smaller, bigger] = getAscendingOrder(cursor1, cursor2);
-	if (smaller->Y == bigger->Y) {
-		auto [newX, line] = LineModifier::erase(data[smaller->Y], bigger->X, bigger->X - smaller->X);
-		erasedText.emplace_back(std::move(line));
-		return *smaller;
-	} else {
-		int sizeToMoveUp = (std::max)((int)data[bigger->Y].size() - bigger->X, 0);
-		std::string toMoveUp = data[bigger->Y].substr(bigger->X, sizeToMoveUp);
-		for (int i = 0; i < bigger->Y - smaller->Y; i++) {
-			auto [size, line] = eraseLine(smaller->Y);
-			erasedText.emplace_back(std::move(line));
-		}
-		auto [newX, line] = LineModifier::erase(data[smaller->Y], data[smaller->Y].size(), data[smaller->Y].size() - smaller->X);
-		erasedText.emplace_back(std::move(line));
-		data[smaller->Y] += toMoveUp;
-	}
-	return *smaller;
-}
-
-COORD Document::eraseText(COORD pos, int eraseSize, std::vector<std::string>& erasedText) {
-	if (eraseSize < pos.X) {
-		auto [newX, line] = LineModifier::erase(data[pos.Y], pos.X, eraseSize);;
-		pos.X = newX;
-		erasedText.emplace_back(std::move(line));
-	}
-	else {
-		std::string toMoveUp = LineModifier::cut(data[pos.Y], pos.X);
-		while (pos.Y > 0 && eraseSize > data[pos.Y].size()) {
-			auto [size, line] = eraseLine(pos.Y--);
-			eraseSize -= size;
-			erasedText.emplace_back(std::move(line));
-		}
-		auto [newX, line] = LineModifier::erase(data[pos.Y], data[pos.Y].size(), eraseSize);
-		LineModifier::append(data[pos.Y], toMoveUp);
-		pos.X = newX;
-		erasedText.emplace_back(std::move(line));
-	}
-	return pos;
-}
-
-std::pair<int, std::string> Document::eraseLine(const int col) {
-	int size = data[col].size() + 1;
-	auto line = data[col];
-	data.erase(data.cbegin() + col);
-	return { size, std::move(line) };
+bool Document::validateUserIdx(const int index) const {
+	return index >= 0 && index < users.size();
 }
 
 COORD Document::erase(const int index, const int eraseSize) {
-	if (index < 0 || index >= users.size()) {
+	if (!validateUserIdx(index)) {
 		return COORD{ -1, -1 };
 	}
 	if (users[index].isSelecting()) {
@@ -161,47 +105,39 @@ COORD Document::erase(const int index, const int eraseSize) {
 	}
 	std::vector<std::string> erasedText;
 	COORD startPos = users[index].cursor.position();
-	COORD endPos = eraseText(startPos, eraseSize, erasedText);
+	COORD endPos = container.erase(startPos, eraseSize, erasedText);
 	COORD diffPos = endPos - startPos;
 	moveAffectedCursors(users[index], diffPos);
 	adjustCursors();
 	users[index].cursor.setOffset(endPos.X);
-	ActionPtr action = std::make_unique<EraseAction>(startPos, endPos, erasedText);
-	pushAction(index, std::move(action));
+	historyManager.pushEraseAction(index, startPos, endPos, erasedText, &container);
 	return endPos;
 }
 
 UndoReturn Document::undo(const int index) {
-	if (index < 0 || index >= users.size()) {
+	if (!validateUserIdx(index)) {
 		return { ActionType::noop };
 	}
-	auto action = users[index].history.undo();
-	if (!action.has_value()) {
-		return { ActionType::noop };
+	auto ret = historyManager.undo(index);
+	if (ret.type == ActionType::noop) {
+		return ret;
 	}
-	auto [performedAction, ret] = action.value()->undo(index, *this);
+	users[index].cursor.setPosition(ret.startPos);
 	COORD diff = ret.endPos - ret.startPos;
 	moveAffectedCursors(users[index], diff);
 	adjustCursors();
-	affectHistories(index ,*performedAction, true);
-	users[index].history.pushToRedo(performedAction);
 	return ret;
 }
 
 UndoReturn Document::redo(const int index) {
-	if (index < 0 || index >= users.size()) {
+	if (!validateUserIdx(index)) {
 		return { ActionType::noop };
 	}
-	auto action = users[index].history.redo();
-	if (!action.has_value()) {
-		return { ActionType::noop };
-	}
-	auto [performedAction, ret] = action.value()->undo(index, *this);
+	auto ret = historyManager.redo(index);
+	users[index].cursor.setPosition(ret.startPos);
 	COORD diff = ret.endPos - ret.startPos;
 	moveAffectedCursors(users[index], diff);
 	adjustCursors();
-	affectHistories(index, *performedAction, false);
-	users[index].history.pushToUndo(performedAction);
 	return ret;
 }
 
@@ -222,7 +158,7 @@ bool Document::analyzeBackwardMove(User& user, const bool withSelect) {
 }
 
 COORD Document::moveCursorLeft(const int index, const bool withSelect) {
-	if (index < 0 || index >= users.size()) {
+	if (!validateUserIdx(index)) {
 		return COORD{ -1, -1 };
 	}
 	auto& cursor = users[index].cursor;
@@ -238,7 +174,7 @@ COORD Document::moveCursorLeft(const int index, const bool withSelect) {
 	}
 	else {
 		cursorPos.Y--;
-		cursorPos.X = data[cursorPos.Y].size();
+		cursorPos.X = container.getLineSize(cursorPos.Y);
 	}
 	cursor.setPosition(cursorPos);
 	cursor.setOffset(cursorPos.X);
@@ -263,7 +199,7 @@ bool Document::analyzeForwardMove(User& user, const bool withSelect) {
 
 
 COORD Document::moveCursorRight(const int index, const bool withSelect) {
-	if (index < 0 || index >= users.size()) {
+	if (!validateUserIdx(index)) {
 		return COORD{ -1, -1 };
 	}
 	auto& cursor = users[index].cursor;
@@ -271,10 +207,10 @@ COORD Document::moveCursorRight(const int index, const bool withSelect) {
 		return cursor.position();
 	}
 	auto cursorPos = cursor.position();
-	if (cursorPos.Y == data.size() - 1 && cursorPos.X == data[cursorPos.Y].size()) {
+	if (cursorPos.Y == container.getHeight() - 1 && cursorPos.X == container.getLineSize(cursorPos.Y)) {
 		return cursorPos;
 	}
-	if (cursorPos.X < data[cursorPos.Y].size()) {
+	if (cursorPos.X < container.getLineSize(cursorPos.Y)) {
 		cursorPos.X++;
 	}
 	else {
@@ -287,7 +223,7 @@ COORD Document::moveCursorRight(const int index, const bool withSelect) {
 }
 
 COORD Document::moveCursorUp(const int index, const int bufferWidth, const bool withSelect) {
-	if (index < 0 || index >= users.size()) {
+	if (!validateUserIdx(index)) {
 		return COORD{ -1, -1 };
 	}
 	auto& cursor = users[index].cursor;
@@ -302,15 +238,15 @@ COORD Document::moveCursorUp(const int index, const int bufferWidth, const bool 
 		if (cursorPos.X < bufferWidth) {
 			cursorPos.Y--;
 		}
-		int perfectCursorPos = data[cursorPos.Y].size() / bufferWidth * bufferWidth + offset;
-		cursorPos.X = (std::min)(perfectCursorPos, (int)data[cursorPos.Y].size());
+		int perfectCursorPos = container.getLineSize(cursorPos.Y) / bufferWidth * bufferWidth + offset;
+		cursorPos.X = (std::min)(perfectCursorPos, (int)container.getLineSize(cursorPos.Y));
 	}
 	cursor.setPosition(cursorPos);
 	return cursorPos;
 }
 
 COORD Document::moveCursorDown(const int index, const int bufferWidth, const bool withSelect) {
-	if (index < 0 || index >= users.size()) {
+	if (!validateUserIdx(index)) {
 		return COORD{ -1, -1 };
 	}
 	auto& cursor = users[index].cursor;
@@ -318,20 +254,20 @@ COORD Document::moveCursorDown(const int index, const int bufferWidth, const boo
 	auto cursorPos = cursor.position();
 	cursor.setOffset(cursor.offset() % bufferWidth);
 	auto offset = cursor.offset();
-	if (data[cursorPos.Y].size() > (cursorPos.X / bufferWidth + 1) * bufferWidth) {
-		cursorPos.X = (std::min)(cursorPos.X + bufferWidth, (int)data[cursorPos.Y].size());
+	if (container.getLineSize(cursorPos.Y) > (cursorPos.X / bufferWidth + 1) * bufferWidth) {
+		cursorPos.X = (std::min)(cursorPos.X + bufferWidth, (int)container.getLineSize(cursorPos.Y));
 	}
-	else if (cursorPos.Y != data.size() - 1) {
+	else if (cursorPos.Y != container.getHeight() - 1) {
 		cursorPos.Y++;
-		int perfectCursorPos = (data[cursorPos.Y].size() % bufferWidth) / bufferWidth * bufferWidth + offset;
-		cursorPos.X = (std::min)(perfectCursorPos, (int)data[cursorPos.Y].size());
+		int perfectCursorPos = (container.getLineSize(cursorPos.Y) % bufferWidth) / bufferWidth * bufferWidth + offset;
+		cursorPos.X = (std::min)(perfectCursorPos, (int)container.getLineSize(cursorPos.Y));
 	}
 	cursor.setPosition(cursorPos);
 	return cursorPos;
 }
 
 COORD Document::moveTo(const int index, const COORD newPos, const COORD anchor, const bool withSelect) {
-	if (index < 0 || index >= users.size() || newPos.Y >= data.size() || newPos.X > data[newPos.Y].size()) {
+	if (!validateUserIdx(index) || newPos.Y >= container.getHeight() || newPos.X > container.getLineSize(newPos.Y)) {
 		return COORD{-1, -1};
 	}
 	auto& cursor = users[index].cursor;
@@ -346,27 +282,17 @@ COORD Document::moveTo(const int index, const COORD newPos, const COORD anchor, 
 	return cursor.position();
 }
 
-bool Document::isCursorValid(Cursor& cursor) {
-	auto pos = cursor.position();
-	if (pos.Y < 0 || pos.Y >= data.size()) {
-		return false;
-	}
-	bool endlPresent = !data[pos.Y].empty() && data[pos.Y][data[pos.Y].size() - 1] == '\n';
-	if (pos.X < 0 || pos.X > data[pos.Y].size() - endlPresent) {
-		return false;
-	}
-	return true;
-}
-
 bool Document::addUser() {
 	users.emplace_back(User());
+	historyManager.addHistory();
 	return true;
 }
 
 bool Document::eraseUser(const int index) {
-	if (index < 0 || index >= users.size()) {
+	if (!validateUserIdx(index)) {
 		return false;
 	}
+	historyManager.removeHistory(index);
 	users.erase(users.cbegin() + index);
 	if (myUserIdx > index) {
 		myUserIdx--;
@@ -375,7 +301,7 @@ bool Document::eraseUser(const int index) {
 }
 
 bool Document::setCursorPos(const int index, COORD newPos) {
-	if (index < 0 || index >= users.size() || newPos.Y >= data.size() || newPos.X > data[newPos.Y].size()) {
+	if (!validateUserIdx(index) || !container.isPosValid(newPos)) {
 		return false;
 	}
 	users[index].cursor.setPosition(newPos);
@@ -383,16 +309,8 @@ bool Document::setCursorPos(const int index, COORD newPos) {
 	return true;
 }
 
-bool Document::setCursorOffset(const int index, const int newOffset) {
-	if (index < 0 || index >= users.size() || newOffset > data[users[index].cursor.position().Y].size()) {
-		return false;
-	}
-	users[index].cursor.setOffset(newOffset);
-	return true;
-}
-
 bool Document::setCursorAnchor(const int index, const COORD newAnchor) {
-	if (index < 0 || index >= users.size() || newAnchor.Y >= data.size() || newAnchor.X > data[newAnchor.Y].size()) {
+	if (!validateUserIdx(index) || !container.isPosValid(newAnchor)) {
 		return false;
 	}
 	users[index].selectAnchor = newAnchor;
@@ -400,18 +318,18 @@ bool Document::setCursorAnchor(const int index, const COORD newAnchor) {
 }
 
 COORD Document::getCursorPos(const int index) const {
-	if (index < 0 || index >= users.size()) {
+	if (!validateUserIdx(index)) {
 		return COORD{-1, -1};
 	}
 	return users[index].cursor.position();
 }
 
 COORD Document::getEndPos() const {
-	return COORD{ static_cast<SHORT>(data[data.size() - 1].size()), static_cast<SHORT>(data.size() - 1) };
+	return container.getEndPos();
 }
 
 std::optional<COORD> Document::getCursorSelectionAnchor(const int index) const {
-	if (index < 0 || index >= users.size()) {
+	if (!validateUserIdx(index)) {
 		return {};
 	}
 	const auto& anchor = users[index].selectAnchor;
@@ -429,15 +347,11 @@ int Document::getCursorNum() const {
 	return users.size();
 }
 
-char Document::getCharPointedByCursor(const int cursor) const {
-	if (cursor < 0 || cursor >= users.size()) {
+char Document::getCharPointedByCursor(const int index) const {
+	if (!validateUserIdx(index)) {
 		return ' ';
 	}
-	auto cursorPos = users[cursor].cursor.position();
-	if (cursorPos.Y >= data.size() || cursorPos.X >= data[cursorPos.Y].size() || data[cursorPos.Y][cursorPos.X] == '\n') {
-		return ' ';
-	}
-	return data[cursorPos.Y][cursorPos.X];
+	return container.getChar(users[index].cursor.position());
 }
 
 std::vector<COORD> Document::getCursorPositions() const {
@@ -448,19 +362,16 @@ std::vector<COORD> Document::getCursorPositions() const {
 	return positions;
 }
 
-const std::vector<std::string>& Document::get() {
-	return data;
+const std::vector<std::string>& Document::get() const {
+	return container.get();
 }
 
-std::string Document::getLine(const int lineIndex) const {
-	if (lineIndex >= data.size()) {
-		return "";
-	}
-	return data[lineIndex];
+std::string Document::getLine(const int col) const {
+	return container.getLine(col);
 }
 
 std::string Document::getText() const {
-	return Parser::parseVectorToText(data);
+	return container.getText();
 }
 
 std::string Document::getSelectedText() const {
@@ -470,17 +381,7 @@ std::string Document::getSelectedText() const {
 	if (!anchor.has_value() || cursorPos == anchor.value().position()) {
 		return "";
 	}
-
-	auto [smaller, bigger] = getAscendingOrder(cursorPos, anchor.value().position());
-	if (smaller->Y == bigger->Y) {
-		return data[smaller->Y].substr(smaller->X, bigger->X - smaller->X);
-	}
-	std::string text = data[smaller->Y].substr(smaller->X, data[smaller->Y].size() - smaller->X) + "\n";
-	for (int row = smaller->Y + 1; row < bigger->Y; row++ ) {
-		text += data[row] + "\n";
-	}
-	text += data[bigger->Y].substr(0, bigger->X);
-	return text;
+	return container.getTextBetween(cursorPos, anchor.value().position());
 }
 
 std::string Document::getFilename() const {
@@ -517,15 +418,7 @@ void Document::adjustCursors() {
 }
 
 void Document::adjustCursor(Cursor& cursor) {
-	if (isCursorValid(cursor)) {
-		return;
-	}
-	auto cursorPos = cursor.position();
-	if (cursorPos.Y >= data.size()) {
-		cursorPos.Y = data.size() - 1;
-	}
-	bool endlPresent = !data[cursorPos.Y].empty() && data[cursorPos.Y][data[cursorPos.Y].size() - 1] == '\n';
-	cursorPos.X = data[cursorPos.Y].size() - endlPresent;
-	cursor.setPosition(cursorPos);
-	cursor.setOffset(cursorPos.X);
+	auto newPos = container.validatePos(cursor.position());
+	cursor.setPosition(newPos);
+	cursor.setOffset(newPos.X);
 }
