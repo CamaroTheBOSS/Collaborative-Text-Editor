@@ -10,16 +10,18 @@ public:
 	EraseAction(COORD& leftPos, COORD& endPos, std::vector<std::string>& text, Timestamp timestamp);
 
 	ActionPtr convertToOppositeAction() const override;
-	std::optional<ActionPtr> affect(Action& other, const bool moveOnly) const override;
+	std::optional<ActionPtr> affect(Action& other, const bool sameUser, const bool fromUndo) override;
 	bool tryMerge(const ActionPtr& other) override;
 	Action::UndoPair undo(const int userIdx, Document& doc) const override;
 	COORD getLeftPos() const override;
 	COORD getRightPos() const override;
 	COORD getEndPos() const override;
 private:
-	std::optional<ActionPtr> affectWrite(const Action& other, const bool moveOnly) override;
-	std::optional<ActionPtr> affectErase(const Action& other, const bool moveOnly) override;
+	void addUndoHook(ActionSptr& action, const int token) override;
+	std::optional<ActionPtr> affectWrite(Action& other, const bool sameUser, const bool fromUndo) override;
+	std::optional<ActionPtr> affectErase(Action& other, const bool sameUser, const bool fromUndo) override;
 	void move(const COORD& otherStartPos, const COORD& diff) override;
 	Cursor end;
 	bool moved = false;
+	std::vector<std::pair<ActionSptr, int>> undoHooks;
 };

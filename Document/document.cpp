@@ -93,14 +93,14 @@ std::string& Document::addNewLine(const int col, const std::string_view initText
 	return data[col];
 }
 
-void Document::pushAction(const int userIdx, ActionPtr action) {
-	affectHistories(userIdx, *action);
+void Document::pushAction(const int userIdx, ActionPtr action, const bool fromUndo) {
+	affectHistories(userIdx, *action, fromUndo);
 	users[userIdx].history.push(action);
 }
 
-void Document::affectHistories(const int userIdx, const Action& newAction) {
+void Document::affectHistories(const int userIdx, Action& newAction, const bool fromUndo) {
 	for (int i = 0; i < users.size(); i++) {
-		users[i].history.affect(newAction, i == userIdx);
+		users[i].history.affect(newAction, i == userIdx, fromUndo);
 	}
 }
 
@@ -183,7 +183,7 @@ UndoReturn Document::undo(const int index) {
 	COORD diff = ret.endPos - ret.startPos;
 	moveAffectedCursors(users[index], diff);
 	adjustCursors();
-	affectHistories(index ,*performedAction);
+	affectHistories(index ,*performedAction, true);
 	users[index].history.pushToRedo(performedAction);
 	return ret;
 }
@@ -200,7 +200,7 @@ UndoReturn Document::redo(const int index) {
 	COORD diff = ret.endPos - ret.startPos;
 	moveAffectedCursors(users[index], diff);
 	adjustCursors();
-	affectHistories(index, *performedAction);
+	affectHistories(index, *performedAction, false);
 	users[index].history.pushToUndo(performedAction);
 	return ret;
 }

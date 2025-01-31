@@ -100,6 +100,9 @@ TEST(DocumentTests, TwoUserHistoryUndoTest) {
 	doc.undo(0);
 	doc.undo(0);
 	EXPECT_EQ(doc.getText(), "BREAK");
+	doc.redo(0);
+	doc.redo(0);
+	EXPECT_EQ(doc.getText(), "first BREAKuser text");
 }
 
 TEST(DocumentTests, TwoUserHistoryUndoWithEndlTest) {
@@ -111,10 +114,14 @@ TEST(DocumentTests, TwoUserHistoryUndoWithEndlTest) {
 	doc.setCursorPos(1, COORD{ 6, 1 });
 	doc.write(1, "BREAK");
 
-	doc.undo(0);
-	doc.undo(0);
-	doc.undo(0);
+	for (int i = 0; i < 3; i++) {
+		doc.undo(0);
+	}
 	EXPECT_EQ(doc.getText(), "BREAK");
+	for (int i = 0; i < 3; i++) {
+		doc.redo(0);
+	}
+	EXPECT_EQ(doc.getText(), "\nfirst BREAKuser text");
 }
 
 TEST(DocumentTests, TwoUserHistoryUndoWithErasesTest) {
@@ -142,7 +149,7 @@ TEST(DocumentTests, TwoUserHistoryUndoWithErasesTest) {
 	EXPECT_EQ(doc.getText(), "include\n\nfirst line\nsecondBREAK line");
 }
 
-TEST(DocumentTests, TwoUserWriteWithEraseUndoTest) {
+TEST(DocumentTests, TwoUserWriteWithEraseBeforeInterruptionUndoTest) {
 	// ...[...(...]...)... //
 	Document doc{ "", 2, 0 };
 	doc.write(0, "first");
@@ -154,27 +161,37 @@ TEST(DocumentTests, TwoUserWriteWithEraseUndoTest) {
 		doc.undo(0);
 	}
 	EXPECT_EQ(doc.getText(), "BREAK");
+	for (int i = 0; i < 4; i++) {
+		doc.redo(0);
+	}
+	EXPECT_EQ(doc.getText(), "firstBREAK user");
 }
 
-//TEST(DocumentTests, TwoUserHistoryUndoHelloWorldTest) {
-//	// ...[...(...]...)... //
-//	Document doc{ "", 2, 0 };
-//	// generate some real user actions
-//	doc.write(0, "int main");
-//	doc.write(0, " (argv");
-//	doc.erase(0, 1);
-//	doc.write(0, "c");
-//	doc.moveCursorLeft(0, 0);
-//	doc.moveCursorLeft(0, 0);
-//	doc.moveCursorLeft(0, 0);
-//	doc.moveCursorLeft(0, 0);
-//	doc.write(0, "int ");
-//	doc.moveCursorRight(0, 0);
-//	doc.moveCursorRight(0, 0);
-//	doc.moveCursorRight(0, 0);
-//	doc.moveCursorRight(0, 0);
-//	doc.write(0, ", char argv[]) {\n\n}");
-//	EXPECT_EQ(doc.getText(), "int main (int argc, char argv[]) {\n\n}");
-//	
-//}
+TEST(DocumentTests, TwoUserWriteWithEraseAfterInterruptionUndoTest) {
+	// ...[...(...]...)... //
+	Document doc{ "", 2, 0 };
+	doc.write(0, "firxd");
+	doc.erase(0, 2);
+	doc.write(0, "st user");
+	doc.setCursorPos(1, COORD{ 3, 0 });
+	doc.write(1, "BREAK");
+	for (int i = 0; i < 4; i++) {
+		doc.undo(0);
+	}
+	EXPECT_EQ(doc.getText(), "BREAK");
+	for (int i = 0; i < 4; i++) {
+		doc.redo(0);
+	}
+	EXPECT_EQ(doc.getText(), "firBREAKst user");
+}
+
+
+TEST(DocumentTests, JustTest) {
+	// ...[...(...]...)... //
+	Document doc{ "", 1, 0 };
+	doc.write(0, "verylongline");
+	doc.erase(0, 2);
+	doc.setCursorPos(0, COORD{ 6, 0 });
+	doc.erase(0, 2);
+}
 

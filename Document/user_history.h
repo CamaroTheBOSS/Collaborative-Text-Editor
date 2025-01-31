@@ -15,13 +15,13 @@ public:
 	void push(ActionPtr& newAction);
 	void pushToRedo(ActionPtr& newAction);
 	void pushToUndo(ActionPtr& newAction);
-	void affect(const Action& newAction, const bool moveOnly = false);
+	void affect(Action& newAction, const bool moveOnly = false, const bool fromUndo = false);
 	std::optional<ActionPtr> undo();
 	std::optional<ActionPtr> redo();
 	const std::vector<ActionPtr>& getUndoActions() const;
 	const std::vector<ActionPtr>& getRedoActions() const;
 private:
-	void _affect(std::vector<ActionPtr>& actions, const Action& newAction, const bool moveOnly);
+	void _affect(std::vector<ActionPtr>& actions, Action& newAction, const bool moveOnly, const bool fromUndo);
 	bool inMergeInterval(const ActionPtr& action) const;
 
 	std::vector<ActionPtr> undoActions;

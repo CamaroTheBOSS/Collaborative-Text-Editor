@@ -20,21 +20,25 @@ ActionPtr EraseAction::convertToOppositeAction() const {
 	return std::make_unique<WriteAction>(startPos, textCopy);
 }
 
-std::optional<ActionPtr> EraseAction::affect(Action& other, const bool moveOnly) const {
-	return other.affectErase(*this, moveOnly);
+void EraseAction::addUndoHook(ActionSptr& action, const int token) {
+	undoHooks.emplace_back(std::make_pair(action, token));
 }
 
-std::optional<ActionPtr> EraseAction::affectWrite(const Action& other, const bool moveOnly) {
+std::optional<ActionPtr> EraseAction::affect(Action& other, const bool moveOnly, const bool fromUndo) {
+	return other.affectErase(*this, moveOnly, fromUndo);
+}
+
+std::optional<ActionPtr> EraseAction::affectWrite(Action& other, const bool moveOnly, const bool fromUndo) {
 	COORD thisEnd = getEndPos();
 	COORD otherStart = other.getStartPos();
 	COORD otherEnd = other.getEndPos();
-	if (otherStart <= thisEnd) {
+	if ((fromUndo && otherStart <= thisEnd) || otherStart < thisEnd) {
 		move(otherStart, otherEnd - otherStart);
 	}
 	return {};
 }
 
-std::optional<ActionPtr> EraseAction::affectErase(const Action& other, const bool moveOnly) {
+std::optional<ActionPtr> EraseAction::affectErase(Action& other, const bool moveOnly, const bool fromUndo) {
 	COORD thisStart = getStartPos();
 	COORD thisEnd = getEndPos();
 	COORD otherStart = other.getStartPos();
