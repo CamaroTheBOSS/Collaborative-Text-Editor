@@ -1,27 +1,27 @@
 #pragma once
 #include "action.h"
 
+using ActionPtr = Action::ActionPtr;
+using AffectPair = Action::AffectPair;
+
 class EraseAction : public Action {
 public:
-	using ActionPtr = std::unique_ptr<Action>;
-
 	EraseAction() = default;
-	EraseAction(COORD& leftPos, COORD& endPos, std::vector<std::string>& text);
-	EraseAction(COORD& leftPos, COORD& endPos, std::vector<std::string>& text, Timestamp timestamp);
+	EraseAction(const COORD& startPos, const COORD& endPos, std::vector<std::string>& text, TextContainer* target, Storage<ActionPtr>* eraseRegistry);
+	EraseAction(const COORD& startPos, const COORD& endPos, TextContainer& text, TextContainer* target, const Timestamp timestamp, Storage<ActionPtr>* eraseRegistry);
+	EraseAction(const COORD& startPos, const COORD& endPos, TextContainer& text, TextContainer* target, const Timestamp timestamp, const bool isChild, Storage<ActionPtr>* eraseRegistry);
 
-	ActionPtr convertToOppositeAction() const override;
-	std::optional<ActionPtr> affect(Action& other, const bool sameUser, const bool fromUndo) override;
+	AffectPair affect(Action& other) override;
 	bool tryMerge(const ActionPtr& other) override;
-	Action::UndoPair undo(const int userIdx, Document& doc) const override;
+	Action::UndoPair undo() override;
 	COORD getLeftPos() const override;
 	COORD getRightPos() const override;
 	COORD getEndPos() const override;
-private:
-	void addUndoHook(ActionSptr& action, const int token) override;
-	std::optional<ActionPtr> affectWrite(Action& other, const bool sameUser, const bool fromUndo) override;
-	std::optional<ActionPtr> affectErase(Action& other, const bool sameUser, const bool fromUndo) override;
+	void triggerRelatedActions() override;
+protected:
+	AffectPair affectWrite(Action& other) override;
+	AffectPair affectErase(Action& other) override;
 	void move(const COORD& otherStartPos, const COORD& diff) override;
+
 	Cursor end;
-	bool moved = false;
-	std::vector<std::pair<ActionSptr, int>> undoHooks;
 };

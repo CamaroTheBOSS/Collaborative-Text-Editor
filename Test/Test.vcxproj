@@ -36,9 +36,9 @@
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="action_history_tests.cpp" />
     <ClCompile Include="action_tests.cpp" />
     <ClCompile Include="document_test.cpp" />
-    <ClCompile Include="text_container_test.cpp" />
     <ClCompile Include="framer_test.cpp" />
     <ClCompile Include="logger_test.cpp" />
     <ClCompile Include="message_test.cpp" />
@@ -49,7 +49,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="screen_buffer_test.cpp" />
-    <ClCompile Include="user_history_tests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -89,13 +88,13 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>..\Client;..\Document;..\Protocol;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Client;..\Document;..\Protocol;..\RandomEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>..\$(IntDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Document.lib;Client.lib;Protocol.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Document.lib;Client.lib;Protocol.lib;RandomEngine.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreLinkEvent>
       <Command>\cmd &amp; "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.36.32532\bin\HostX64\x64\lib.exe" /OUT:D:\Code\CollaborativeTextEditor\$(IntDir)Client.lib ..\Client\$(IntDir)*.obj
@@ -127,7 +126,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>..\Client;..\Document;..\Protocol;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Client;..\Document;..\Protocol;..\RandomEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -135,7 +134,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <AdditionalLibraryDirectories>..\$(IntDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Document.lib;Client.lib;Protocol.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Document.lib;Client.lib;Protocol.lib;RandomEngine.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreLinkEvent>
       <Command>\cmd &amp; "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.36.32532\bin\HostX64\x64\lib.exe" /OUT:D:\Code\CollaborativeTextEditor\$(IntDir)Client.lib ..\Client\$(IntDir)*.obj

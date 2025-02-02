@@ -36,6 +36,7 @@ public:
 	~Terminal();
 	KeyPack readChar() const;
 	void render(Document& doc);
+	void clear() const;
 	unsigned int getDocBufferWidth() const;
 	std::string getClipboardData() const;
 	bool setClipboardData(const std::string& txt) const;

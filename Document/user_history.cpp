@@ -76,7 +76,7 @@ void UserHistory::affect(Action& newAction, const bool moveOnly, const bool from
 }
 
 void UserHistory::_affect(std::vector<ActionPtr>& actions, Action& newAction, const bool moveOnly, const bool fromUndo) {
-	int i = 0;
+	/*int i = 0;
 	while (i < actions.size()) {
 		int current = i;
 		auto result = newAction.affect(*actions[i], moveOnly, fromUndo);
@@ -89,5 +89,5 @@ void UserHistory::_affect(std::vector<ActionPtr>& actions, Action& newAction, co
 			i--;
 		}
 		i++;
-	}
+	}*/
 }

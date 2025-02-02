@@ -1,20 +1,8 @@
 #include "test_client.h"
+#include "engine.h"
 
 #include <iostream>;
 #include <array>
-
-std::mt19937 getRandomEngine(const int seed) {
-	if (seed < 0) {
-		std::random_device device;
-		std::random_device::result_type data[(std::mt19937::state_size - 1) / sizeof(device()) + 1];
-		std::generate(std::begin(data), std::end(data), std::ref(device));
-		std::seed_seq seed{std::begin(data), std::end(data)};
-		return std::mt19937(seed);
-	}
-	std::mt19937_64::result_type reproducibleSeed = seed;
-	return std::mt19937(reproducibleSeed);
-}
-
 
 constexpr static std::array<const char*, 20> randomStrings = { 
 	"","a","b","1","2","!?","test","void","bamper","sticky","pleasure","wisconsin","starbucks","platonic",
@@ -24,8 +12,9 @@ constexpr static std::array<const char*, 20> randomStrings = {
 TestClient::TestClient(const std::string& serverIp, const int serverPort, const int seed) :
 	controller(),
 	serverIp(serverIp),
-	serverPort(serverPort),
-	randomEngine(getRandomEngine(seed)) {}
+	serverPort(serverPort) {
+	random::Engine::get().setSeed(seed);
+}
 
 DocAction TestClient::getUndoAction() const {
 	DocAction key;
@@ -37,10 +26,10 @@ DocAction TestClient::getUndoAction() const {
 DocAction TestClient::getRandomKey() {
 	std::uniform_int_distribution<> actionDist(0, 960);
 	std::uniform_int_distribution<> charDist(32, 127);
-	int action = actionDist(randomEngine);
+	int action = random::Engine::get().getRandFromDist(actionDist);
 	DocAction docAction;
 	if (action < 650) {
-		docAction.key.keyCode = charDist(randomEngine);
+		docAction.key.keyCode = random::Engine::get().getRandFromDist(charDist);
 		docAction.type = msg::Type::write;
 		docAction.text = std::string{ static_cast<char>(docAction.key.keyCode) };
 	}
@@ -74,10 +63,10 @@ std::string TestClient::getRandomString() {
 	std::uniform_int_distribution<> stringDist(0, 19);
 	std::string endlStr = "\n";
 	std::string ret;
-	int length = lengthDist(randomEngine);
+	int length = random::Engine::get().getRandFromDist(lengthDist);
 	for (int i = 0; i < length; i++) {
-		bool endl = endlineDist(randomEngine);
-		ret += randomStrings[stringDist(randomEngine)] + (endl ? endlStr : "");
+		bool endl = random::Engine::get().getRandFromDist(endlineDist);
+		ret += randomStrings[random::Engine::get().getRandFromDist(stringDist)] + (endl ? endlStr : "");
 	}
 	return ret;
 }
@@ -87,7 +76,7 @@ bool TestClient::makeActionSync(const DocAction& key) {
 	bool gotMsg = false;
 	constexpr int maxTries = 50;
 	int tries = 0;
-	std::chrono::nanoseconds timeout{400};
+	std::chrono::microseconds timeout{10};
 	while (!gotMsg) {
 		tries++;
 		gotMsg = controller.checkIncomingMessages();

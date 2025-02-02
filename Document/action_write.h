@@ -2,28 +2,28 @@
 #include "action.h"
 #include <unordered_map>
 
+using ActionPtr = Action::ActionPtr;
+using AffectPair = Action::AffectPair;
+
 class WriteAction: public Action {
 public:
-	using ActionPtr = std::unique_ptr<Action>;
-
+	using Key = random::Engine::Key;
 	WriteAction() = default;
-	WriteAction(COORD& leftPos, std::vector<std::string>& text);
-	WriteAction(COORD& leftPos, std::vector<std::string>& text, Timestamp timestamp);
+	WriteAction(const COORD& startPos, std::vector<std::string>& text, TextContainer* target, Storage<ActionPtr>* eraseRegistry);
+	WriteAction(const COORD& startPos, TextContainer& text, TextContainer* target, const Timestamp timestamp, Storage<ActionPtr>* eraseRegistry);
+	WriteAction(const COORD& startPos, TextContainer& text, TextContainer* target, const Timestamp timestamp, const bool isChild, Storage<ActionPtr>* eraseRegistry);
+	~WriteAction() override;
 
-	ActionPtr convertToOppositeAction() const override;
-	std::optional<ActionPtr> affect(Action& other, const bool sameUser, const bool fromUndo) override;
+	AffectPair affect(Action& other) override;
 	bool tryMerge(const ActionPtr& other) override;
-	Action::UndoPair undo(const int userIdx, Document& doc) const override;
+	Action::UndoPair undo() override;
 	COORD getLeftPos() const override;
 	COORD getRightPos() const override;
 	COORD getEndPos() const override;
-private:
-	void addToHistory(Action& other, COORD pos, std::vector<std::string>& text);
-	void addUndoHook(ActionSptr& action, const int token) override;
-	std::optional<ActionPtr> affectWrite(Action& other, const bool sameUser, const bool fromUndo) override;
-	std::optional<ActionPtr> affectErase(Action& other, const bool sameUser, const bool fromUndo) override;
+protected:
+	Key addToRegistry(const COORD& startPos, const COORD& endPos, TextContainer& text, Action& other);
+	void removeItselfFromRegistry();
+	AffectPair affectWrite(Action& other) override;
+	AffectPair affectErase(Action& other) override;
 	void move(const COORD& otherStartPos, const COORD& diff) override;
-
-	std::unordered_map<int, ActionSptr> history;
-	int revisionIndex = 0;
 };
