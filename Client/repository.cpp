@@ -71,7 +71,7 @@ namespace client {
 	bool Repository::write(msg::Buffer& buffer) {
 		msg::WriteResponse msg;
 		parse(buffer, 1, msg.version, msg.user, msg.text, msg.X, msg.Y);
-		assert(doc.setCursorPos(msg.user, makeCoord(msg.X, msg.Y)));
+		doc.setCursorPos(msg.user, makeCoord(msg.X, msg.Y));
 		doc.write(msg.user, msg.text);
 		logger.logInfo("User", msg.user, "wrote '" + msg.text + "' to document");
 		return true;
