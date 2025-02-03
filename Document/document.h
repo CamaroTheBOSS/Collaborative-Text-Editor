@@ -18,10 +18,7 @@ struct User {
 class SyncTester;
 class Document {
 public:
-	friend class ActionHistory;
 	friend class SyncTester;
-	friend class EraseAction;
-	friend class WriteAction;
 	Document();
 	Document(const std::string& text);
 	Document(const std::string& text, const int cursors, const int myUserIdx);
@@ -64,7 +61,6 @@ private:
 	bool validateUserIdx(const int index) const;
 	COORD eraseSelectedText(const int userIdx);
 
-	void adjustCursors();
 	void adjustCursor(Cursor& cursor);
 	void moveAffectedCursors(User& movedUser, COORD& posDiff);
 	void moveAffectedCursor(Cursor& cursor, COORD& moveStartPos, COORD& posDiff);

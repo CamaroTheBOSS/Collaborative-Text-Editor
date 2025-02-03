@@ -67,7 +67,6 @@ COORD Document::write(const int index, const std::string& newText) {
 	endPos = container.insert(endPos, parsedLines);
 	COORD diffPos = endPos - startPos;
 	moveAffectedCursors(users[index], diffPos);
-	adjustCursors();
 	users[index].cursor.setOffset(endPos.X);
 	historyManager.pushWriteAction(index, startPos, parsedLines, &container);
 	return endPos;
@@ -85,7 +84,6 @@ COORD Document::eraseSelectedText(const int index) {
 	user.selectAnchor.reset();
 	COORD diffPos = endPos - startPos;
 	moveAffectedCursors(user, diffPos);
-	adjustCursors();
 	user.cursor.setPosition(endPos);
 	user.cursor.setOffset(endPos.X);
 	historyManager.pushEraseAction(index, startPos, endPos, erasedText, &container);
@@ -108,7 +106,6 @@ COORD Document::erase(const int index, const int eraseSize) {
 	COORD endPos = container.erase(startPos, eraseSize, erasedText);
 	COORD diffPos = endPos - startPos;
 	moveAffectedCursors(users[index], diffPos);
-	adjustCursors();
 	users[index].cursor.setOffset(endPos.X);
 	historyManager.pushEraseAction(index, startPos, endPos, erasedText, &container);
 	return endPos;
@@ -125,7 +122,6 @@ UndoReturn Document::undo(const int index) {
 	users[index].cursor.setPosition(ret.startPos);
 	COORD diff = ret.endPos - ret.startPos;
 	moveAffectedCursors(users[index], diff);
-	adjustCursors();
 	return ret;
 }
 
@@ -137,7 +133,6 @@ UndoReturn Document::redo(const int index) {
 	users[index].cursor.setPosition(ret.startPos);
 	COORD diff = ret.endPos - ret.startPos;
 	moveAffectedCursors(users[index], diff);
-	adjustCursors();
 	return ret;
 }
 
@@ -406,15 +401,7 @@ void Document::moveAffectedCursor(Cursor& cursor, COORD& moveStartPos, COORD& po
 	else if (otherCursorPos.Y > moveStartPos.Y) {
 		cursor.setPosition(otherCursorPos + COORD{ 0, posDiff.Y });
 	}
-}
-
-void Document::adjustCursors() {
-	for (auto& user : users) {
-		adjustCursor(user.cursor);
-		if (user.selectAnchor.has_value()) {
-			adjustCursor(user.selectAnchor.value());
-		}
-	}
+	adjustCursor(cursor);
 }
 
 void Document::adjustCursor(Cursor& cursor) {
