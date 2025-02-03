@@ -25,13 +25,13 @@ ActionPtr makeEmptyEraseAction() {
 
 void addWriteActionToHistory(ActionHistory& history, COORD startPos, std::vector<std::string> txt) {
 	auto action = makeWriteAction(std::move(startPos), std::move(txt));
-	history.affect(action);
+	history.affectUndo(action);
 	history.push(action);
 }
 
 void addEraseActionToHistory(ActionHistory& history, COORD startPos, COORD endPos, std::vector<std::string> txt) {
 	auto action = makeEraseAction(std::move(startPos), std::move(endPos), std::move(txt));
-	history.affect(action);
+	history.affectUndo(action);
 	history.push(action);
 }
 
@@ -223,7 +223,7 @@ TEST(ActionHistoryTests, SplitActionTest) {
 	history.push(action);
 
 	auto anotherUserAction = makeWriteAction(COORD{ 4, 0 }, std::vector<std::string>{"test"});
-	history.affect(anotherUserAction);
+	history.affectUndo(anotherUserAction);
 
 	EXPECT_EQ(history.getUndoActions().size(), 2);
 	action = history.undo().value_or(makeEmptyWriteAction());
@@ -244,7 +244,7 @@ TEST(ActionHistoryTests, SplitActionWithEndlTest) {
 
 	auto anotherUserAction = makeWriteAction(COORD{ 4, 0 }, std::vector<std::string>{"ThisTextIsSoLong", ""});
 	COORD diffPos = COORD{ -4, 1 };
-	history.affect(anotherUserAction);
+	history.affectUndo(anotherUserAction);
 
 	EXPECT_EQ(history.getUndoActions().size(), 2);
 	action = history.undo().value_or(makeEmptyWriteAction());
@@ -265,7 +265,7 @@ TEST(ActionHistoryTests, a1bcTest) {
 	addWriteActionToHistory(history, COORD{ 1, 0 }, std::vector<std::string>{"1"});
 	history.undo();
 	auto action = makeEraseAction(COORD{ 2, 0 }, COORD{ 1, 0 }, std::vector<std::string>{"1"});
-	history.affect(action);
+	history.affectUndo(action);
 
 	auto& actions = history.getUndoActions();
 	EXPECT_EQ(actions.size(), 3);
@@ -282,9 +282,9 @@ TEST(ActionHistoryTests, ActionsWithEndlinesSplitTest) {
 	addWriteActionToHistory(history1, COORD{ 6, 1 }, std::vector<std::string>{"", "third", "fourth"});
 	addWriteActionToHistory(history1, COORD{ 6, 3 }, std::vector<std::string>{"", "fifth"});
 	auto action = makeWriteAction(COORD{ 2, 4 }, std::vector<std::string>{"1234"});
-	history1.affect(action);
+	history1.affectUndo(action);
 	action = makeWriteAction(COORD{ 6, 3 }, std::vector<std::string>{"123"});
-	history1.affect(action);
+	history1.affectUndo(action);
 	auto& actions = history1.getUndoActions();
 	EXPECT_EQ(actions.size(), 4);
 	if (actions.size() == 4) {
@@ -302,7 +302,7 @@ TEST(ActionHistoryTests, ActionsWithEndlinesNewActionWithEndlineSplitTest) {
 	addWriteActionToHistory(history1, COORD{ 6, 1 }, std::vector<std::string>{"", "third", "fourth"});
 	addWriteActionToHistory(history1, COORD{ 6, 3 }, std::vector<std::string>{"", "fifth"});
 	auto action = makeWriteAction(COORD{ 2, 4 }, std::vector<std::string>{"1234", ""});
-	history1.affect(action);
+	history1.affectUndo(action);
 	auto& actions = history1.getUndoActions();
 	EXPECT_EQ(actions.size(), 4);
 	if (actions.size() == 4) {
@@ -319,7 +319,7 @@ TEST(ActionHistoryTests, CutActionFromRightTest) {
 	addWriteActionToHistory(history, COORD{ 0, 0 }, std::vector<std::string>{"testing123"});
 
 	auto action = makeEraseAction(COORD{ 12, 0 }, COORD{ 8, 0 }, std::vector<std::string>{"23xd"});
-	history.affect(action);
+	history.affectUndo(action);
 
 	auto& actions = history.getUndoActions();
 	EXPECT_EQ(actions.size(), 1);
@@ -334,7 +334,7 @@ TEST(ActionHistoryTests, CutActionFromLeftTest) {
 	addWriteActionToHistory(history, COORD{ 2, 0 }, std::vector<std::string>{"testing123"});
 
 	auto action = makeEraseAction(COORD{ 4, 0 }, COORD{ 0, 0 }, std::vector<std::string>{"xdte"});
-	history.affect(action);
+	history.affectUndo(action);
 
 	auto& actions = history.getUndoActions();
 	EXPECT_EQ(actions.size(), 1);
@@ -350,7 +350,7 @@ TEST(ActionHistoryTests, DeleteActionTest) {
 	addWriteActionToHistory(history, COORD{ 2, 0 }, std::vector<std::string>{"testing123"});
 
 	auto action = makeEraseAction(COORD{ 12, 0 }, COORD{ 2, 0 }, std::vector<std::string>{"testing123"});
-	history.affect(action);
+	history.affectUndo(action);
 
 	auto& actions = history.getUndoActions();
 	EXPECT_EQ(actions.size(), 1);
@@ -365,7 +365,7 @@ TEST(ActionHistoryTests, EraseInWriteTest) {
 	addWriteActionToHistory(history, COORD{ 2, 0 }, std::vector<std::string>{"testing123"});
 
 	auto action = makeEraseAction(COORD{ 8, 0 }, COORD{ 4, 0 }, std::vector<std::string>{"stin"});
-	history.affect(action);
+	history.affectUndo(action);
 
 	auto& actions = history.getUndoActions();
 	EXPECT_EQ(actions.size(), 1);

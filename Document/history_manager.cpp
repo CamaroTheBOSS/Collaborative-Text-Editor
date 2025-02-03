@@ -37,13 +37,16 @@ namespace history {
 		if (index < 0 || index >= histories.size()) {
 			return;
 		}
-		affect(action);
+		affect(index, action);
 		histories[index].push(action);
 	}
 
-	void HistoryManager::affect(ActionPtr& action) {
-		for (auto& history : histories) {
-			history.affect(action);
+	void HistoryManager::affect(const int index, ActionPtr& action) {
+		for (int i = 0; i < histories.size(); i++) {
+			histories[i].affectUndo(action);
+			if (i != index) {
+				histories[i].affectRedo(action);
+			}
 		}
 	}
 
@@ -56,7 +59,7 @@ namespace history {
 			return { ActionType::noop };
 		}
 		auto [actionDone, undoRet] = actionOpt.value()->undo();
-		affect(actionDone);
+		affect(index, actionDone);
 		actionOpt.value()->triggerRelatedActions();
 		histories[index].pushToRedo(actionDone);
 		return undoRet;
@@ -71,7 +74,7 @@ namespace history {
 			return { ActionType::noop };
 		}
 		auto [actionDone, undoRet] = actionOpt.value()->undo();
-		affect(actionDone);
+		affect(index, actionDone);
 		actionOpt.value()->triggerRelatedActions();
 		histories[index].pushToUndo(actionDone);
 		return undoRet;

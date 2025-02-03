@@ -273,3 +273,17 @@ TEST(DocumentTests, MergeEraseUndoTest) {
 	}
 	EXPECT_EQ(doc.getText(), "some text");
 }
+
+TEST(DocumentTests, UndoMovedRedoTest) {
+	history::HistoryManagerOptions options;
+	options.mergeInterval = std::chrono::milliseconds{ 0 };
+	Document doc{ "", 3, 0, options };
+	doc.write(0, "hello world");
+	doc.write(1, " strawberry");
+	doc.write(2, " kinematic");
+	doc.undo(1);
+	doc.setCursorPos(0, COORD{ 0, 0 });
+	doc.write(0, "another text ");
+	doc.redo(1);
+	EXPECT_EQ(doc.getText(), "another text hello world strawberry kinematic");
+}

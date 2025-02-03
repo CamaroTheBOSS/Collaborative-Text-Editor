@@ -15,7 +15,8 @@ public:
 	void push(ActionPtr& action);
 	std::optional<ActionPtr> redo();
 	std::optional<ActionPtr> undo();
-	void affect(ActionPtr& action);
+	void affectUndo(ActionPtr& action);
+	void affectRedo(ActionPtr& action);
 
 	
 	const std::vector<ActionPtr>& getUndoActions() const;
@@ -23,6 +24,7 @@ public:
 	void pushToRedo(ActionPtr& action);
 	void pushToUndo(ActionPtr& action);
 private:
+	void _affect(std::vector<ActionPtr>&  actions, ActionPtr& action);
 	bool tryMerge(const ActionPtr& action) const;
 
 	std::vector<ActionPtr> undoActions;

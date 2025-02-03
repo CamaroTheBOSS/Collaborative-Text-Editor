@@ -30,7 +30,7 @@ namespace history {
 		void pushWriteAction(const int index, const COORD& startPos, std::vector<std::string>& text, TextContainer* target);
 		void pushEraseAction(const int index, const COORD& startPos, const COORD& endPos, std::vector<std::string>& text, TextContainer* target);
 	private:
-		void affect(ActionPtr& action);
+		void affect(const int index, ActionPtr& action);
 		void push(const int index, ActionPtr& action);
 
 		const std::chrono::milliseconds mergeInterval{ defaultMergeInterval };

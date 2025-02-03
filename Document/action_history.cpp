@@ -49,13 +49,21 @@ bool ActionHistory::tryMerge(const ActionPtr& action) const {
 	return last->tryMerge(action);
 }
 
-void ActionHistory::affect(ActionPtr& action) {
+void ActionHistory::affectUndo(ActionPtr& action) {
+	_affect(undoActions, action);
+}
+
+void ActionHistory::affectRedo(ActionPtr& action) {
+	_affect(redoActions, action);
+}
+
+void ActionHistory::_affect(std::vector<ActionPtr>& actions, ActionPtr& action) {
 	int i = 0;
-	while (i < undoActions.size()) {
+	while (i < actions.size()) {
 		int current = i;
-		auto result = action->affect(*undoActions[i]);
+		auto result = action->affect(*actions[i]);
 		if (result.first.has_value()) {
-			undoActions.insert(undoActions.cbegin() + current + 1, std::move(result.first.value()));
+			actions.insert(actions.cbegin() + current + 1, std::move(result.first.value()));
 			i++;
 		}
 		i++;
