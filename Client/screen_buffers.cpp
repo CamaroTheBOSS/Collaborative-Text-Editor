@@ -61,11 +61,11 @@ COORD ScrollableScreenBuffer::getEndPos() const {
 
 COORD ScrollableScreenBuffer::getTerminalCursorPos(Document& doc, const COORD& docCursor) const {
 	const auto& data = doc.get();
-	if (docCursor.X < 0) {
+	int screenWidth = width();
+	if (docCursor.X < 0 || screenWidth <= 0) {
 		return COORD{0, 0};
 	}
 
-	int screenWidth = width();
 	COORD terminalCursor{ 0, 0 };
 	for (int i = 0; i <= docCursor.Y; i++) {
 		if (i >= data.size()) {
@@ -126,6 +126,9 @@ TextLines ScrollableScreenBuffer::getTextInBuffer(Document& doc) const {
 	TextLines textLines;
 	int screenWidth = width();
 	int screenHeight = height();
+	if (screenWidth <= 0 || screenHeight <= 0) {
+		return textLines;
+	}
 	int topBorder = scroll;
 	int botBorder = scroll + screenHeight;
 	for (const auto& line : doc.get()) {

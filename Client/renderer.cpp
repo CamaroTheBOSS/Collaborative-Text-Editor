@@ -29,7 +29,7 @@ void Renderer::render(Document& doc, const ScrollableScreenBuffer& buffer) const
 }
 
 void Renderer::renderText(const ScrollableScreenBuffer& buffer, const std::vector<std::string>& linesToRender, const COORD& startPos, const COORD& endPos) const {
-    if (startPos >= endPos) {
+    if (startPos >= endPos || linesToRender.empty()) {
         return;
     }
     auto bufferStartPos = buffer.getStartPos();
