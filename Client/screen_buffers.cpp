@@ -28,6 +28,21 @@ void ScrollableScreenBuffer::scrollScreen(const int units) {
 	scroll = (std::max)(scroll + units, 0);
 }
 
+void ScrollableScreenBuffer::scrollToCursor(const RenderCursor& cursor) {
+	int topDiff = (top + 2) - cursor.pos.Y;
+	int bottomDiff = cursor.pos.Y - (bottom - 2);
+	if (topDiff > 0) {
+		scrollScreen(-topDiff);
+	}
+	else if (bottomDiff > 0) {
+		scrollScreen(bottomDiff);
+	}
+}
+
+bool ScrollableScreenBuffer::isShowingLineNumbers() const {
+	return showLineNumbers;
+}
+
 int ScrollableScreenBuffer::width() const {
 	return right - left;
 }
@@ -83,6 +98,27 @@ std::vector<RenderCursor> ScrollableScreenBuffer::getTerminalCursors(Document& d
 		terminalCursors.emplace_back(getTerminalCursor(doc, cursor));
 	}
 	return terminalCursors;
+}
+
+std::pair<ScrollableScreenBuffer, TextLines> ScrollableScreenBuffer::getLineNumbersText() const {
+	TextLines textLines;
+	if (!showLineNumbers) {
+		return std::make_pair(ScrollableScreenBuffer(), textLines);
+	}
+	int screenHeight = height();
+	int lastLineIndex = scroll + screenHeight + 1;
+	int desiredSize = std::to_string(lastLineIndex).size() + lineNumberSuffix.size() + 1;
+	for (int n = scroll + 1; n <= lastLineIndex; n++) {
+		std::string base = std::to_string(n) + lineNumberSuffix;
+		std::string line = std::string(desiredSize - base.size(), ' ') + base;
+		textLines.emplace_back(std::move(line));
+	}
+	auto buffer = ScrollableScreenBuffer();
+	buffer.top = top;
+	buffer.bottom = bottom;
+	buffer.right = left;
+	buffer.left = buffer.right - desiredSize;
+	return std::make_pair(buffer, textLines);
 }
 
 TextLines ScrollableScreenBuffer::getTextInBuffer(Document& doc) const {

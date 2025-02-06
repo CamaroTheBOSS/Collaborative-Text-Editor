@@ -94,20 +94,8 @@ void Terminal::clear() const {
 }
 
 void Terminal::render(Document& doc) {
-    auto tCursor = docBuffer.getMyTerminalCursor(doc);
-    scrollDocBuffer(tCursor);
+    docBuffer.scrollToCursor(docBuffer.getMyTerminalCursor(doc));
     return renderer.render(doc, docBuffer);
-}
-
-void Terminal::scrollDocBuffer(const RenderCursor& tCursor) {
-    int topDiff = (docBuffer.top + 2) - tCursor.pos.Y;
-    int bottomDiff = tCursor.pos.Y - (docBuffer.bottom - 2);
-    if (topDiff > 0) {
-        docBuffer.scrollScreen(-topDiff);
-    }
-    else if (bottomDiff > 0) {
-        docBuffer.scrollScreen(bottomDiff);
-    }
 }
 
 unsigned int Terminal::getDocBufferWidth() const {

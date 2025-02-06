@@ -9,7 +9,11 @@ constexpr int defaultColor = 7;
 
 void Renderer::render(Document& doc, const ScrollableScreenBuffer& buffer) const {
     auto visibleLines = buffer.getTextInBuffer(doc);
+    auto [nLinesBuffer, nLinesText] = buffer.getLineNumbersText();
     renderText(buffer, visibleLines, buffer.getStartPos(), buffer.getEndPos());
+    if (nLinesText.size() > 0 && buffer.left >= nLinesText[0].size()) {
+        renderText(nLinesBuffer, nLinesText, nLinesBuffer.getStartPos(), nLinesBuffer.getEndPos());
+    }
 
     auto cursors = buffer.getTerminalCursors(doc);
     auto myCursorSelectionAnchor = doc.getCursorSelectionAnchor(doc.getMyCursor());
