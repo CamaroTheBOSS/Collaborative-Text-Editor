@@ -20,8 +20,12 @@ class BaseDocument {
 public:
 	friend class SyncTester;
 	BaseDocument();
+	BaseDocument(const BaseDocument& other);
+	BaseDocument(BaseDocument&& other) noexcept;
 	BaseDocument(const std::string& text);
 	BaseDocument(const std::string& text, const int cursors, const int myUserIdx);
+	BaseDocument& operator=(const BaseDocument& other);
+	BaseDocument& operator=(BaseDocument&& other) noexcept;
 
 	COORD write(const int index, const std::string& text);
 	COORD erase(const int index, const int eraseSize);

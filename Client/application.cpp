@@ -11,9 +11,10 @@ constexpr msg::OneByteInt version = 1;
 Application::Application() :
     client(),
     terminal(),
-    window(std::make_unique<TextEditorWindow>(client)),
-    repo(window->getDoc()) {
-    terminal.resizeScreenBufferIfNeeded(window);
+    windows(),
+    repo() {
+    windows.emplace_back(std::make_unique<TextEditorWindow>());
+    terminal.resizeScreenBufferIfNeeded(windows[0]);
 }
 
 bool Application::connect(const std::string& ip, const int port) {
@@ -35,14 +36,14 @@ KeyPack Application::readChar() const {
 bool Application::processChar(const KeyPack& key) {
     switch (key.keyCode) {
     case CTRL_V:
-        return window->processChar(key, terminal.getClipboardData());
+        return windows[focus]->processChar(client, key, terminal.getClipboardData());
     case CTRL_C:
-        return terminal.setClipboardData(window->getDoc().getSelectedText());
+        return terminal.setClipboardData(windows[focus]->getDoc().getSelectedText());
     case CTRL_X:
-        terminal.setClipboardData(window->getDoc().getSelectedText());
-        return window->processChar(key);
+        terminal.setClipboardData(windows[focus]->getDoc().getSelectedText());
+        return windows[focus]->processChar(client, key);
     }
-    return window->processChar(key);
+    return windows[focus]->processChar(client, key);
 }
 
 bool Application::checkIncomingMessages() {
@@ -52,9 +53,9 @@ bool Application::checkIncomingMessages() {
         if (msgBuffer.empty()) {
             break;
         }
-        needRender += repo.processMsg(msgBuffer);
+        needRender += repo.processMsg(windows[0]->getDoc(), msgBuffer);
     }
-    needRender += terminal.resizeScreenBufferIfNeeded(window);
+    needRender += terminal.resizeScreenBufferIfNeeded(windows[0]);
     return needRender;
 }
 
@@ -71,7 +72,7 @@ bool Application::requestDocument(const std::chrono::milliseconds& timeout, cons
         }
         msg::Type msgType;
         msg::parse(msgBuffer, 0, msgType);
-        repo.processMsg(msgBuffer);
+        repo.processMsg(windows[0]->getDoc(), msgBuffer);
         if (msgType == msg::Type::sync) {
             return true;
         }
@@ -80,8 +81,7 @@ bool Application::requestDocument(const std::chrono::milliseconds& timeout, cons
 }
 
 void Application::render() {
-    /*for (auto& window : windows) {
-        terminal.render(window.getDoc());
-    }*/
-    terminal.render(window);
+    for (auto& window : windows) {
+        terminal.render(window);
+    }
 }

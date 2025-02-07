@@ -8,16 +8,13 @@ namespace client {
 	class Repository {
 		friend class SyncTester;
 	public:
-		Repository(ClientSiteDocument& doc);
-		bool processMsg(msg::Buffer& buffer);
+		bool processMsg(ClientSiteDocument& doc, msg::Buffer& buffer);
 	private:
-		bool write(msg::Buffer& buffer);
-		bool erase(msg::Buffer& buffer);
-		bool move(msg::Buffer& buffer);
-		bool sync(msg::Buffer& buffer);
-		bool connectNewUser(msg::Buffer& buffer);
-		bool disconnectUser(msg::Buffer& buffer);
-
-		ClientSiteDocument& doc;
+		bool write(ClientSiteDocument& doc, msg::Buffer& buffer);
+		bool erase(ClientSiteDocument& doc, msg::Buffer& buffer);
+		bool move(ClientSiteDocument& doc, msg::Buffer& buffer);
+		bool sync(ClientSiteDocument& doc, msg::Buffer& buffer);
+		bool connectNewUser(ClientSiteDocument& doc, msg::Buffer& buffer);
+		bool disconnectUser(ClientSiteDocument& doc, msg::Buffer& buffer);
 	};
 }

@@ -5,35 +5,31 @@
 #include "logging.h"
 
 namespace client {
-
-	Repository::Repository(ClientSiteDocument& doc) :
-		doc(doc) {}
-
-	bool Repository::processMsg(msg::Buffer& buffer) {
+	bool Repository::processMsg(ClientSiteDocument& doc, msg::Buffer& buffer) {
 		msg::Type msgType;
 		msg::parse(buffer, 0, msgType);
 
 		switch (msgType) {
 		case msg::Type::write:
-			return write(buffer);
+			return write(doc, buffer);
 		case msg::Type::erase:
-			return erase(buffer);
+			return erase(doc, buffer);
 		case msg::Type::selectAll:
 		case msg::Type::moveHorizontal:
 		case msg::Type::moveVertical:
-			return move(buffer);
+			return move(doc, buffer);
 		case msg::Type::sync:
-			return sync(buffer);
+			return sync(doc, buffer);
 		case msg::Type::connect:
-			return connectNewUser(buffer);
+			return connectNewUser(doc, buffer);
 		case msg::Type::disconnect:
-			return disconnectUser(buffer);
+			return disconnectUser(doc, buffer);
 		}
 		assert(false && "Unrecognized msg type. Aborting...");
 		return false;
 	}
 
-	bool Repository::sync(msg::Buffer& buffer) {
+	bool Repository::sync(ClientSiteDocument& doc, msg::Buffer& buffer) {
 		msg::ConnectResponse msg;
 		parse(buffer, 1, msg.version, msg.user, msg.text, msg.cursorPositions);
 		assert(msg.cursorPositions.size() == (msg.user + 1) * 2);
@@ -46,19 +42,19 @@ namespace client {
 		return true;
 	}
 
-	bool Repository::connectNewUser(msg::Buffer& buffer) {
+	bool Repository::connectNewUser(ClientSiteDocument& doc, msg::Buffer& buffer) {
 		logger.logInfo("Added new user to document");
 		return doc.addUser();
 	}
 
-	bool Repository::disconnectUser(msg::Buffer& buffer) {
+	bool Repository::disconnectUser(ClientSiteDocument& doc, msg::Buffer& buffer) {
 		msg::DisconnectResponse msg;
 		parse(buffer, 1, msg.version, msg.user);
 		logger.logInfo("Disconnected user", msg.user);
 		return doc.eraseUser(msg.user);
 	}
 
-	bool Repository::write(msg::Buffer& buffer) {
+	bool Repository::write(ClientSiteDocument& doc, msg::Buffer& buffer) {
 		msg::WriteResponse msg;
 		parse(buffer, 1, msg.version, msg.user, msg.text, msg.X, msg.Y);
 		doc.setCursorPos(msg.user, makeCoord(msg.X, msg.Y));
@@ -67,7 +63,7 @@ namespace client {
 		return true;
 	}
 
-	bool Repository::erase(msg::Buffer& buffer) {
+	bool Repository::erase(ClientSiteDocument& doc, msg::Buffer& buffer) {
 		msg::EraseResponse msg;
 		parse(buffer, 1, msg.version, msg.user, msg.eraseSize, msg.X, msg.Y);
 		doc.setCursorPos(msg.user, makeCoord(msg.X, msg.Y));
@@ -76,7 +72,7 @@ namespace client {
 		return true;
 	}
 
-	bool Repository::move(msg::Buffer& buffer) {
+	bool Repository::move(ClientSiteDocument& doc, msg::Buffer& buffer) {
 		msg::MoveResponse msg;
 		parse(buffer, 1, msg.version, msg.user, msg.X, msg.Y, msg.withSelect, msg.anchorX, msg.anchorY);
 		doc.moveTo(msg.user, makeCoord(msg.X, msg.Y), makeCoord(msg.anchorX, msg.anchorY), msg.withSelect);

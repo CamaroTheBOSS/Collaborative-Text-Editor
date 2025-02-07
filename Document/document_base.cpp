@@ -10,6 +10,18 @@ BaseDocument::BaseDocument() :
 	addUser();
 }
 
+BaseDocument::BaseDocument(const BaseDocument& other) :
+	container(other.container),
+	users(other.users),
+	filename(other.filename),
+	myUserIdx(other.myUserIdx) {}
+
+BaseDocument::BaseDocument(BaseDocument&& other) noexcept :
+	container(std::move(other.container)),
+	users(std::move(other.users)),
+	filename(std::move(other.filename)),
+	myUserIdx(other.myUserIdx) {}
+
 BaseDocument::BaseDocument(const std::string& text) :
 	container(text) {
 	addUser();
@@ -21,6 +33,22 @@ BaseDocument::BaseDocument(const std::string& text, const int nCursors, const in
 	for (int i = 0; i < nCursors; i++) {
 		addUser();
 	}
+}
+
+BaseDocument& BaseDocument::operator=(const BaseDocument& other) {
+	container = other.container;
+	users = other.users;
+	filename = other.filename;
+	myUserIdx = other.myUserIdx;
+	return *this;
+}
+
+BaseDocument& BaseDocument::operator=(BaseDocument&& other) noexcept {
+	container = std::move(other.container);
+	users = std::move(other.users);
+	filename = std::move(other.filename);
+	myUserIdx = std::move(other.myUserIdx);
+	return *this;
 }
 
 COORD BaseDocument::write(const int index, const std::string& newText) {

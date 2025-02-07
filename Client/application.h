@@ -20,7 +20,8 @@ public:
 private:
 	TCPClient client;
 	Terminal terminal;
-	std::unique_ptr<BaseWindow> window;
+	int focus = 0;
+	std::vector<std::unique_ptr<BaseWindow>> windows;
 	client::Repository repo;
 	
 };
