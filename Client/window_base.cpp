@@ -1,7 +1,6 @@
 #include "window_base.h"
 
-BaseWindow::BaseWindow(TCPClient& client) :
-    client(client),
+BaseWindow::BaseWindow() :
     doc() {}
 
 bool BaseWindow::saveDoc() const {

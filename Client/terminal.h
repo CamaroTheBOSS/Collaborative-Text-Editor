@@ -20,8 +20,8 @@ public:
 private:
 
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	CONSOLE_SCREEN_BUFFER_INFO screenInfo;
-	CONSOLE_CURSOR_INFO cursorInfo;
+	CONSOLE_SCREEN_BUFFER_INFO screenInfo{};
+	CONSOLE_CURSOR_INFO cursorInfo{};
 
 	Renderer renderer;
 };

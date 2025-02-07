@@ -4,6 +4,6 @@
 class TextEditorWindow : public BaseWindow {
 	friend class SyncTester;
 public:
-	TextEditorWindow(TCPClient& client);
-	bool processChar(const KeyPack& key, const std::string& clipboardData) override;
+	TextEditorWindow();
+	bool processChar(TCPClient& client, const KeyPack& key, const std::string& clipboardData) override;
 };

@@ -6,8 +6,6 @@
 
 using namespace client;
 
-constexpr int rightMargin = 5;
-
 bool screenBuffersEqual(const SMALL_RECT& first, const SMALL_RECT& second) {
     return first.Top == second.Top && first.Bottom == second.Bottom &&
         first.Left == second.Left && first.Right == second.Right;

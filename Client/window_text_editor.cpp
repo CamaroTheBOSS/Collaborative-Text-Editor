@@ -2,10 +2,10 @@
 
 constexpr msg::OneByteInt version = 1;
 
-TextEditorWindow::TextEditorWindow(TCPClient& client) :
-    BaseWindow(client) {}
+TextEditorWindow::TextEditorWindow() :
+    BaseWindow() {}
 
-bool TextEditorWindow::processChar(const KeyPack& key, const std::string& clipboardData) {
+bool TextEditorWindow::processChar(TCPClient& client, const KeyPack& key, const std::string& clipboardData) {
     
     if (key.keyCode >= 32 && key.keyCode <= 127) {
         return client.sendMsg(msg::Type::write, version, std::string{""}, std::string(1, key.keyCode));

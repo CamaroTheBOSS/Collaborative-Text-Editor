@@ -6,14 +6,13 @@
 class BaseWindow {
 	friend class SyncTester;
 public:
-	BaseWindow(TCPClient& client);
-	virtual bool processChar(const KeyPack& key, const std::string& clipboardData = "") = 0;
+	BaseWindow();
+	virtual bool processChar(TCPClient& client, const KeyPack& key, const std::string& clipboardData = "") = 0;
 	bool saveDoc() const;
 	ClientSiteDocument& getDoc();
 	ScrollableScreenBuffer& getBuffer();
 	unsigned int getDocBufferWidth();
 protected:
-	TCPClient& client;
 	ClientSiteDocument doc;
 	ScrollableScreenBuffer buffer;
 };
