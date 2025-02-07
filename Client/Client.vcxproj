@@ -136,8 +136,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="client_document.cpp" />
-    <ClCompile Include="controller_base.cpp" />
-    <ClCompile Include="controller_doc.cpp" />
+    <ClCompile Include="window_base.cpp" />
+    <ClCompile Include="window_text_editor.cpp" />
     <ClCompile Include="application.cpp" />
     <ClCompile Include="logging.cpp" />
     <ClCompile Include="main.cpp" />
@@ -150,8 +150,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="client_document.h" />
-    <ClInclude Include="controller_base.h" />
-    <ClInclude Include="controller_doc.h" />
+    <ClInclude Include="keypack.h" />
+    <ClInclude Include="window_base.h" />
+    <ClInclude Include="window_text_editor.h" />
     <ClInclude Include="application.h" />
     <ClInclude Include="logging.h" />
     <ClInclude Include="renderer.h" />

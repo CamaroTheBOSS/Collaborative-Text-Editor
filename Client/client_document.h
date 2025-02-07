@@ -7,5 +7,4 @@ public:
 	ClientSiteDocument(const std::string& text);
 	ClientSiteDocument(const std::string& text, const int cursors, const int myUserIdx);
 private:
-
 };

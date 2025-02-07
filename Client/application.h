@@ -1,6 +1,7 @@
 #pragma once
-#include "controller_base.h"
+#include "window_base.h"
 #include "terminal.h"
+#include "repository.h"
 
 #include <list>
 
@@ -19,7 +20,7 @@ public:
 private:
 	TCPClient client;
 	Terminal terminal;
-	std::unique_ptr<BaseController> controller;
+	std::unique_ptr<BaseWindow> window;
 	client::Repository repo;
 	
 };

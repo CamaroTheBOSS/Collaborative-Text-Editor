@@ -1,7 +1,7 @@
 #include <chrono>
 #include <thread>
 
-#include "controller_doc.h"
+#include "window_text_editor.h"
 #include "application.h"
 #include "logging.h"
 
@@ -11,8 +11,10 @@ constexpr msg::OneByteInt version = 1;
 Application::Application() :
     client(),
     terminal(),
-    controller(std::make_unique<DocController>(client, terminal)),
-    repo(controller->getDoc()) {}
+    window(std::make_unique<TextEditorWindow>(client)),
+    repo(window->getDoc()) {
+    terminal.resizeScreenBufferIfNeeded(window);
+}
 
 bool Application::connect(const std::string& ip, const int port) {
     return client.connectServer(ip, port);
@@ -31,7 +33,16 @@ KeyPack Application::readChar() const {
 }
 
 bool Application::processChar(const KeyPack& key) {
-    return controller->processChar(key);
+    switch (key.keyCode) {
+    case CTRL_V:
+        return window->processChar(key, terminal.getClipboardData());
+    case CTRL_C:
+        return terminal.setClipboardData(window->getDoc().getSelectedText());
+    case CTRL_X:
+        terminal.setClipboardData(window->getDoc().getSelectedText());
+        return window->processChar(key);
+    }
+    return window->processChar(key);
 }
 
 bool Application::checkIncomingMessages() {
@@ -43,7 +54,7 @@ bool Application::checkIncomingMessages() {
         }
         needRender += repo.processMsg(msgBuffer);
     }
-    needRender += terminal.resizeScreenBufferIfNeeded();
+    needRender += terminal.resizeScreenBufferIfNeeded(window);
     return needRender;
 }
 
@@ -72,5 +83,5 @@ void Application::render() {
     /*for (auto& window : windows) {
         terminal.render(window.getDoc());
     }*/
-    terminal.render(controller->getDoc());
+    terminal.render(window);
 }

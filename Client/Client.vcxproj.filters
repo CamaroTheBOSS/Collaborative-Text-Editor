@@ -21,7 +21,7 @@
     <ClCompile Include="tcp_client.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClCompile>
-    <ClCompile Include="controller_doc.cpp">
+    <ClCompile Include="window_text_editor.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
     <ClCompile Include="terminal.cpp">
@@ -45,7 +45,7 @@
     <ClCompile Include="application.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
-    <ClCompile Include="controller_base.cpp">
+    <ClCompile Include="window_base.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
     <ClCompile Include="client_document.cpp">
@@ -53,7 +53,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="controller_doc.h">
+    <ClInclude Include="window_text_editor.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
     <ClInclude Include="terminal.h">
@@ -74,10 +74,13 @@
     <ClInclude Include="application.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
-    <ClInclude Include="controller_base.h">
+    <ClInclude Include="window_base.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
     <ClInclude Include="client_document.h">
+      <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
+    <ClInclude Include="keypack.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
   </ItemGroup>
