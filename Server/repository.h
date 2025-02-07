@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "messages.h"
-#include "document.h"
+#include "server_document.h"
 
 namespace server {
 	struct Response {
@@ -16,7 +16,7 @@ namespace server {
 	};
 
 	struct Session {
-		std::unique_ptr<Document> document;
+		std::unique_ptr<ServerSiteDocument> document;
 		std::string accessCode;
 		std::string filename;
 	};
@@ -40,7 +40,7 @@ namespace server {
 		int findClient(SOCKET client);
 
 		// TODO BETTER SYSTEM
-		Document doc{ "", 0, 0 };
+		ServerSiteDocument doc{ "", 0, 0 };
 		std::vector<SOCKET> connectedClients;
 		std::mutex connectedClientsLock;
 		std::mutex docLock;

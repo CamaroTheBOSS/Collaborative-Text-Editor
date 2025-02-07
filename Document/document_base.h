@@ -5,7 +5,7 @@
 #include <string>
 #include <optional>
 #include "text_container.h"
-#include "history_manager.h"
+#include "cursor.h"
 
 struct User {
 	Cursor cursor;
@@ -16,31 +16,24 @@ struct User {
 };
 
 class SyncTester;
-class Document {
+class BaseDocument {
 public:
 	friend class SyncTester;
-	Document();
-	Document(const std::string& text);
-	Document(const std::string& text, const int cursors, const int myUserIdx);
-	Document(const std::string& text, const int cursors, const int myUserIdx, const history::HistoryManagerOptions& historyManagerOptions);
-	Document(Document&&) noexcept;
-	Document& operator=(Document&&) noexcept;
-	Document(const Document&) = delete;
-	Document& operator=(const Document&) = delete;
+	BaseDocument();
+	BaseDocument(const std::string& text);
+	BaseDocument(const std::string& text, const int cursors, const int myUserIdx);
 
 	COORD write(const int index, const std::string& text);
 	COORD erase(const int index, const int eraseSize);
-	UndoReturn undo(const int index);
-	UndoReturn redo(const int index);
-	
+
 	COORD moveCursorLeft(const int index, const bool withSelect);
 	COORD moveCursorRight(const int index, const bool withSelect);
 	COORD moveCursorUp(const int index, const int bufferWidth, const bool withSelect);
 	COORD moveCursorDown(const int index, const int bufferWidth, const bool withSelect);
-	COORD moveTo(const int index, const COORD newPos, const COORD anchor, const bool withSelec);
+	COORD moveTo(const int index, const COORD newPos, const COORD anchor, const bool withSelect);
 
-	bool addUser();
-	bool eraseUser(const int index);
+	virtual bool addUser();
+	virtual bool eraseUser(const int index);
 	bool setCursorPos(const int index, const COORD newPos);
 	bool setCursorAnchor(const int index, const COORD newAnchor);
 	COORD getCursorPos(const int index) const;
@@ -57,20 +50,21 @@ public:
 	std::string getSelectedText() const;
 	std::string getFilename() const;
 
-private:
+protected:
+	bool analyzeBackwardMove(User& user, const bool withSelect);
+	bool analyzeForwardMove(User& user, const bool withSelect);
+	virtual void pushWriteAction(const int index, const COORD& startPos, std::vector<std::string>& text, TextContainer* target) {}
+	virtual void pushEraseAction(const int index, const COORD& startPos, const COORD& endPos, std::vector<std::string>& text, TextContainer* target) {}
+
 	bool validateUserIdx(const int index) const;
 	COORD eraseSelectedText(const int userIdx);
 
 	void adjustCursor(Cursor& cursor);
 	void moveAffectedCursors(User& movedUser, COORD& posDiff);
 	void moveAffectedCursor(Cursor& cursor, COORD& moveStartPos, COORD& posDiff);
-	bool analyzeBackwardMove(User& user, const bool withSelect);
-	bool analyzeForwardMove(User& user, const bool withSelect);
+
 	std::string filename = "document.txt";
 	std::vector<User> users;
-
 	TextContainer container;
-	history::HistoryManager historyManager;
 	int myUserIdx;
-
 };

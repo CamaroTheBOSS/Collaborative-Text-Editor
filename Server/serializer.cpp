@@ -1,6 +1,6 @@
 #include "serializer.h"
 
-msg::Buffer Serializer::makeConnectResponse(const Document& doc, const int userIdx, const msg::Connect& msg) {
+msg::Buffer Serializer::makeConnectResponse(const ServerSiteDocument& doc, const int userIdx, const msg::Connect& msg) {
 	std::vector<unsigned int> cursorPositions;
 	for (const auto& cursorPos : doc.getCursorPositions()) {
 		cursorPositions.push_back(static_cast<unsigned int>(cursorPos.X));
@@ -38,19 +38,19 @@ msg::Buffer Serializer::makeEraseResponse(const COORD& startPos, const int userI
 	return buffer;
 }
 
-msg::Buffer Serializer::makeMoveResponse(const Document& doc, const int userIdx, const msg::MoveHorizontal& msg) {
+msg::Buffer Serializer::makeMoveResponse(const ServerSiteDocument& doc, const int userIdx, const msg::MoveHorizontal& msg) {
 	return makeMoveResponseImpl(doc, msg.type, msg.version, userIdx, msg.withSelect);
 }
 
-msg::Buffer Serializer::makeMoveResponse(const Document& doc, const int userIdx, const msg::MoveVertical& msg) {
+msg::Buffer Serializer::makeMoveResponse(const ServerSiteDocument& doc, const int userIdx, const msg::MoveVertical& msg) {
 	return makeMoveResponseImpl(doc, msg.type, msg.version, userIdx, msg.withSelect);
 }
 
-msg::Buffer Serializer::makeMoveResponse(const Document& doc, const int userIdx, const msg::MoveSelectAll& msg) {
+msg::Buffer Serializer::makeMoveResponse(const ServerSiteDocument& doc, const int userIdx, const msg::MoveSelectAll& msg) {
 	return makeMoveResponseImpl(doc, msg.type, msg.version, userIdx, true);
 }
 
-msg::Buffer Serializer::makeMoveResponseImpl(const Document& doc, const msg::Type type, const msg::OneByteInt version, const int userIdx, const bool withSelect) {
+msg::Buffer Serializer::makeMoveResponseImpl(const ServerSiteDocument& doc, const msg::Type type, const msg::OneByteInt version, const int userIdx, const bool withSelect) {
 	msg::Buffer buffer{30};
 	auto userBuff = static_cast<msg::OneByteInt>(userIdx);
 	auto cursorPos = doc.getCursorPos(userIdx);

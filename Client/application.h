@@ -1,11 +1,13 @@
 #pragma once
-#include "tcp_client.h"
-#include "repository.h"
+#include "controller_base.h"
 #include "terminal.h"
 
-class Controller {
+#include <list>
+
+class Application {
 	friend class SyncTester;
 public:
+	Application();
 	bool connect(const std::string& ip, const int port);
 	bool disconnect();
 	bool isConnected() const;
@@ -14,11 +16,10 @@ public:
 	bool checkIncomingMessages();
 	bool requestDocument(const std::chrono::milliseconds& timeout, const int tries);
 	void render();
-	bool saveDoc() const;
-
 private:
-
 	TCPClient client;
 	Terminal terminal;
+	std::unique_ptr<BaseController> controller;
 	client::Repository repo;
+	
 };

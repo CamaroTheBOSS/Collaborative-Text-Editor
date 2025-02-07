@@ -1,5 +1,3 @@
-#include <algorithm>
-
 #include "action_history.h"
 
 ActionHistory::ActionHistory(std::chrono::milliseconds mergeInterval, const int capacity) :

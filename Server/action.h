@@ -21,13 +21,13 @@ struct UndoReturn {
 
 class Document;
 class Action {
+	friend class WriteAction;
+	friend class EraseAction;
 public:
 	using Key = random::Engine::Key;
 	using ActionPtr = std::unique_ptr<Action>;
 	using UndoPair = std::pair<ActionPtr, UndoReturn>;
 	using AffectPair = std::pair<std::optional<ActionPtr>, std::optional<Key>>;
-	friend class WriteAction;
-	friend class EraseAction;
 
 	Action() = default;
 	Action(const ActionType type, const COORD& startPos, std::vector<std::string>& text, TextContainer* target, Storage<ActionPtr>* eraseRegistry);

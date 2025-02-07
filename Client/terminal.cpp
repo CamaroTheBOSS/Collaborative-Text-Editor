@@ -93,7 +93,7 @@ void Terminal::clear() const {
     printf("\033[1;1H"); // move cursor home
 }
 
-void Terminal::render(Document& doc) {
+void Terminal::render(ClientSiteDocument& doc) {
     docBuffer.scrollToCursor(docBuffer.getMyTerminalCursor(doc));
     return renderer.render(doc, docBuffer);
 }

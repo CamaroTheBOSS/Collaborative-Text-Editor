@@ -1,6 +1,6 @@
 #pragma once
 
-#include "document.h"
+#include "client_document.h"
 #include "messages.h"
 #include "screen_buffers.h"
 
@@ -8,9 +8,8 @@ namespace client {
 	class Repository {
 		friend class SyncTester;
 	public:
+		Repository(ClientSiteDocument& doc);
 		bool processMsg(msg::Buffer& buffer);
-		bool saveDoc() const;
-		Document& getDoc();
 	private:
 		bool write(msg::Buffer& buffer);
 		bool erase(msg::Buffer& buffer);
@@ -19,7 +18,6 @@ namespace client {
 		bool connectNewUser(msg::Buffer& buffer);
 		bool disconnectUser(msg::Buffer& buffer);
 
-		Document doc;
-
+		ClientSiteDocument& doc;
 	};
 }

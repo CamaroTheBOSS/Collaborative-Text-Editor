@@ -1,6 +1,5 @@
 #pragma once
 #include "action.h"
-#include <unordered_map>
 
 using ActionPtr = Action::ActionPtr;
 using AffectPair = Action::AffectPair;

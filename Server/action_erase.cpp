@@ -1,9 +1,6 @@
 #include "action_erase.h"
-#include "pos_helpers.h"
-#include "document.h"
 #include "action_write.h"
-#include "parser.h"
-#include <assert.h>
+#include "pos_helpers.h"
 
 using ActionPtr = EraseAction::ActionPtr;
 

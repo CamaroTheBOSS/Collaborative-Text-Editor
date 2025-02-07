@@ -135,7 +135,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="controller.cpp" />
+    <ClCompile Include="client_document.cpp" />
+    <ClCompile Include="controller_base.cpp" />
+    <ClCompile Include="controller_doc.cpp" />
+    <ClCompile Include="application.cpp" />
     <ClCompile Include="logging.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="renderer.cpp" />
@@ -146,7 +149,10 @@
     <ClCompile Include="terminal.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="controller.h" />
+    <ClInclude Include="client_document.h" />
+    <ClInclude Include="controller_base.h" />
+    <ClInclude Include="controller_doc.h" />
+    <ClInclude Include="application.h" />
     <ClInclude Include="logging.h" />
     <ClInclude Include="renderer.h" />
     <ClInclude Include="repository.h" />

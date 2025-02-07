@@ -2,7 +2,7 @@
 
 class Renderer {
 public:
-	void render(Document& doc, const ScrollableScreenBuffer& buffer) const;
+	void render(ClientSiteDocument& doc, const ScrollableScreenBuffer& buffer) const;
 private:
 	void renderText(const ScrollableScreenBuffer& buffer, const std::vector<std::string>& linesToRender, const COORD& startPos, const COORD& endPos) const;
 	void renderCursor(const ScrollableScreenBuffer& buffer, const RenderCursor& cursor, const int color) const;

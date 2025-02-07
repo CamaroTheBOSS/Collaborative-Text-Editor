@@ -131,33 +131,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="action.h" />
-    <ClInclude Include="action_erase.h" />
-    <ClInclude Include="action_history.h" />
-    <ClInclude Include="action_write.h" />
     <ClInclude Include="cursor.h" />
-    <ClInclude Include="history_manager.h" />
+    <ClInclude Include="document_base.h" />
     <ClInclude Include="line_modifier.h" />
     <ClInclude Include="parser.h" />
     <ClInclude Include="pos_helpers.h" />
-    <ClInclude Include="document.h" />
     <ClInclude Include="storage.h" />
     <ClInclude Include="text_container.h" />
-    <ClInclude Include="user_history.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="action.cpp" />
-    <ClCompile Include="action_erase.cpp" />
-    <ClCompile Include="action_history.cpp" />
-    <ClCompile Include="action_write.cpp" />
     <ClCompile Include="cursor.cpp" />
-    <ClCompile Include="history_manager.cpp" />
+    <ClCompile Include="document_base.cpp" />
     <ClCompile Include="line_modifier.cpp" />
     <ClCompile Include="parser.cpp" />
     <ClCompile Include="pos_helpers.cpp" />
-    <ClCompile Include="document.cpp" />
     <ClCompile Include="text_container.cpp" />
-    <ClCompile Include="user_history.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RandomEngine\RandomEngine.vcxproj">

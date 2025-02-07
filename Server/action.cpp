@@ -1,6 +1,5 @@
 #include "action.h"
 #include "pos_helpers.h"
-#include "parser.h"
 
 Action::Action(const ActionType type, const COORD& startPos, std::vector<std::string>& text, TextContainer* target, Storage<ActionPtr>* eraseRegistry) :
 	type(type),

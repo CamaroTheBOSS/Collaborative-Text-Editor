@@ -7,7 +7,7 @@
 constexpr std::array<int, 8> colors = { 240, 128, 144, 160, 48, 192, 208, 96 };
 constexpr int defaultColor = 7;
 
-void Renderer::render(Document& doc, const ScrollableScreenBuffer& buffer) const {
+void Renderer::render(ClientSiteDocument& doc, const ScrollableScreenBuffer& buffer) const {
     auto visibleLines = buffer.getTextInBuffer(doc);
     auto [nLinesBuffer, nLinesText] = buffer.getLineNumbersText();
     renderText(buffer, visibleLines, buffer.getStartPos(), buffer.getEndPos());

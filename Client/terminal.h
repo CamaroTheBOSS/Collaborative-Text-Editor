@@ -2,7 +2,7 @@
 #define _WINSOCKAPI_ 
 #include <Winsock2.h>
 #include <Windows.h>
-#include "document.h"
+#include "client_document.h"
 #include "renderer.h"
 #include "screen_buffers.h"
 
@@ -35,7 +35,7 @@ public:
 	Terminal();
 	~Terminal();
 	KeyPack readChar() const;
-	void render(Document& doc);
+	void render(ClientSiteDocument& doc);
 	void clear() const;
 	unsigned int getDocBufferWidth() const;
 	std::string getClipboardData() const;

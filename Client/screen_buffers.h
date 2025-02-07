@@ -1,6 +1,6 @@
 #pragma once
 #include "Windows.h"
-#include "document.h"
+#include "client_document.h"
 
 using TextLines = std::vector<std::string>;
 
@@ -20,12 +20,12 @@ public:
     ScrollableScreenBuffer(const SMALL_RECT& screen);
     COORD getStartPos() const;
     COORD getEndPos() const;
-    COORD getTerminalCursorPos(Document& doc, const COORD& docCursor) const;
-    RenderCursor getTerminalCursor(Document& doc, const int cursor) const;
-    RenderCursor getMyTerminalCursor(Document& doc) const;
-    std::vector<RenderCursor> getTerminalCursors(Document& doc) const;
+    COORD getTerminalCursorPos(ClientSiteDocument& doc, const COORD& docCursor) const;
+    RenderCursor getTerminalCursor(ClientSiteDocument& doc, const int cursor) const;
+    RenderCursor getMyTerminalCursor(ClientSiteDocument& doc) const;
+    std::vector<RenderCursor> getTerminalCursors(ClientSiteDocument& doc) const;
     std::pair<ScrollableScreenBuffer, TextLines> getLineNumbersText() const;
-    TextLines getTextInBuffer(Document& doc) const;
+    TextLines getTextInBuffer(ClientSiteDocument& doc) const;
     void moveHorizontal(const int units);
     void moveVertical(const int units);
     void scrollToCursor(const RenderCursor& cursor);

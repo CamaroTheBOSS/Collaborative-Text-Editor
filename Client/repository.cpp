@@ -6,18 +6,8 @@
 
 namespace client {
 
-	Document& Repository::getDoc() {
-		return doc;
-	}
-
-	bool Repository::saveDoc() const {
-		std::ofstream file(doc.getFilename(), std::ios::out);
-		if (!file) {
-			return false;
-		}
-		file << doc.getText();
-		return true;
-	}
+	Repository::Repository(ClientSiteDocument& doc) :
+		doc(doc) {}
 
 	bool Repository::processMsg(msg::Buffer& buffer) {
 		msg::Type msgType;
@@ -47,7 +37,7 @@ namespace client {
 		msg::ConnectResponse msg;
 		parse(buffer, 1, msg.version, msg.user, msg.text, msg.cursorPositions);
 		assert(msg.cursorPositions.size() == (msg.user + 1) * 2);
-		doc = Document(msg.text, msg.user + 1, msg.user);
+		doc = ClientSiteDocument(msg.text, msg.user + 1, msg.user);
 		for (int i = 1; i < msg.cursorPositions.size(); i += 2) {
 			auto pos = COORD{ static_cast<SHORT>(msg.cursorPositions[i - 1]), static_cast<SHORT>(msg.cursorPositions[i]) };
 			doc.setCursorPos(i / 2, pos);

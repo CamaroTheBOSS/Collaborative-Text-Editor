@@ -135,20 +135,34 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="action.cpp" />
+    <ClCompile Include="action_erase.cpp" />
+    <ClCompile Include="action_history.cpp" />
+    <ClCompile Include="action_write.cpp" />
     <ClCompile Include="deserializer.cpp" />
+    <ClCompile Include="history_manager.cpp" />
+    <ClCompile Include="server_document.cpp" />
     <ClCompile Include="logging.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="repository.cpp" />
     <ClCompile Include="serializer.cpp" />
     <ClCompile Include="server.cpp" />
+    <ClCompile Include="user_history.cpp" />
     <ClCompile Include="worker.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="action.h" />
+    <ClInclude Include="action_erase.h" />
+    <ClInclude Include="action_history.h" />
+    <ClInclude Include="action_write.h" />
     <ClInclude Include="deserializer.h" />
+    <ClInclude Include="history_manager.h" />
+    <ClInclude Include="server_document.h" />
     <ClInclude Include="logging.h" />
     <ClInclude Include="repository.h" />
     <ClInclude Include="serializer.h" />
     <ClInclude Include="server.h" />
+    <ClInclude Include="user_history.h" />
     <ClInclude Include="worker.h" />
   </ItemGroup>
   <ItemGroup>

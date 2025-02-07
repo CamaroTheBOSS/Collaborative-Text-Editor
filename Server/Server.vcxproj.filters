@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Pliki nagłówkowe\Actions">
+      <UniqueIdentifier>{71e1c2cc-c8c5-429a-b1e9-665469107c39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki źródłowe\Actions">
+      <UniqueIdentifier>{58cac431-84fa-4b4f-bd3f-7f9f69dd5372}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -36,6 +42,27 @@
     <ClCompile Include="deserializer.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
+    <ClCompile Include="server_document.cpp">
+      <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
+    <ClCompile Include="action.cpp">
+      <Filter>Pliki źródłowe\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="action_erase.cpp">
+      <Filter>Pliki źródłowe\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="action_history.cpp">
+      <Filter>Pliki źródłowe\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="action_write.cpp">
+      <Filter>Pliki źródłowe\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="history_manager.cpp">
+      <Filter>Pliki źródłowe\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="user_history.cpp">
+      <Filter>Pliki źródłowe\Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="server.h">
@@ -55,6 +82,27 @@
     </ClInclude>
     <ClInclude Include="deserializer.h">
       <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
+    <ClInclude Include="server_document.h">
+      <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
+    <ClInclude Include="action.h">
+      <Filter>Pliki nagłówkowe\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="action_erase.h">
+      <Filter>Pliki nagłówkowe\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="action_history.h">
+      <Filter>Pliki nagłówkowe\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="action_write.h">
+      <Filter>Pliki nagłówkowe\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="history_manager.h">
+      <Filter>Pliki nagłówkowe\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="user_history.h">
+      <Filter>Pliki nagłówkowe\Actions</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
