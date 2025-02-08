@@ -2,6 +2,7 @@
 #include <thread>
 
 #include "window_text_editor.h"
+#include "window_search.h"
 #include "application.h"
 #include "logging.h"
 
@@ -65,6 +66,9 @@ ActionDone Application::processChar(const KeyPack& key) {
     case CTRL_X:
         terminal.setClipboardData(windows[focus]->getDoc().getSelectedText());
         return windows[focus]->processChar(client, key);
+   /* case F3:
+        COORD consoleSize = terminal.getScreenSize();
+        windows.emplace_back(std::make_unique<SearchWindow>(Pos<double>(0.3, 0.7), Pos<double>(0.7, 0.9), Pos<int>{consoleSize.X, consoleSize.Y}));*/
     }
     auto actionDone = windows[focus]->processChar(client, key);
     if (actionDone == ActionDone::up) {

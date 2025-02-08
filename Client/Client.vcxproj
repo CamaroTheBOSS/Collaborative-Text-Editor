@@ -137,6 +137,7 @@
   <ItemGroup>
     <ClCompile Include="client_document.cpp" />
     <ClCompile Include="window_base.cpp" />
+    <ClCompile Include="window_search.cpp" />
     <ClCompile Include="window_text_editor.cpp" />
     <ClCompile Include="application.cpp" />
     <ClCompile Include="logging.cpp" />
@@ -152,6 +153,7 @@
     <ClInclude Include="client_document.h" />
     <ClInclude Include="keypack.h" />
     <ClInclude Include="window_base.h" />
+    <ClInclude Include="window_search.h" />
     <ClInclude Include="window_text_editor.h" />
     <ClInclude Include="application.h" />
     <ClInclude Include="logging.h" />
