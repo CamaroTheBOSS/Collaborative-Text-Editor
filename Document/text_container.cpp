@@ -66,8 +66,15 @@ std::pair<int, std::string> TextContainer::eraseLine(const int col) {
 	return { size, std::move(line) };
 }
 
+std::vector<std::string> TextContainer::eraseLines(const int start, const int end) {
+	auto erasedLines = std::vector<std::string>(data.cbegin() + start, data.cbegin() + end + 1);
+	data.erase(data.cbegin() + start, data.cbegin() + end + 1);
+	return erasedLines;
+}
+
 COORD TextContainer::eraseBetween(const COORD& start, const COORD& end, std::vector<std::string>& erasedText) {
 	auto [smaller, bigger] = getAscendingOrder(start, end);
+	erasedText.reserve(bigger->Y - smaller->Y + 5);
 	if (smaller->Y == bigger->Y) {
 		auto [newX, line] = LineModifier::erase(data[smaller->Y], bigger->X, bigger->X - smaller->X);
 		erasedText.emplace_back(std::move(line));
@@ -75,10 +82,10 @@ COORD TextContainer::eraseBetween(const COORD& start, const COORD& end, std::vec
 	}
 	else {
 		erasedText.emplace_back(LineModifier::cut(data[smaller->Y], smaller->X));
-		data[smaller->Y] += LineModifier::cut(data[bigger->Y], bigger->X);;
-		for (int i = smaller->Y + 1; i <= bigger->Y; i++) {
-			auto [size, line] = eraseLine(smaller->Y + 1);
-			erasedText.emplace_back(std::move(line));
+		data[smaller->Y] += LineModifier::cut(data[bigger->Y], bigger->X);
+		auto erased = eraseLines(smaller->Y + 1, bigger->Y);
+		for (const auto& element : erased) {
+			erasedText.emplace_back(element);
 		}
 	}
 	return *smaller;

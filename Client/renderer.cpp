@@ -7,12 +7,19 @@
 constexpr std::array<int, 8> colors = { 240, 128, 144, 160, 48, 192, 208, 96 };
 constexpr int defaultColor = 7;
 
-void Renderer::render(ClientSiteDocument& doc, const ScrollableScreenBuffer& buffer) const {
+void Renderer::render(const std::unique_ptr<BaseWindow>& window) const {
+    auto& buffer = window->getBuffer();
+    auto& doc = window->getDoc();
     auto visibleLines = buffer.getTextInBuffer(doc);
-    auto [nLinesBuffer, nLinesText] = buffer.getLineNumbersText();
+    auto frames = buffer.getFrames();
     renderText(buffer, visibleLines, buffer.getStartPos(), buffer.getEndPos());
-    if (nLinesText.size() > 0 && buffer.getLeft() >= nLinesText[0].size()) {
-        renderText(nLinesBuffer, nLinesText, nLinesBuffer.getStartPos(), nLinesBuffer.getEndPos());
+    for (const auto& frame : frames) {
+        if (!frame.text.empty() && frame.buffer.fitInConsole()) {
+            renderText(frame.buffer, frame.text, frame.buffer.getStartPos(), frame.buffer.getEndPos());
+        }
+    }
+    if (!window->isActive()) {
+        return;
     }
 
     auto cursors = buffer.getTerminalCursors(doc);

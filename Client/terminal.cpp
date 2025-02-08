@@ -95,7 +95,7 @@ void Terminal::render(const std::unique_ptr<BaseWindow>& window) {
     auto& docBuffer = window->getBuffer();
     auto& doc = window->getDoc();
     docBuffer.scrollToCursor(docBuffer.getMyTerminalCursor(doc));
-    return renderer.render(doc, docBuffer);
+    return renderer.render(window);
 }
 
 std::string Terminal::getClipboardData() const {

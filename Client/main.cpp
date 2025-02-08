@@ -30,9 +30,9 @@ int main() {
 	app.render();
 	while (app.isConnected()) {
 		KeyPack key = app.readChar();
-		app.processChar(key);
+		auto actionDone = app.processChar(key);
 		bool render = app.checkIncomingMessages();
-		if (render) {
+		if (render || actionDone == ActionDone::render) {
 			app.render();
 		}
 	}

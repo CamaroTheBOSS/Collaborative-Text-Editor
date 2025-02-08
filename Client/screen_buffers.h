@@ -3,7 +3,6 @@
 #include "client_document.h"
 
 using TextLines = std::vector<std::string>;
-
 struct RenderCursor {
     RenderCursor(const COORD& pos, const char pointedChar, const int indexInDoc) :
         pos(pos),
@@ -19,7 +18,7 @@ struct Pos {
     T X{ 0 };
     T Y{ 0 };
 };
-
+struct Frame;
 class ScrollableScreenBuffer {
 public:
     friend class ScrollableScreenBufferBuilder;
@@ -36,6 +35,7 @@ public:
     void moveVertical(const int units);
     void scrollToCursor(const RenderCursor& cursor);
     bool isVisible(const COORD& coord) const;
+    bool fitInConsole() const;
     int height() const;
     int width() const;
     bool isShowingLineNumbers() const;
@@ -47,6 +47,7 @@ public:
     int getTop() const;
     int getBottom() const;
     Pos<double> getCenter() const;
+    std::vector<Frame> getFrames() const;
 
 private:
     void scrollScreen(const int units);
@@ -54,12 +55,19 @@ private:
     int validateAbsolutePosX(int X);
     int validateAbsolutePosY(int Y);
 
+    Frame getLeftFrame() const;
+    Frame getRightFrame() const;
+    Frame getTopFrame() const;
+    Frame getBottomFrame() const;
+    TextLines getHorizontalFrame(const std::string& pattern) const;
+
     // Absolute positions
     int top = 0;
     int bottom = 0;
     int left = 0;
     int right = 0;
     int scroll = 0;
+    int scrollHisteresis = 0;
 
     // Console size in pixels e.g. 512x256
     Pos<int> consoleSize;
@@ -75,4 +83,9 @@ private:
     std::string rightFramePattern;
     std::string topFramePattern;
     std::string botFramePattern;
+};
+
+struct Frame {
+    ScrollableScreenBuffer buffer;
+    TextLines text;
 };

@@ -15,6 +15,7 @@ public:
 
 	const std::string& addLine(const int col, const std::string& initText);
 	std::pair<int, std::string> eraseLine(const int col);
+	std::vector<std::string> eraseLines(const int start, const int end);
 
 	std::string getLine(const int col) const;
 	std::string getText() const;

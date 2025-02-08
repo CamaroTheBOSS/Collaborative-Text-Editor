@@ -3,7 +3,7 @@
 #include "screen_buffers_builder.h"
 #include "keypack.h"
 
-enum class ActionDone { done, undone, up, down };
+enum class ActionDone { done, undone, up, down, render };
 
 class BaseWindow {
 	friend class SyncTester;
@@ -15,7 +15,12 @@ public:
 	ClientSiteDocument& getDoc();
 	ScrollableScreenBuffer& getBuffer();
 	unsigned int getDocBufferWidth();
+	bool isActive() const;
+	void activate();
+	void deactivate();
+	virtual std::string name() const = 0;
 protected:
 	ClientSiteDocument doc;
 	ScrollableScreenBuffer buffer;
+	bool active;
 };

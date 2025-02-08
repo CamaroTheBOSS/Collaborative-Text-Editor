@@ -27,3 +27,15 @@ ScrollableScreenBuffer& BaseWindow::getBuffer() {
 unsigned int BaseWindow::getDocBufferWidth() {
     return buffer.width();
 }
+
+bool BaseWindow::isActive() const {
+    return active;
+}
+
+void BaseWindow::activate() {
+    active = true;
+}
+
+void BaseWindow::deactivate() {
+    active = false;
+}

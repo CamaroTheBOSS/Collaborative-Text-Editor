@@ -3,7 +3,7 @@
 #include "terminal.h"
 #include "repository.h"
 
-#include <list>
+#include <unordered_map>
 
 class Application {
 	friend class SyncTester;
@@ -19,12 +19,18 @@ public:
 	bool requestDocument(const std::chrono::milliseconds& timeout, const int tries);
 	void render();
 private:
+	void setFocus(const int windowIdx);
+	void showSearchWindow();
+	void destroyLastWindow();
 	void changeFocusUp();
 	void changeFocusDown();
 	TCPClient client;
 	Terminal terminal;
+	client::Repository repo;
+
 	int focus = 0;
 	std::vector<std::unique_ptr<BaseWindow>> windows;
-	client::Repository repo;
+	std::unordered_map<std::string, bool> windowsRegistry;
+	
 	
 };

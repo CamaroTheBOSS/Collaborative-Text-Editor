@@ -22,8 +22,12 @@ Application::Application() :
         .setRelativeRight(0.9)
         .setRelativeBot(0.9)
         .setConsoleSize(Pos<int>{consoleSize.X, consoleSize.Y})
-        .showLeftFramePattern("|");
+        .showLeftFramePattern("|")
+        .showRightFramePattern("|")
+        .showTopFramePattern("-")
+        .showBottomFramePattern("-");
     windows.emplace_back(std::make_unique<TextEditorWindow>(builder));
+    windows[0]->activate();
 }
 
 bool Application::connect(const std::string& ip, const int port) {
@@ -43,25 +47,29 @@ KeyPack Application::readChar() const {
 }
 
 void Application::changeFocusUp() {
+    int newFocus = focus;
     double curr = windows[focus]->getBuffer().getCenter().Y;
     for (int i = 0; i < windows.size(); i++) {
         double other = windows[i]->getBuffer().getCenter().Y;
         if (other <= curr) {
             curr = other;
-            focus = i;
+            newFocus = i;
         }
     }
+    setFocus(newFocus);
 }
 
 void Application::changeFocusDown() {
+    int newFocus = focus;
     double curr = windows[focus]->getBuffer().getCenter().Y;
     for (int i = 0; i < windows.size(); i++) {
         double other = windows[i]->getBuffer().getCenter().Y;
         if (other > curr) {
             curr = other;
-            focus = i;
+            newFocus = i;
         }
     }
+    setFocus(newFocus);
 }
 
 ActionDone Application::processChar(const KeyPack& key) {
@@ -74,15 +82,22 @@ ActionDone Application::processChar(const KeyPack& key) {
     case CTRL_X:
         terminal.setClipboardData(windows[focus]->getDoc().getSelectedText());
         return windows[focus]->processChar(client, key);
+    case F3:
+        showSearchWindow();
+        return ActionDone::render;
+    case ESC:
+        destroyLastWindow();
+        return ActionDone::render;
     }
     auto actionDone = windows[focus]->processChar(client, key);
-    if (actionDone == ActionDone::up) {
+    switch (actionDone) {
+    case ActionDone::up:
         changeFocusUp();
-    }
-    else if (actionDone == ActionDone::down) {
+        return ActionDone::render;
+    case ActionDone::down:
         changeFocusDown();
+        return ActionDone::render;
     }
-    return actionDone;
 }
 
 bool Application::checkBufferWasResized() {
@@ -131,5 +146,51 @@ bool Application::requestDocument(const std::chrono::milliseconds& timeout, cons
 void Application::render() {
     for (auto& window : windows) {
         terminal.render(window);
+    }
+}
+
+void Application::setFocus(const int windowIdx) {
+    if (windowIdx >= windows.size()) {
+        return;
+    }
+    if (focus < windows.size()) {
+        windows[focus]->deactivate();
+    }
+    focus = windowIdx;
+    windows[focus]->activate();
+}
+
+void Application::showSearchWindow() {
+    if (windowsRegistry.find(SearchWindow::className) != windowsRegistry.cend()) {
+        return;
+    }
+    COORD consoleSize = terminal.getScreenSize();
+    ScrollableScreenBufferBuilder builder;
+    builder.setScrollHisteresis(0)
+        .setRelativeLeft(0.4)
+        .setRelativeTop(0.8)
+        .setRelativeRight(0.6)
+        .setRelativeBot(0.9)
+        .setConsoleSize(Pos<int>{consoleSize.X, consoleSize.Y})
+        .showLeftFramePattern("|")
+        .showRightFramePattern("|")
+        .showTopFramePattern("-")
+        .showBottomFramePattern("-");
+    auto window = std::make_unique<SearchWindow>(builder);
+    windowsRegistry[window->name()] = true;
+    windows.emplace_back(std::move(window));
+    setFocus(windows.size() - 1);
+}
+
+void Application::destroyLastWindow() {
+    if (windows.size() <= 1) {
+        return;
+    }
+    auto& last = windows.back();
+    bool isActive = last->isActive();
+    windowsRegistry.erase(last->name());
+    windows.erase(windows.cend() - 1);
+    if (isActive) {
+        setFocus(windows.size() - 1);
     }
 }

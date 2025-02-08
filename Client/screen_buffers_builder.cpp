@@ -20,6 +20,10 @@ ScrollableScreenBufferBuilder& ScrollableScreenBufferBuilder::showBottomFramePat
 	botFramePattern = pattern;
 	return *this;
 }
+ScrollableScreenBufferBuilder& ScrollableScreenBufferBuilder::setScrollHisteresis(const int val) {
+	scrollHisteresis = val;
+	return *this;
+}
 ScrollableScreenBufferBuilder& ScrollableScreenBufferBuilder::setAbsoluteTop(const int val) {
 	leftTopAbs.Y = val;
 	return *this;
@@ -59,6 +63,7 @@ ScrollableScreenBufferBuilder& ScrollableScreenBufferBuilder::setConsoleSize(con
 
 ScrollableScreenBuffer ScrollableScreenBufferBuilder::getResult() const {
 	ScrollableScreenBuffer buffer;
+	buffer.scrollHisteresis = scrollHisteresis;
 	buffer.showLineNumbers = lineNumbers;
 	buffer.botFramePattern = botFramePattern;
 	buffer.topFramePattern = topFramePattern;
