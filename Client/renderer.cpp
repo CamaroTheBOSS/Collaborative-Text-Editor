@@ -11,7 +11,7 @@ void Renderer::render(ClientSiteDocument& doc, const ScrollableScreenBuffer& buf
     auto visibleLines = buffer.getTextInBuffer(doc);
     auto [nLinesBuffer, nLinesText] = buffer.getLineNumbersText();
     renderText(buffer, visibleLines, buffer.getStartPos(), buffer.getEndPos());
-    if (nLinesText.size() > 0 && buffer.left >= nLinesText[0].size()) {
+    if (nLinesText.size() > 0 && buffer.getLeft() >= nLinesText[0].size()) {
         renderText(nLinesBuffer, nLinesText, nLinesBuffer.getStartPos(), nLinesBuffer.getEndPos());
     }
 

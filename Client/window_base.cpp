@@ -3,6 +3,10 @@
 BaseWindow::BaseWindow() :
     doc() {}
 
+BaseWindow::BaseWindow(const Pos<double>& leftTop, const Pos<double>& rightBottom, const Pos<int>& consoleSize) :
+    doc(),
+    buffer(leftTop, rightBottom, consoleSize) {}
+
 bool BaseWindow::saveDoc() const {
     std::ofstream file(doc.getFilename(), std::ios::out);
     if (!file) {

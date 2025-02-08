@@ -1,27 +1,22 @@
 #include "screen_buffers.h"
 
-ScrollableScreenBuffer::ScrollableScreenBuffer() :
-	top(0),
-	bottom(0),
-	left(0),
-	right(0),
-	scroll(0) {}
 
-ScrollableScreenBuffer::ScrollableScreenBuffer(const SMALL_RECT& rect) :
-	top(rect.Top),
-	bottom(rect.Bottom),
-	left(rect.Left),
-	right(rect.Right),
-	scroll(0) {}
+ScrollableScreenBuffer::ScrollableScreenBuffer(const Pos<double>& leftTop, const Pos<double>& rightBottom, const Pos<int>& consoleSize):
+	consoleSize(consoleSize) {
+	setBufferSize(leftTop, rightBottom);
+}
+
+ScrollableScreenBuffer::ScrollableScreenBuffer(const int newLeft, const int newTop, const int newRight, const int newBottom, const Pos<int>& consoleSize):
+	consoleSize(consoleSize) {
+	setBufferAbsoluteSize(newLeft, newTop, newRight, newBottom);
+}
 
 void ScrollableScreenBuffer::moveHorizontal(const int units) {
-	left += units;
-	right += units;
+	setBufferAbsoluteSize(left + units, top, right + units, bottom);
 }
 
 void ScrollableScreenBuffer::moveVertical(const int units) {
-	top += units;
-	bottom += units;
+	setBufferAbsoluteSize(left, top + units, right, bottom + units);
 }
 
 void ScrollableScreenBuffer::scrollScreen(const int units) {
@@ -113,11 +108,8 @@ std::pair<ScrollableScreenBuffer, TextLines> ScrollableScreenBuffer::getLineNumb
 		std::string line = std::string(desiredSize - base.size(), ' ') + base;
 		textLines.emplace_back(std::move(line));
 	}
-	auto buffer = ScrollableScreenBuffer();
-	buffer.top = top;
-	buffer.bottom = bottom;
-	buffer.right = left;
-	buffer.left = buffer.right - desiredSize;
+	ScrollableScreenBuffer buffer = *this;
+	buffer.setBufferAbsoluteSize(left - desiredSize, top, left, bottom);
 	return std::make_pair(buffer, textLines);
 }
 
@@ -164,6 +156,67 @@ TextLines ScrollableScreenBuffer::getTextInBuffer(ClientSiteDocument& doc) const
 }
 
 bool ScrollableScreenBuffer::isVisible(const COORD& coord) const {
-	return coord.X >= left && coord.X <= right
-		&& coord.Y >= top && coord.Y <= bottom;
+	return coord.X >= getLeft() && coord.X <= getRight()
+		&& coord.Y >= getTop() && coord.Y <= getBottom();
+}
+
+void ScrollableScreenBuffer::setNewConsoleSize(const Pos<int>& newConsoleSize) {
+	consoleSize = newConsoleSize;
+	setBufferSize(leftTop, rightBottom);
+}
+
+void ScrollableScreenBuffer::setBufferSize(Pos<double> newLeftTop, Pos<double> newRightBottom) {
+	leftTop = validatePos(newLeftTop);
+	rightBottom = validatePos(newRightBottom);
+	center.X = (leftTop.X + rightBottom.X) / 2.;
+	center.Y = (leftTop.Y + rightBottom.Y) / 2.;
+	left = leftTop.X * consoleSize.X;
+	right = rightBottom.X * consoleSize.X;
+	top = leftTop.Y * consoleSize.Y;
+	bottom = rightBottom.Y * consoleSize.Y;
+}
+
+void ScrollableScreenBuffer::setBufferAbsoluteSize(const int newLeft, const int newTop, const int newRight, const int newBottom) {
+	left = validateAbsolutePosX(newLeft);
+	right = validateAbsolutePosX(newRight);
+	top = validateAbsolutePosY(newTop);
+	bottom = validateAbsolutePosY(newBottom);
+	leftTop = Pos<double>((double)left / (double)consoleSize.X, (double)top / (double)consoleSize.Y);
+	rightBottom = Pos<double>((double)right / (double)consoleSize.X, (double)bottom / (double)consoleSize.Y);
+	center.X = (leftTop.X + rightBottom.X) / 2.;
+	center.Y = (leftTop.Y + rightBottom.Y) / 2.;
+}
+
+int ScrollableScreenBuffer::getLeft() const {
+	return left;
+}
+
+int ScrollableScreenBuffer::getRight() const {
+	return right;
+}
+
+int ScrollableScreenBuffer::getTop() const {
+	return top;
+}
+
+int ScrollableScreenBuffer::getBottom() const {
+	return bottom;
+}
+
+Pos<double> ScrollableScreenBuffer::getCenter() const {
+	return center;
+}
+
+Pos<double>& ScrollableScreenBuffer::validatePos(Pos<double>& pos) {
+	pos.X = (std::max)((std::min)(1., pos.X), 0.);
+	pos.Y = (std::max)((std::min)(1., pos.Y), 0.);
+	return pos;
+}
+
+int ScrollableScreenBuffer::validateAbsolutePosX(int X) {
+	return (std::max)((std::min)(consoleSize.X, X), 0);
+}
+
+int ScrollableScreenBuffer::validateAbsolutePosY(int Y) {
+	return (std::max)((std::min)(consoleSize.Y, Y), 0);
 }

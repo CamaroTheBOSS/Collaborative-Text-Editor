@@ -13,8 +13,8 @@ Application::Application() :
     terminal(),
     windows(),
     repo() {
-    windows.emplace_back(std::make_unique<TextEditorWindow>());
-    terminal.resizeScreenBufferIfNeeded(windows[0]);
+    COORD consoleSize = terminal.getScreenSize();
+    windows.emplace_back(std::make_unique<TextEditorWindow>(Pos<double>(0.1, 0.1), Pos<double>(0.9, 0.9), Pos<int>{consoleSize.X, consoleSize.Y}));
 }
 
 bool Application::connect(const std::string& ip, const int port) {
@@ -33,17 +33,56 @@ KeyPack Application::readChar() const {
     return terminal.readChar();
 }
 
-bool Application::processChar(const KeyPack& key) {
+void Application::changeFocusUp() {
+    double curr = windows[focus]->getBuffer().getCenter().Y;
+    for (int i = 0; i < windows.size(); i++) {
+        double other = windows[i]->getBuffer().getCenter().Y;
+        if (other <= curr) {
+            curr = other;
+            focus = i;
+        }
+    }
+}
+
+void Application::changeFocusDown() {
+    double curr = windows[focus]->getBuffer().getCenter().Y;
+    for (int i = 0; i < windows.size(); i++) {
+        double other = windows[i]->getBuffer().getCenter().Y;
+        if (other > curr) {
+            curr = other;
+            focus = i;
+        }
+    }
+}
+
+ActionDone Application::processChar(const KeyPack& key) {
     switch (key.keyCode) {
     case CTRL_V:
         return windows[focus]->processChar(client, key, terminal.getClipboardData());
     case CTRL_C:
-        return terminal.setClipboardData(windows[focus]->getDoc().getSelectedText());
+        terminal.setClipboardData(windows[focus]->getDoc().getSelectedText());
+        return ActionDone::done;
     case CTRL_X:
         terminal.setClipboardData(windows[focus]->getDoc().getSelectedText());
         return windows[focus]->processChar(client, key);
     }
-    return windows[focus]->processChar(client, key);
+    auto actionDone = windows[focus]->processChar(client, key);
+    if (actionDone == ActionDone::up) {
+        changeFocusUp();
+    }
+    else if (actionDone == ActionDone::down) {
+        changeFocusDown();
+    }
+    return actionDone;
+}
+
+bool Application::checkBufferWasResized() {
+    bool screenResized = terminal.resizeScreenBufferIfNeeded();
+    if (screenResized) {
+        COORD newConsoleSize = terminal.getScreenSize();
+        windows[0]->getBuffer().setNewConsoleSize({ newConsoleSize.X, newConsoleSize.Y });
+    }
+    return screenResized;
 }
 
 bool Application::checkIncomingMessages() {
@@ -55,7 +94,7 @@ bool Application::checkIncomingMessages() {
         }
         needRender += repo.processMsg(windows[0]->getDoc(), msgBuffer);
     }
-    needRender += terminal.resizeScreenBufferIfNeeded(windows[0]);
+    needRender += checkBufferWasResized();
     return needRender;
 }
 

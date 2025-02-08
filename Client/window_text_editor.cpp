@@ -5,37 +5,58 @@ constexpr msg::OneByteInt version = 1;
 TextEditorWindow::TextEditorWindow() :
     BaseWindow() {}
 
-bool TextEditorWindow::processChar(TCPClient& client, const KeyPack& key, const std::string& clipboardData) {
-    
+TextEditorWindow::TextEditorWindow(const Pos<double>& leftTop, const Pos<double>& rightBottom, const Pos<int>& consoleSize) :
+    BaseWindow(leftTop, rightBottom, consoleSize) {}
+
+ActionDone TextEditorWindow::processChar(TCPClient& client, const KeyPack& key, const std::string& clipboardData) {
     if (key.keyCode >= 32 && key.keyCode <= 127) {
-        return client.sendMsg(msg::Type::write, version, std::string{""}, std::string(1, key.keyCode));
+        client.sendMsg(msg::Type::write, version, std::string{""}, std::string(1, key.keyCode));
+        return ActionDone::done;
     }
+    bool actionDone = false;
     switch (key.keyCode) {
     case ENTER:
-        return client.sendMsg(msg::Type::write, version, std::string{""}, std::string{'\n'});
+        actionDone = client.sendMsg(msg::Type::write, version, std::string{""}, std::string{'\n'});
+        break;
     case TABULAR:
-        return client.sendMsg(msg::Type::write, version, std::string{""}, std::string{"    "});
+        actionDone = client.sendMsg(msg::Type::write, version, std::string{""}, std::string{"    "});
+        break;
     case BACKSPACE:
-        return client.sendMsg(msg::Type::erase, version, std::string{""}, static_cast<unsigned int>(1));
+        actionDone = client.sendMsg(msg::Type::erase, version, std::string{""}, static_cast<unsigned int>(1));
+        break;
     case ARROW_LEFT:
-        return client.sendMsg(msg::Type::moveHorizontal, version, std::string{""}, msg::MoveSide::left, key.shiftPressed);
+        actionDone = client.sendMsg(msg::Type::moveHorizontal, version, std::string{""}, msg::MoveSide::left, key.shiftPressed);
+        break;
     case ARROW_RIGHT:
-        return client.sendMsg(msg::Type::moveHorizontal, version, std::string{""}, msg::MoveSide::right, key.shiftPressed);
+        actionDone = client.sendMsg(msg::Type::moveHorizontal, version, std::string{""}, msg::MoveSide::right, key.shiftPressed);
+        break;
     case ARROW_UP:
-        return client.sendMsg(msg::Type::moveVertical, version, std::string{""}, msg::MoveSide::up, getDocBufferWidth(), key.shiftPressed);
+        actionDone = client.sendMsg(msg::Type::moveVertical, version, std::string{""}, msg::MoveSide::up, getDocBufferWidth(), key.shiftPressed);
+        break;
     case ARROW_DOWN:
-        return client.sendMsg(msg::Type::moveVertical, version, std::string{""}, msg::MoveSide::down, getDocBufferWidth(), key.shiftPressed);
+        actionDone = client.sendMsg(msg::Type::moveVertical, version, std::string{""}, msg::MoveSide::down, getDocBufferWidth(), key.shiftPressed);
+        break;
+    case CTRL_ARROW_DOWN:
+        return ActionDone::down;
+    case CTRL_ARROW_UP:
+        return ActionDone::up;
     case CTRL_A:
-        return client.sendMsg(msg::Type::selectAll, version, std::string{""});
+        actionDone = client.sendMsg(msg::Type::selectAll, version, std::string{""});
+        break;
     case CTRL_V:
-        return client.sendMsg(msg::Type::write, version, std::string{""}, clipboardData);
+        actionDone = client.sendMsg(msg::Type::write, version, std::string{""}, clipboardData);
+        break;
     case CTRL_X:
-        return client.sendMsg(msg::Type::erase, version, std::string{""}, static_cast<unsigned int>(1));
+        actionDone = client.sendMsg(msg::Type::erase, version, std::string{""}, static_cast<unsigned int>(1));
+        break;
     case CTRL_Z:
         if (key.shiftPressed) {
-            return client.sendMsg(msg::Type::redo, version, std::string{""});
+            actionDone = client.sendMsg(msg::Type::redo, version, std::string{""});
         }
-        return client.sendMsg(msg::Type::undo, version, std::string{""});
+        else {
+            actionDone = client.sendMsg(msg::Type::undo, version, std::string{""});
+        }
+        break;
     }
-    return false;
+    return actionDone ? ActionDone::done : ActionDone::undone;
 }

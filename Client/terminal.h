@@ -16,12 +16,14 @@ public:
 	void clear() const;
 	std::string getClipboardData() const;
 	bool setClipboardData(const std::string& txt) const;
-	bool resizeScreenBufferIfNeeded(const std::unique_ptr<BaseWindow>& window);
+	bool resizeScreenBufferIfNeeded();
+	COORD getScreenSize() const;
 private:
 
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_SCREEN_BUFFER_INFO screenInfo{};
 	CONSOLE_CURSOR_INFO cursorInfo{};
+	COORD screenSize{ 0, 0 };
 
 	Renderer renderer;
 };

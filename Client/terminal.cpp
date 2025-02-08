@@ -48,9 +48,14 @@ Terminal::~Terminal() {
     auto stdInput = GetStdHandle(STD_INPUT_HANDLE);
     GetConsoleMode(stdInput, &currMode);
     SetConsoleMode(stdInput, currMode | features);
+    resizeScreenBufferIfNeeded();
 }
 
-bool Terminal::resizeScreenBufferIfNeeded(const std::unique_ptr<BaseWindow>& window) {
+COORD Terminal::getScreenSize() const {
+    return screenSize;
+}
+
+bool Terminal::resizeScreenBufferIfNeeded() {
     CONSOLE_SCREEN_BUFFER_INFO newScreenInfo;
     GetConsoleScreenBufferInfo(hConsole, &newScreenInfo);
     if (screenBuffersEqual(screenInfo.srWindow, newScreenInfo.srWindow)) {
@@ -62,12 +67,8 @@ bool Terminal::resizeScreenBufferIfNeeded(const std::unique_ptr<BaseWindow>& win
     };
     SetConsoleScreenBufferSize(hConsole, size);
     SetConsoleCursorInfo(hConsole, &cursorInfo);
-    auto& docBuffer = window->getBuffer();
-    docBuffer.top = newScreenInfo.srWindow.Top + 3;
-    docBuffer.bottom = newScreenInfo.srWindow.Bottom - 3;
-    docBuffer.right = newScreenInfo.srWindow.Right - 10;
-    docBuffer.left = newScreenInfo.srWindow.Left + 10;
     screenInfo = std::move(newScreenInfo);
+    screenSize = std::move(size);
     clear();
     return true;
 }

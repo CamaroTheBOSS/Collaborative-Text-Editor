@@ -6,6 +6,9 @@
 #define ARROW_LEFT 1299
 #define ARROW_RIGHT 1301
 
+#define CTRL_ARROW_UP 1365
+#define CTRL_ARROW_DOWN 1369
+
 #define CTRL_A 1
 #define CTRL_C 3
 #define CTRL_V 22
@@ -16,6 +19,8 @@
 #define TABULAR 9
 #define ENTER 13
 #define ESC 27
+
+#define F3 1061
 
 struct KeyPack {
 	int keyCode;

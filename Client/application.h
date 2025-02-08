@@ -13,11 +13,14 @@ public:
 	bool disconnect();
 	bool isConnected() const;
 	KeyPack readChar() const;
-	bool processChar(const KeyPack& key);
+	ActionDone processChar(const KeyPack& key);
 	bool checkIncomingMessages();
+	bool checkBufferWasResized();
 	bool requestDocument(const std::chrono::milliseconds& timeout, const int tries);
 	void render();
 private:
+	void changeFocusUp();
+	void changeFocusDown();
 	TCPClient client;
 	Terminal terminal;
 	int focus = 0;
