@@ -17,6 +17,7 @@ Application::Application() :
     COORD consoleSize = terminal.getScreenSize();
     ScrollableScreenBufferBuilder builder;
     builder.showLineNumbers()
+        .setScrollHisteresis(2)
         .setRelativeLeft(0.1)
         .setRelativeTop(0.1)
         .setRelativeRight(0.9)

@@ -38,5 +38,5 @@ private:
     std::string topFramePattern;
     std::string botFramePattern;
 
-    int scrollHisteresis;
+    int scrollHisteresis = 2;
 };
