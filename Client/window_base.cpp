@@ -3,9 +3,9 @@
 BaseWindow::BaseWindow() :
     doc() {}
 
-BaseWindow::BaseWindow(const Pos<double>& leftTop, const Pos<double>& rightBottom, const Pos<int>& consoleSize) :
+BaseWindow::BaseWindow(const ScrollableScreenBufferBuilder& ssbBuilder) :
     doc(),
-    buffer(leftTop, rightBottom, consoleSize) {}
+    buffer(ssbBuilder.getResult()) {}
 
 bool BaseWindow::saveDoc() const {
     std::ofstream file(doc.getFilename(), std::ios::out);

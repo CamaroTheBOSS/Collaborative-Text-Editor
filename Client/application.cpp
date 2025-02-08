@@ -15,7 +15,15 @@ Application::Application() :
     windows(),
     repo() {
     COORD consoleSize = terminal.getScreenSize();
-    windows.emplace_back(std::make_unique<TextEditorWindow>(Pos<double>(0.1, 0.1), Pos<double>(0.9, 0.9), Pos<int>{consoleSize.X, consoleSize.Y}));
+    ScrollableScreenBufferBuilder builder;
+    builder.showLineNumbers()
+        .setRelativeLeft(0.1)
+        .setRelativeTop(0.1)
+        .setRelativeRight(0.9)
+        .setRelativeBot(0.9)
+        .setConsoleSize(Pos<int>{consoleSize.X, consoleSize.Y})
+        .showLeftFramePattern("|");
+    windows.emplace_back(std::make_unique<TextEditorWindow>(builder));
 }
 
 bool Application::connect(const std::string& ip, const int port) {
@@ -66,9 +74,6 @@ ActionDone Application::processChar(const KeyPack& key) {
     case CTRL_X:
         terminal.setClipboardData(windows[focus]->getDoc().getSelectedText());
         return windows[focus]->processChar(client, key);
-   /* case F3:
-        COORD consoleSize = terminal.getScreenSize();
-        windows.emplace_back(std::make_unique<SearchWindow>(Pos<double>(0.3, 0.7), Pos<double>(0.7, 0.9), Pos<int>{consoleSize.X, consoleSize.Y}));*/
     }
     auto actionDone = windows[focus]->processChar(client, key);
     if (actionDone == ActionDone::up) {

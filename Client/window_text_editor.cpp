@@ -5,8 +5,8 @@ constexpr msg::OneByteInt version = 1;
 TextEditorWindow::TextEditorWindow() :
     BaseWindow() {}
 
-TextEditorWindow::TextEditorWindow(const Pos<double>& leftTop, const Pos<double>& rightBottom, const Pos<int>& consoleSize) :
-    BaseWindow(leftTop, rightBottom, consoleSize) {}
+TextEditorWindow::TextEditorWindow(const ScrollableScreenBufferBuilder& ssbBuilder) :
+    BaseWindow(ssbBuilder) {}
 
 ActionDone TextEditorWindow::processChar(TCPClient& client, const KeyPack& key, const std::string& clipboardData) {
     if (key.keyCode >= 32 && key.keyCode <= 127) {

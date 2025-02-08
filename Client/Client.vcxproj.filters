@@ -42,9 +42,6 @@
     <ClCompile Include="renderer.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
-    <ClCompile Include="screen_buffers.cpp">
-      <Filter>Pliki źródłowe</Filter>
-    </ClCompile>
     <ClCompile Include="application.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
@@ -60,6 +57,12 @@
     <ClCompile Include="window_search.cpp">
       <Filter>Pliki źródłowe\Windows</Filter>
     </ClCompile>
+    <ClCompile Include="screen_buffers.cpp">
+      <Filter>Pliki źródłowe\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="screen_buffers_builder.cpp">
+      <Filter>Pliki źródłowe\Windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="terminal.h">
@@ -72,9 +75,6 @@
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
     <ClInclude Include="renderer.h">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
-    <ClInclude Include="screen_buffers.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
     <ClInclude Include="application.h">
@@ -93,6 +93,12 @@
       <Filter>Pliki nagłówkowe\Windows</Filter>
     </ClInclude>
     <ClInclude Include="window_search.h">
+      <Filter>Pliki nagłówkowe\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="screen_buffers.h">
+      <Filter>Pliki nagłówkowe\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="screen_buffers_builder.h">
       <Filter>Pliki nagłówkowe\Windows</Filter>
     </ClInclude>
   </ItemGroup>

@@ -3,11 +3,6 @@
 #include "client_document.h"
 
 using TextLines = std::vector<std::string>;
-template <typename T> 
-struct Pos {
-    T X{ 0 };
-    T Y{ 0 };
-};
 
 struct RenderCursor {
     RenderCursor(const COORD& pos, const char pointedChar, const int indexInDoc) :
@@ -19,11 +14,16 @@ struct RenderCursor {
     int indexInDoc;
 };
 
+template <typename T>
+struct Pos {
+    T X{ 0 };
+    T Y{ 0 };
+};
+
 class ScrollableScreenBuffer {
 public:
+    friend class ScrollableScreenBufferBuilder;
     ScrollableScreenBuffer() = default;
-    ScrollableScreenBuffer(const Pos<double>& leftTop, const Pos<double>& rightBottom, const Pos<int>& consoleSize);
-    ScrollableScreenBuffer(const int newLeft, const int newTop, const int newRight, const int newBottom, const Pos<int>& consoleSize);
     COORD getStartPos() const;
     COORD getEndPos() const;
     COORD getTerminalCursorPos(ClientSiteDocument& doc, const COORD& docCursor) const;
@@ -69,6 +69,10 @@ private:
     Pos<double> rightBottom;
     Pos<double> center;
 
-    bool showLineNumbers = true;
-    const std::string lineNumberSuffix = "|";
+    // Buffer format
+    bool showLineNumbers = false;
+    std::string leftFramePattern;
+    std::string rightFramePattern;
+    std::string topFramePattern;
+    std::string botFramePattern;
 };

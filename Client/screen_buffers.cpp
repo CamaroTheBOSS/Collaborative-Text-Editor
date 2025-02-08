@@ -1,16 +1,5 @@
 #include "screen_buffers.h"
 
-
-ScrollableScreenBuffer::ScrollableScreenBuffer(const Pos<double>& leftTop, const Pos<double>& rightBottom, const Pos<int>& consoleSize):
-	consoleSize(consoleSize) {
-	setBufferSize(leftTop, rightBottom);
-}
-
-ScrollableScreenBuffer::ScrollableScreenBuffer(const int newLeft, const int newTop, const int newRight, const int newBottom, const Pos<int>& consoleSize):
-	consoleSize(consoleSize) {
-	setBufferAbsoluteSize(newLeft, newTop, newRight, newBottom);
-}
-
 void ScrollableScreenBuffer::moveHorizontal(const int units) {
 	setBufferAbsoluteSize(left + units, top, right + units, bottom);
 }
@@ -102,9 +91,9 @@ std::pair<ScrollableScreenBuffer, TextLines> ScrollableScreenBuffer::getLineNumb
 	}
 	int screenHeight = height();
 	int lastLineIndex = scroll + screenHeight + 1;
-	int desiredSize = std::to_string(lastLineIndex).size() + lineNumberSuffix.size() + 1;
+	int desiredSize = std::to_string(lastLineIndex).size() + leftFramePattern.size() + 1;
 	for (int n = scroll + 1; n <= lastLineIndex; n++) {
-		std::string base = std::to_string(n) + lineNumberSuffix;
+		std::string base = std::to_string(n) + leftFramePattern;
 		std::string line = std::string(desiredSize - base.size(), ' ') + base;
 		textLines.emplace_back(std::move(line));
 	}

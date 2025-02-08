@@ -5,8 +5,8 @@ constexpr msg::OneByteInt version = 1;
 SearchWindow::SearchWindow() :
     BaseWindow() {}
 
-SearchWindow::SearchWindow(const Pos<double>& leftTop, const Pos<double>& rightBottom, const Pos<int>& consoleSize) :
-    BaseWindow(leftTop, rightBottom, consoleSize) {}
+SearchWindow::SearchWindow(const ScrollableScreenBufferBuilder& ssbBuilder) :
+    BaseWindow(ssbBuilder) {}
 
 ActionDone SearchWindow::processChar(TCPClient& client, const KeyPack& key, const std::string& clipboardData) {
     if (key.keyCode >= 32 && key.keyCode <= 127) {
