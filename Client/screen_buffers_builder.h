@@ -9,6 +9,7 @@ public:
     ScrollableScreenBufferBuilder& showRightFramePattern(const std::string& pattern);
     ScrollableScreenBufferBuilder& showTopFramePattern(const std::string& pattern);
     ScrollableScreenBufferBuilder& showBottomFramePattern(const std::string& pattern);
+    ScrollableScreenBufferBuilder& setTitle(const std::string& newTitle);
     ScrollableScreenBufferBuilder& setScrollHisteresis(const int val);
     ScrollableScreenBufferBuilder& setAbsoluteTop(const int val);
     ScrollableScreenBufferBuilder& setAbsoluteBot(const int val);
@@ -37,6 +38,7 @@ private:
     std::string rightFramePattern;
     std::string topFramePattern;
     std::string botFramePattern;
+    std::string title;
 
     int scrollHisteresis = 2;
 };

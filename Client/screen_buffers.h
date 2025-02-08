@@ -83,6 +83,7 @@ private:
     std::string rightFramePattern;
     std::string topFramePattern;
     std::string botFramePattern;
+    std::string title;
 };
 
 struct Frame {

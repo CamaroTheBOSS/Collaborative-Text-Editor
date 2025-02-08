@@ -17,6 +17,7 @@ Application::Application() :
     COORD consoleSize = terminal.getScreenSize();
     ScrollableScreenBufferBuilder builder;
     builder.showLineNumbers()
+        .setTitle("Document")
         .setScrollHisteresis(2)
         .setRelativeLeft(0.1)
         .setRelativeTop(0.1)
@@ -168,6 +169,7 @@ void Application::showSearchWindow() {
     COORD consoleSize = terminal.getScreenSize();
     ScrollableScreenBufferBuilder builder;
     builder.setScrollHisteresis(0)
+        .setTitle(SearchWindow::className)
         .setRelativeLeft(0.4)
         .setRelativeTop(0.8)
         .setRelativeRight(0.6)

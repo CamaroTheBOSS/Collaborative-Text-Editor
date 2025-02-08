@@ -10,5 +10,5 @@ public:
 	std::string name() const override {
 		return className;
 	}
-	static constexpr const char* className = "SearchWindow";
+	static constexpr const char* className = "Search Window";
 };

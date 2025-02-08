@@ -273,7 +273,13 @@ Frame ScrollableScreenBuffer::getTopFrame() const {
 	}
 	ScrollableScreenBuffer buffer = *this;
 	buffer.setBufferAbsoluteSize(left - leftFramePattern.size(), top - 1, right + rightFramePattern.size(), top - 1);
-	return { std::move(buffer), getHorizontalFrame(topFramePattern) };
+	auto topLine = getHorizontalFrame(topFramePattern);
+	if (!title.empty() && title.size() < topLine[0].size()) {
+		topLine[0].insert((topLine[0].size() - title.size()) / 2, title);
+		topLine[0].erase(topLine[0].size() - title.size());
+	}
+	
+	return { std::move(buffer), std::move(topLine) };
 }
 
 Frame ScrollableScreenBuffer::getBottomFrame() const {

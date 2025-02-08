@@ -20,6 +20,10 @@ ScrollableScreenBufferBuilder& ScrollableScreenBufferBuilder::showBottomFramePat
 	botFramePattern = pattern;
 	return *this;
 }
+ScrollableScreenBufferBuilder& ScrollableScreenBufferBuilder::setTitle(const std::string& newTitle) {
+	title = newTitle;
+	return *this;
+}
 ScrollableScreenBufferBuilder& ScrollableScreenBufferBuilder::setScrollHisteresis(const int val) {
 	scrollHisteresis = val;
 	return *this;
@@ -63,6 +67,7 @@ ScrollableScreenBufferBuilder& ScrollableScreenBufferBuilder::setConsoleSize(con
 
 ScrollableScreenBuffer ScrollableScreenBufferBuilder::getResult() const {
 	ScrollableScreenBuffer buffer;
+	buffer.title = title;
 	buffer.scrollHisteresis = scrollHisteresis;
 	buffer.showLineNumbers = lineNumbers;
 	buffer.botFramePattern = botFramePattern;
