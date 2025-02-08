@@ -10,5 +10,5 @@ public:
 	ClientSiteDocument(const std::string& text, const int cursors, const int myUserIdx);
 	ClientSiteDocument& operator=(const ClientSiteDocument& other);
 	ClientSiteDocument& operator=(ClientSiteDocument&& other) noexcept;
-private:
+	TextContainer::Segments findSegments(const std::string& pattern);
 };

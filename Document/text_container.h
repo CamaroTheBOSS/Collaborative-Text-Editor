@@ -5,6 +5,7 @@
 
 class TextContainer {
 public:
+	using Segments = std::vector<std::pair<COORD, COORD>>;
 	TextContainer();
 	TextContainer(const std::string& initText);
 	TextContainer(std::vector<std::string>& initText);
@@ -17,6 +18,7 @@ public:
 	std::pair<int, std::string> eraseLine(const int col);
 	std::vector<std::string> eraseLines(const int start, const int end);
 
+	Segments findAll(const std::string& pattern) const;
 	std::string getLine(const int col) const;
 	std::string getText() const;
 	std::string getTextBetween(const COORD pos1, const COORD pos2) const;

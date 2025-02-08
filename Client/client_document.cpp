@@ -30,3 +30,7 @@ ClientSiteDocument& ClientSiteDocument::operator=(ClientSiteDocument&& other) no
 	myUserIdx = std::move(other.myUserIdx);
 	return *this;
 }
+
+TextContainer::Segments ClientSiteDocument::findSegments(const std::string& pattern) {
+	return container.findAll(pattern);
+}
