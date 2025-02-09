@@ -2,30 +2,30 @@
 #include "pos_helpers.h"
 
 ServerSiteDocument::ServerSiteDocument() :
-	BaseDocument() {}
+	BaseDocument() {
+	addUser();
+}
 
 ServerSiteDocument::ServerSiteDocument(const std::string& text) :
-	BaseDocument(text) {}
+	BaseDocument(text) {
+	addUser();
+}
 
 ServerSiteDocument::ServerSiteDocument(const std::string& text, const int nCursors, const int myUserIdx) :
-	BaseDocument(text, nCursors, myUserIdx) {}
+	BaseDocument(text, nCursors, myUserIdx) {
+	for (int i = 0; i < nCursors; i++) {
+		addUser();
+	}
+}
 
 ServerSiteDocument::ServerSiteDocument(const std::string& text, const int nCursors, const int myUserIdx, const history::HistoryManagerOptions& historyManagerOptions) :
 	BaseDocument(text, nCursors, myUserIdx),
-	historyManager(historyManagerOptions) {}
-
-ServerSiteDocument::ServerSiteDocument(ServerSiteDocument&& other) noexcept :
-	BaseDocument(std::move(other)),
-	historyManager(std::move(other.historyManager)) {}
-
-ServerSiteDocument& ServerSiteDocument::operator=(ServerSiteDocument&& other) noexcept {
-	container = std::move(other.container);
-	users = std::move(other.users);
-	filename = std::move(other.filename);
-	myUserIdx = other.myUserIdx;
-	historyManager = std::move(other.historyManager);
-	return *this;
+	historyManager(historyManagerOptions) {
+	for (int i = 0; i < nCursors; i++) {
+		addUser();
+	}
 }
+
 
 bool ServerSiteDocument::addUser() {
 	users.emplace_back(User());
@@ -70,11 +70,11 @@ UndoReturn ServerSiteDocument::redo(const int index) {
 	return ret;
 }
 
-void ServerSiteDocument::pushWriteAction(const int index, const COORD& startPos, std::vector<std::string>& text, TextContainer* target) {
-	historyManager.pushWriteAction(index, startPos, text, target);
+void ServerSiteDocument::afterWriteAction(const int index, const COORD& startPos, const COORD& endPos, std::vector<std::string>& writtenText) {
+	historyManager.pushWriteAction(index, startPos, writtenText, &container);
 }
 
-void ServerSiteDocument::pushEraseAction(const int index, const COORD& startPos, const COORD& endPos, std::vector<std::string>& text, TextContainer* target) {
-	historyManager.pushEraseAction(index, startPos, endPos, text, target);
+void ServerSiteDocument::afterEraseAction(const int index, const COORD& startPos, const COORD& endPos, std::vector<std::string>& erasedText) {
+	historyManager.pushEraseAction(index, startPos, endPos, erasedText, &container);
 }
 

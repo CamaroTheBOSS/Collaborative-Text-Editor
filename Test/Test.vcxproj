@@ -57,6 +57,18 @@
     <ProjectReference Include="..\Client\Client.vcxproj">
       <Project>{c6b1bf4f-d67b-4e55-8406-844f408affa2}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\Document\Document.vcxproj">
+      <Project>{35fff3d9-a0de-44f8-8c78-8c731a78fd27}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Protocol\Protocol.vcxproj">
+      <Project>{678f5027-d666-49f3-8f8f-07bdfbb01944}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\RandomEngine\RandomEngine.vcxproj">
+      <Project>{20d36ff5-b69d-4f25-8c7e-8a99ae6d8e86}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Server\Server.vcxproj">
+      <Project>{17b3342d-55ff-40b6-917d-eaf43c7fe265}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemDefinitionGroup />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
@@ -88,17 +100,19 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>..\Client;..\Document;..\Protocol;..\RandomEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Client;..\Document;..\Protocol;..\RandomEngine;..\Server;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>..\$(IntDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Document.lib;Client.lib;Protocol.lib;RandomEngine.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Document.lib;Client.lib;Protocol.lib;RandomEngine.lib;Server.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreLinkEvent>
       <Command>\cmd &amp; "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.36.32532\bin\HostX64\x64\lib.exe" /OUT:D:\Code\CollaborativeTextEditor\$(IntDir)Client.lib ..\Client\$(IntDir)*.obj
-\cmd &amp; "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.36.32532\bin\HostX64\x64\lib.exe" D:\Code\CollaborativeTextEditor\$(IntDir)Client.lib /REMOVE:..\Client\$(IntDir)main.obj</Command>
+\cmd &amp; "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.36.32532\bin\HostX64\x64\lib.exe" D:\Code\CollaborativeTextEditor\$(IntDir)Client.lib /REMOVE:..\Client\$(IntDir)main.obj
+\cmd &amp; "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.36.32532\bin\HostX64\x64\lib.exe" /OUT:D:\Code\CollaborativeTextEditor\$(IntDir)Server.lib ..\Server\$(IntDir)*.obj
+\cmd &amp; "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.36.32532\bin\HostX64\x64\lib.exe" D:\Code\CollaborativeTextEditor\$(IntDir)Server.lib /REMOVE:..\Server\$(IntDir)main.obj</Command>
     </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -126,7 +140,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>..\Client;..\Document;..\Protocol;..\RandomEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Client;..\Document;..\Protocol;..\RandomEngine;..\Server;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -134,11 +148,13 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <AdditionalLibraryDirectories>..\$(IntDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Document.lib;Client.lib;Protocol.lib;RandomEngine.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Document.lib;Client.lib;Protocol.lib;RandomEngine.lib;Server.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreLinkEvent>
       <Command>\cmd &amp; "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.36.32532\bin\HostX64\x64\lib.exe" /OUT:D:\Code\CollaborativeTextEditor\$(IntDir)Client.lib ..\Client\$(IntDir)*.obj
-\cmd &amp; "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.36.32532\bin\HostX64\x64\lib.exe" D:\Code\CollaborativeTextEditor\$(IntDir)Client.lib /REMOVE:..\Client\$(IntDir)main.obj</Command>
+\cmd &amp; "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.36.32532\bin\HostX64\x64\lib.exe" D:\Code\CollaborativeTextEditor\$(IntDir)Client.lib /REMOVE:..\Client\$(IntDir)main.obj
+\cmd &amp; "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.36.32532\bin\HostX64\x64\lib.exe" /OUT:D:\Code\CollaborativeTextEditor\$(IntDir)Server.lib ..\Server\$(IntDir)*.obj
+\cmd &amp; "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.36.32532\bin\HostX64\x64\lib.exe" D:\Code\CollaborativeTextEditor\$(IntDir)Server.lib /REMOVE:..\Server\$(IntDir)main.obj</Command>
     </PreLinkEvent>
   </ItemDefinitionGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

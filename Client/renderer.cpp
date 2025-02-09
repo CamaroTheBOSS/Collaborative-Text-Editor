@@ -12,16 +12,24 @@ void Renderer::render(const std::unique_ptr<BaseWindow>& window) const {
     auto& doc = window->getDoc();
     auto visibleLines = buffer.getTextInBuffer(doc);
     auto frames = buffer.getFrames();
+    // Render basic text + frame if applicable
     renderText(buffer, visibleLines, buffer.getStartPos(), buffer.getEndPos());
     for (const auto& frame : frames) {
         if (!frame.text.empty() && frame.buffer.fitInConsole()) {
             renderText(frame.buffer, frame.text, frame.buffer.getStartPos(), frame.buffer.getEndPos());
         }
     }
+    // Render found segments if applicable
+    auto& segments = doc.getSegments();
+    auto terminalSegments = buffer.getSegmentsTerminalCursorPos(doc, segments);
+    for (const auto& segment : terminalSegments) {
+        renderSelection(visibleLines, buffer, segment.first, segment.second, colors[doc.getMyCursor()]);
+    }
+    
     if (!window->isActive()) {
         return;
     }
-
+    // Render selection if applicable
     auto cursors = buffer.getTerminalCursors(doc);
     auto myCursorSelectionAnchor = doc.getCursorSelectionAnchor(doc.getMyCursor());
     if (myCursorSelectionAnchor.has_value()) {
@@ -29,6 +37,7 @@ void Renderer::render(const std::unique_ptr<BaseWindow>& window) const {
         renderSelection(visibleLines, buffer, cursors[doc.getMyCursor()].pos, terminalSelectionAnchor, colors[doc.getMyCursor()]);
     }
     
+    // Render cursors if applicable
     auto nCursors = (std::min)(cursors.size(), colors.size());
     for (int i = 0; i < nCursors; i++) {
         renderCursor(buffer, cursors[i], colors[i]);

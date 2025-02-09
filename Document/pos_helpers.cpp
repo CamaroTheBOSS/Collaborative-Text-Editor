@@ -63,3 +63,7 @@ bool posBetween(const COORD& pos, const COORD& first, const COORD& second) {
 	auto [left, right] = getAscendingOrder(first, second);
 	return *left < pos && pos < *right;
 }
+
+bool segmentsIntersect(const COORD& s1, const COORD& e1, const COORD& s2, const COORD& e2) {
+	return posBetween(s1, s2, e2) || posBetween(e1, s2, e2) || posBetween(s2, s1, e1) || posBetween(e2, s1, e1);
+}

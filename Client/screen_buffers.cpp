@@ -67,6 +67,56 @@ COORD ScrollableScreenBuffer::getTerminalCursorPos(ClientSiteDocument& doc, cons
 	return terminalCursor;
 }
 
+std::vector<std::pair<COORD, COORD>> ScrollableScreenBuffer::getSegmentsTerminalCursorPos(ClientSiteDocument& doc, const TextContainer::Segments& segments) const {
+	int screenWidth = width();
+	if (screenWidth <= 0) {
+		return {};
+	}
+	const auto& data = doc.get();
+	int docCurrentY = 0;
+	std::vector<std::pair<COORD, COORD>> terminalCursorPairs;
+	COORD terminalCursor1{ 0, top - scroll };
+	COORD terminalCursor2{ 0, top - scroll };
+	for (int i = 0; i < segments.size(); i++) {
+		if (docCurrentY >= data.size()) {
+			break;
+		}
+		auto& docCursor1 = segments[i].first;
+		auto& docCursor2 = segments[i].second;
+		if (docCursor1.X < 0 || docCursor2.X < 0 || docCurrentY > docCursor1.Y || docCurrentY > docCursor2.Y) {
+			continue;
+		}
+		for (docCurrentY; docCurrentY <= docCursor1.Y; docCurrentY++) {
+			if (docCurrentY >= data.size()) {
+				break;
+			}
+			bool endlPresent1 = docCurrentY != docCursor1.Y;
+			bool endlPresent2 = docCurrentY != docCursor2.Y;
+			int base1 = docCurrentY != docCursor1.Y ? data[docCurrentY].size() : docCursor1.X;
+			int base2 = docCurrentY != docCursor2.Y ? data[docCurrentY].size() : docCursor2.X;
+			terminalCursor1.Y += base1 / screenWidth + endlPresent1;
+			terminalCursor2.Y += base2 / screenWidth + endlPresent2;
+			if (data[docCurrentY].size() == screenWidth && endlPresent1) {
+				terminalCursor1.Y--;
+			}
+			if (data[docCurrentY].size() == screenWidth && endlPresent2) {
+				terminalCursor2.Y--;
+			}
+		}
+		docCurrentY--;
+		if (terminalCursor1.Y < top) {
+			continue;
+		}
+		if (terminalCursor1.Y > bottom) {
+			break;
+		}
+		terminalCursor1.X = left + (docCursor1.X % screenWidth);
+		terminalCursor2.X = left + (docCursor2.X % screenWidth);
+		terminalCursorPairs.emplace_back(std::make_pair(terminalCursor1, terminalCursor2));
+	}
+	return terminalCursorPairs;
+}
+
 RenderCursor ScrollableScreenBuffer::getTerminalCursor(ClientSiteDocument& doc, const int cursor) const {
 	auto terminalCursor = getTerminalCursorPos(doc, doc.getCursorPos(cursor));
 	return RenderCursor(terminalCursor, doc.getCharPointedByCursor(cursor), cursor);

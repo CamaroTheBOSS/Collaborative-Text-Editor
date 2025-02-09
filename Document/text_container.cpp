@@ -96,13 +96,14 @@ TextContainer::Segments TextContainer::findAll(const std::string& pattern) const
 	for (int i = 0; i < data.size(); i++) {
 		size_t pos = 0;
 		while (pos != std::string::npos) {
-			auto pos = data[i].find(pattern);
+			pos = data[i].find(pattern, pos);
 			if (pos == std::string::npos) {
 				break;
 			}
 			COORD start{ (SHORT)pos, (SHORT)i };
 			COORD end{ (SHORT)pos + pattern.size(), (SHORT)i};
 			segments.emplace_back(std::make_pair(std::move(start), std::move(end)));
+			pos++;
 		}
 	}
 	return segments;

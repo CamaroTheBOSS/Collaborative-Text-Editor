@@ -3,22 +3,31 @@
 constexpr msg::OneByteInt version = 1;
 
 SearchWindow::SearchWindow() :
-    BaseWindow() {}
+    BaseWindow(),
+    docToSearch(nullptr) {}
 
-SearchWindow::SearchWindow(const ScrollableScreenBufferBuilder& ssbBuilder) :
-    BaseWindow(ssbBuilder) {}
+SearchWindow::SearchWindow(const ScrollableScreenBufferBuilder& ssbBuilder, ClientSiteDocument* docToSearch) :
+    BaseWindow(ssbBuilder),
+    docToSearch(docToSearch) {}
+
+SearchWindow::~SearchWindow() {
+    docToSearch->resetSegments();
+}
 
 ActionDone SearchWindow::processChar(TCPClient& client, const KeyPack& key, const std::string& clipboardData) {
     if (key.keyCode >= 32 && key.keyCode <= 127) {
         doc.write(0, std::string(1, key.keyCode));
+        docToSearch->findSegments(doc.getText());
         return ActionDone::render;
     }
     switch (key.keyCode) {
     case TABULAR:
         doc.write(0, "    ");
+        docToSearch->findSegments(doc.getText());
         return ActionDone::render;
     case BACKSPACE:
         doc.erase(0, 1);
+        docToSearch->findSegments(doc.getText());
         return ActionDone::render;
     case ARROW_LEFT:
         doc.moveCursorLeft(0, key.shiftPressed);
@@ -42,9 +51,11 @@ ActionDone SearchWindow::processChar(TCPClient& client, const KeyPack& key, cons
         return ActionDone::render;
     case CTRL_V:
         doc.write(0, clipboardData);
+        docToSearch->findSegments(doc.getText());
         return ActionDone::render;
     case CTRL_X:
         doc.erase(0, 1);
+        docToSearch->findSegments(doc.getText());
         return ActionDone::render;
     }
     return ActionDone::undone;

@@ -1,36 +1,94 @@
 #include "client_document.h"
+#include "pos_helpers.h"
+
+std::pair<int, bool> binarySearchSegments(const TextContainer::Segments& segments, const int left, const int right, const COORD& pos) {
+	if (segments.empty()) {
+		return { -1, false };
+	}
+	if (left == right) {
+		return { left, false };
+	}
+	int center = left + (right - left) / 2;
+	if (segments[center].first >= pos) {
+		return binarySearchSegments(segments, left, center, pos);
+	}
+	else if (segments[center].second <= pos) {
+		return binarySearchSegments(segments, center + 1, right, pos);
+	}
+	return { center, true };
+}
 
 ClientSiteDocument::ClientSiteDocument() :
-	BaseDocument() {}
-
-ClientSiteDocument::ClientSiteDocument(const ClientSiteDocument& other) :
-	BaseDocument(other) {}
-
-ClientSiteDocument::ClientSiteDocument(ClientSiteDocument&& other) :
-	BaseDocument(std::move(other)) {}
+	BaseDocument() {
+	addUser();
+}
 
 ClientSiteDocument::ClientSiteDocument(const std::string& text) :
-	BaseDocument(text) {}
+	BaseDocument(text) {
+	addUser();
+}
 
 ClientSiteDocument::ClientSiteDocument(const std::string& text, const int nCursors, const int myUserIdx) :
-	BaseDocument(text, nCursors, myUserIdx) {}
-
-ClientSiteDocument& ClientSiteDocument::operator=(const ClientSiteDocument& other) {
-	container = other.container;
-	users = other.users;
-	filename = other.filename;
-	myUserIdx = other.myUserIdx;
-	return *this;
+	BaseDocument(text, nCursors, myUserIdx) {
+	for (int i = 0; i < nCursors; i++) {
+		addUser();
+	}
 }
 
-ClientSiteDocument& ClientSiteDocument::operator=(ClientSiteDocument&& other) noexcept {
-	container = std::move(other.container);
-	users = std::move(other.users);
-	filename = std::move(other.filename);
-	myUserIdx = std::move(other.myUserIdx);
-	return *this;
+void ClientSiteDocument::findSegments(const std::string& pattern) {
+	segments = container.findAll(pattern);
 }
 
-TextContainer::Segments ClientSiteDocument::findSegments(const std::string& pattern) {
-	return container.findAll(pattern);
+void ClientSiteDocument::resetSegments() {
+	segments.clear();
+}
+
+const TextContainer::Segments& ClientSiteDocument::getSegments() const {
+	return segments;
+}
+
+void ClientSiteDocument::moveSegment(std::pair<COORD, COORD>& segment, const COORD& startPos, const COORD& diff) const {
+	if (segment.first.Y == startPos.Y && segment.first.X >= startPos.X) {
+		segment.first = segment.first + diff;
+		segment.second = segment.second + diff;
+	}
+	else if (segment.first.Y > startPos.Y) {
+		segment.first = segment.first + COORD{ 0, diff.Y };
+		segment.second = segment.second + COORD{ 0, diff.Y };
+	}
+}
+
+void ClientSiteDocument::afterWriteAction(const int index, const COORD& startPos, const COORD& endPos, std::vector<std::string>& writtenText) {
+	if (segments.empty()) {
+		return;
+	}
+	COORD diff = endPos - startPos;
+	auto [closestSegment, toDelete] = binarySearchSegments(segments, 0, segments.size(), startPos);
+	int start = (std::max)(closestSegment, 0);
+	for (int i = start; i < segments.size(); i++) {
+		moveSegment(segments[i], startPos, diff);
+	}
+	if (toDelete) {
+		segments.erase(segments.cbegin() + closestSegment);
+	}
+}
+
+void ClientSiteDocument::afterEraseAction(const int index, const COORD& startPos, const COORD& endPos, std::vector<std::string>& erasedText) {
+	if (segments.empty()) {
+		return;
+	}
+	COORD diff = endPos - startPos;
+	auto [closestSegmnetToEnd, toDeleteEnd] = binarySearchSegments(segments, 0, segments.size(), endPos);
+	int start = (std::max)(closestSegmnetToEnd, 0);
+	std::vector<int> indexesToDelete;
+	for (int i = start; i < segments.size(); i++) {
+		if (segmentsIntersect(segments[i].first, segments[i].second, endPos, startPos)) {
+			indexesToDelete.push_back(i);
+			continue;
+		}
+		moveSegment(segments[i], startPos, diff);
+	}
+	for (int i = indexesToDelete.size() - 1; i >= 0; i--) {
+		segments.erase(segments.cbegin() + indexesToDelete[i]);
+	}
 }

@@ -10,6 +10,7 @@ class BaseWindow {
 public:
 	BaseWindow();
 	BaseWindow(const ScrollableScreenBufferBuilder& ssbBuilder);
+	virtual ~BaseWindow() {};
 	virtual ActionDone processChar(TCPClient& client, const KeyPack& key, const std::string& clipboardData = "") = 0;
 	bool saveDoc() const;
 	ClientSiteDocument& getDoc();

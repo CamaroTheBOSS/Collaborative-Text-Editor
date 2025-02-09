@@ -20,12 +20,8 @@ class BaseDocument {
 public:
 	friend class SyncTester;
 	BaseDocument();
-	BaseDocument(const BaseDocument& other);
-	BaseDocument(BaseDocument&& other) noexcept;
 	BaseDocument(const std::string& text);
 	BaseDocument(const std::string& text, const int cursors, const int myUserIdx);
-	BaseDocument& operator=(const BaseDocument& other);
-	BaseDocument& operator=(BaseDocument&& other) noexcept;
 
 	COORD write(const int index, const std::string& text);
 	COORD erase(const int index, const int eraseSize);
@@ -57,8 +53,8 @@ public:
 protected:
 	bool analyzeBackwardMove(User& user, const bool withSelect);
 	bool analyzeForwardMove(User& user, const bool withSelect);
-	virtual void pushWriteAction(const int index, const COORD& startPos, std::vector<std::string>& text, TextContainer* target) {}
-	virtual void pushEraseAction(const int index, const COORD& startPos, const COORD& endPos, std::vector<std::string>& text, TextContainer* target) {}
+	virtual void afterWriteAction(const int index, const COORD& startPos, const COORD& endPos, std::vector<std::string>& writtenText) {}
+	virtual void afterEraseAction(const int index, const COORD& startPos, const COORD& endPos, std::vector<std::string>& erasedText) {}
 
 	bool validateUserIdx(const int index) const;
 	COORD eraseSelectedText(const int userIdx);

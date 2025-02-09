@@ -75,7 +75,11 @@ ScrollableScreenBuffer ScrollableScreenBufferBuilder::getResult() const {
 	buffer.leftFramePattern = leftFramePattern;
 	buffer.rightFramePattern = rightFramePattern;
 	buffer.consoleSize = consoleSize;
-	buffer.setBufferAbsoluteSize(leftTopAbs.X, leftTopAbs.Y, rightBottomAbs.X, rightBottomAbs.Y);
-	buffer.setBufferSize(leftTop, rightBottom);
+	if (leftTopAbs.X != 0 || leftTopAbs.Y != 0 || rightBottomAbs.X != 0 || rightBottomAbs.Y != 0) {
+		buffer.setBufferAbsoluteSize(leftTopAbs.X, leftTopAbs.Y, rightBottomAbs.X, rightBottomAbs.Y);
+	}
+	else {
+		buffer.setBufferSize(leftTop, rightBottom);
+	}
 	return buffer;
 }

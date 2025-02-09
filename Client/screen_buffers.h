@@ -28,6 +28,7 @@ public:
     COORD getTerminalCursorPos(ClientSiteDocument& doc, const COORD& docCursor) const;
     RenderCursor getTerminalCursor(ClientSiteDocument& doc, const int cursor) const;
     RenderCursor getMyTerminalCursor(ClientSiteDocument& doc) const;
+    std::vector<std::pair<COORD, COORD>> getSegmentsTerminalCursorPos(ClientSiteDocument& doc, const TextContainer::Segments& segments) const;
     std::vector<RenderCursor> getTerminalCursors(ClientSiteDocument& doc) const;
     std::pair<ScrollableScreenBuffer, TextLines> getLineNumbersText() const;
     TextLines getTextInBuffer(ClientSiteDocument& doc) const;

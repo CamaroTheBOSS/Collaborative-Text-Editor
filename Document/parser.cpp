@@ -9,7 +9,8 @@ std::vector<std::string> Parser::parseTextToVector(const std::string& text) {
 		return parsedLines;
 	}
 	do {
-		std::string lineText{text.cbegin() + offset, text.cbegin() + end};
+		bool windowsStyleEndl = end > 0 && text[end - 1] == '\r';
+		std::string lineText{text.cbegin() + offset, text.cbegin() + end - windowsStyleEndl};
 		parsedLines.emplace_back(lineText);
 		offset = end + 1;
 		end = text.find('\n', offset);

@@ -3,13 +3,23 @@
 #include "renderer.h"
 
 
+ScrollableScreenBuffer getScreenBuffer(const int left, const int top, const int right, const int bottom) {
+	ScrollableScreenBufferBuilder builder;
+	builder.setAbsoluteLeft(left)
+		.setAbsoluteTop(top)
+		.setAbsoluteRight(right)
+		.setAbsoluteBot(bottom)
+		.setConsoleSize(Pos<int>(50, 50));
+	return builder.getResult();
+}
+
 
 TEST(RendererTests, CursorSyncOneLinerDocTest) {
-	Document doc{ "Oneliner test", 1, 0 };
+	ClientSiteDocument doc{ "Oneliner test", 1, 0 };
 	COORD dPos{ 5, 0 };
 	doc.setCursorPos(0, dPos);
 
-	ScrollableScreenBuffer screenBuffer{ SMALL_RECT(0, 0, 20, 20) };
+	auto screenBuffer = getScreenBuffer(0, 0, 20, 20);
 	RenderCursor tCursor = screenBuffer.getMyTerminalCursor(doc);
 	EXPECT_EQ(tCursor.pointedChar, 'n');
 	EXPECT_EQ(tCursor.pos.X, 5);
@@ -18,11 +28,11 @@ TEST(RendererTests, CursorSyncOneLinerDocTest) {
 
 
 TEST(RendererTests, CursorSyncOneEmptyLineTest) {
-	Document doc{ "Oneliner test\n", 1, 0 };
+	ClientSiteDocument doc{ "Oneliner test\n", 1, 0 };
 	COORD dPos{ 0, 1 };
 	doc.setCursorPos(0, dPos);
 
-	ScrollableScreenBuffer screenBuffer{ SMALL_RECT(0, 0, 20, 20) };
+	auto screenBuffer = getScreenBuffer(0, 0, 20, 20);
 	RenderCursor tCursor = screenBuffer.getMyTerminalCursor(doc);
 	EXPECT_EQ(tCursor.pointedChar, ' ');
 	EXPECT_EQ(tCursor.pos.X, 0);
@@ -31,11 +41,11 @@ TEST(RendererTests, CursorSyncOneEmptyLineTest) {
 
 
 TEST(RendererTests, CursorSyncOneLinerFilledTest) {
-	Document doc{ "This is oneline test", 1, 0 };
+	ClientSiteDocument doc{ "This is oneline test", 1, 0 };
 	COORD dPos{ 20, 0 };
 	doc.setCursorPos(0, dPos);
 
-	ScrollableScreenBuffer screenBuffer{ SMALL_RECT(0, 0, 20, 20) };
+	auto screenBuffer = getScreenBuffer(0, 0, 20, 20);
 	RenderCursor tCursor = screenBuffer.getMyTerminalCursor(doc);
 	EXPECT_EQ(tCursor.pointedChar, ' ');
 	EXPECT_EQ(tCursor.pos.X, 0);
@@ -45,11 +55,11 @@ TEST(RendererTests, CursorSyncOneLinerFilledTest) {
 
 
 TEST(RendererTests, CursorSyncOneLinerFilledWithEndlTest) {
-	Document doc{ "This is oneline test\n", 1, 0 };
+	ClientSiteDocument doc{ "This is oneline test\n", 1, 0 };
 	COORD dPos{ 20, 0 };
 	doc.setCursorPos(0, dPos);
 
-	ScrollableScreenBuffer screenBuffer{ SMALL_RECT(0, 0, 20, 20) };
+	auto screenBuffer = getScreenBuffer(0, 0, 20, 20);
 	RenderCursor tCursor = screenBuffer.getMyTerminalCursor(doc);
 	EXPECT_EQ(tCursor.pointedChar, ' ');
 	EXPECT_EQ(tCursor.pos.X, 0);
@@ -60,8 +70,8 @@ TEST(RendererTests, CursorSyncOneLinerFilledWithEndlTest) {
 
 
 TEST(RendererTests, CursorSyncForLongerLinesTest) {
-	Document doc{ "This is oneline but longer than screen widthh\n", 4, 0 };
-	ScrollableScreenBuffer screenBuffer{ SMALL_RECT(0, 0, 20, 20) };
+	ClientSiteDocument doc{ "This is oneline but longer than screen widthh\n", 4, 0 };
+	auto screenBuffer = getScreenBuffer(0, 0, 20, 20);
 	
 	std::vector<COORD> testDocPositions = { {5, 0}, {25, 0}, {45, 0}, {0, 1} };
 	std::vector<COORD> desiredTerminalPositions = { {5, 0}, {5, 1}, {5, 2}, {0, 3} };

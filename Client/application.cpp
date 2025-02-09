@@ -179,7 +179,7 @@ void Application::showSearchWindow() {
         .showRightFramePattern("|")
         .showTopFramePattern("-")
         .showBottomFramePattern("-");
-    auto window = std::make_unique<SearchWindow>(builder);
+    auto window = std::make_unique<SearchWindow>(builder, &windows[0]->getDoc());
     windowsRegistry[window->name()] = true;
     windows.emplace_back(std::move(window));
     setFocus(windows.size() - 1);

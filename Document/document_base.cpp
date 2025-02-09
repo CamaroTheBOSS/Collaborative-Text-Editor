@@ -6,49 +6,16 @@
 #define NOMINMAX
 
 BaseDocument::BaseDocument() :
-	container() {
-	addUser();
-}
-
-BaseDocument::BaseDocument(const BaseDocument& other) :
-	container(other.container),
-	users(other.users),
-	filename(other.filename),
-	myUserIdx(other.myUserIdx) {}
-
-BaseDocument::BaseDocument(BaseDocument&& other) noexcept :
-	container(std::move(other.container)),
-	users(std::move(other.users)),
-	filename(std::move(other.filename)),
-	myUserIdx(other.myUserIdx) {}
+	container(),
+	myUserIdx(0) {}
 
 BaseDocument::BaseDocument(const std::string& text) :
-	container(text) {
-	addUser();
-}
+	container(text),
+	myUserIdx(0) {}
 
 BaseDocument::BaseDocument(const std::string& text, const int nCursors, const int myUserIdx) :
 	container(text),
 	myUserIdx(myUserIdx) {
-	for (int i = 0; i < nCursors; i++) {
-		addUser();
-	}
-}
-
-BaseDocument& BaseDocument::operator=(const BaseDocument& other) {
-	container = other.container;
-	users = other.users;
-	filename = other.filename;
-	myUserIdx = other.myUserIdx;
-	return *this;
-}
-
-BaseDocument& BaseDocument::operator=(BaseDocument&& other) noexcept {
-	container = std::move(other.container);
-	users = std::move(other.users);
-	filename = std::move(other.filename);
-	myUserIdx = std::move(other.myUserIdx);
-	return *this;
 }
 
 COORD BaseDocument::write(const int index, const std::string& newText) {
@@ -62,7 +29,7 @@ COORD BaseDocument::write(const int index, const std::string& newText) {
 	COORD diffPos = endPos - startPos;
 	moveAffectedCursors(users[index], diffPos);
 	users[index].cursor.setOffset(endPos.X);
-	pushWriteAction(index, startPos, parsedLines, &container);
+	afterWriteAction(index, startPos, endPos, parsedLines);
 	return endPos;
 }
 
@@ -80,7 +47,7 @@ COORD BaseDocument::eraseSelectedText(const int index) {
 	moveAffectedCursors(user, diffPos);
 	user.cursor.setPosition(endPos);
 	user.cursor.setOffset(endPos.X);
-	pushEraseAction(index, startPos, endPos, erasedText, &container);
+	afterEraseAction(index, startPos, endPos, erasedText);
 	return endPos;
 }
 
@@ -101,7 +68,7 @@ COORD BaseDocument::erase(const int index, const int eraseSize) {
 	COORD diffPos = endPos - startPos;
 	moveAffectedCursors(users[index], diffPos);
 	users[index].cursor.setOffset(endPos.X);
-	pushEraseAction(index, startPos, endPos, erasedText, &container);
+	afterEraseAction(index, startPos, endPos, erasedText);
 	return endPos;
 }
 
