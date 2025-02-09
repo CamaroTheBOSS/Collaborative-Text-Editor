@@ -5,7 +5,7 @@
 #include <chrono>
 #include <random>
 
-#include "controller.h";
+#include "application.h";
 
 auto getRandomEngine() {
 	std::random_device device;
@@ -55,28 +55,27 @@ int main() {
 		return 0;
 	}
 
-	Controller controller{};
-	if (!controller.connect("192.168.1.10", 8081)) {
+	Application app;
+	if (!app.connect("192.168.1.10", 8081)) {
 		std::cout << "Connection to server failed!\n";
 		return 0;
 	}
-	if (!controller.requestDocument(std::chrono::milliseconds(500), 3)) {
+	if (!app.requestDocument(std::chrono::milliseconds(500), 3)) {
 		std::cout << "Requesting document from the server failed!\n";
 		return 0;
 	}
-	controller.render();
-	while (controller.isConnected()) {
-		KeyPack key = controller.readChar();
+	app.render();
+	while (app.isConnected()) {
+		KeyPack key = app.readChar();
 		if (key.keyCode == '\0') {
 			key.keyCode = getRandomKey();
 		}
-		controller.processChar(key);
-		bool render = controller.checkIncomingMessages();
+		app.processChar(key);
+		bool render = app.checkIncomingMessages();
 		if (render) {
-			controller.render();
+			app.render();
 		}
 	}
-	controller.saveDoc();
 	WSACleanup();
 
 	return 0;
