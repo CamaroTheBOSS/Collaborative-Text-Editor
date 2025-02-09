@@ -37,6 +37,7 @@ ClientSiteDocument::ClientSiteDocument(const std::string& text, const int nCurso
 
 void ClientSiteDocument::findSegments(const std::string& pattern) {
 	segments = container.findAll(pattern);
+	chosenSegment = -1;
 }
 
 void ClientSiteDocument::resetSegments() {
@@ -86,6 +87,9 @@ void ClientSiteDocument::afterWriteAction(const int index, const COORD& startPos
 	}
 	if (toDelete) {
 		segments.erase(segments.cbegin() + closestSegment);
+		if (chosenSegment == closestSegment) {
+			chosenSegment--;
+		}
 	}
 }
 
@@ -104,7 +108,10 @@ void ClientSiteDocument::afterEraseAction(const int index, const COORD& startPos
 		}
 		moveSegment(segments[i], startPos, diff);
 	}
-	for (int i = indexesToDelete.size() - 1; i >= 0; i--) {
-		segments.erase(segments.cbegin() + indexesToDelete[i]);
+	if (!indexesToDelete.empty()) {
+		segments.erase(segments.cbegin() + indexesToDelete.front(), segments.cbegin() + indexesToDelete.back());
+		if (chosenSegment >= indexesToDelete.front() && chosenSegment <= indexesToDelete.back()) {
+			chosenSegment = indexesToDelete.front() - 1;
+		}
 	}
 }

@@ -106,7 +106,9 @@ bool Application::checkBufferWasResized() {
     bool screenResized = terminal.resizeScreenBufferIfNeeded();
     if (screenResized) {
         COORD newConsoleSize = terminal.getScreenSize();
-        windows[0]->getBuffer().setNewConsoleSize({ newConsoleSize.X, newConsoleSize.Y });
+        for (auto& window : windows) {
+            window->getBuffer().setNewConsoleSize({ newConsoleSize.X, newConsoleSize.Y });
+        }
     }
     return screenResized;
 }
@@ -170,10 +172,10 @@ void Application::showSearchWindow() {
     ScrollableScreenBufferBuilder builder;
     builder.setScrollHisteresis(0)
         .setTitle(SearchWindow::className)
-        .setRelativeLeft(0.4)
-        .setRelativeTop(0.8)
-        .setRelativeRight(0.6)
-        .setRelativeBot(0.9)
+        .setRelativeLeft(0.7)
+        .setRelativeTop(0.1)
+        .setRelativeRight(0.9)
+        .setRelativeBot(0.12)
         .setConsoleSize(Pos<int>{consoleSize.X, consoleSize.Y})
         .showLeftFramePattern("|")
         .showRightFramePattern("|")

@@ -21,12 +21,10 @@ void Renderer::render(const std::unique_ptr<BaseWindow>& window) const {
         }
     }
     // Render found segments if applicable
-    auto& segments = doc.getSegments();
     int myCursorIdx = doc.getMyCursor();
-    int chosenSegmentIndex = doc.getChosenSegmentIndex();
-    auto terminalSegments = buffer.getSegmentsTerminalCursorPos(doc, segments);
+    auto [terminalSegments, chosenIndex] = buffer.getSegmentsTerminalCursorPos(doc);
     for (int i = 0; i < terminalSegments.size(); i++) {
-        int color = i == chosenSegmentIndex ? colors[myCursorIdx] : foundSegmentsColor;
+        int color = i == chosenIndex ? colors[myCursorIdx] : foundSegmentsColor;
         renderSelection(visibleLines, buffer, terminalSegments[i].first, terminalSegments[i].second, color);
     }
 

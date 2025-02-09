@@ -25,13 +25,15 @@ public:
     ScrollableScreenBuffer() = default;
     COORD getStartPos() const;
     COORD getEndPos() const;
+
     COORD getTerminalCursorPos(ClientSiteDocument& doc, const COORD& docCursor) const;
     RenderCursor getTerminalCursor(ClientSiteDocument& doc, const int cursor) const;
     RenderCursor getMyTerminalCursor(ClientSiteDocument& doc) const;
-    std::vector<std::pair<COORD, COORD>> getSegmentsTerminalCursorPos(ClientSiteDocument& doc, const TextContainer::Segments& segments) const;
+    std::pair<std::vector<std::pair<COORD, COORD>>, int> getSegmentsTerminalCursorPos(ClientSiteDocument& doc) const;
     std::vector<RenderCursor> getTerminalCursors(ClientSiteDocument& doc) const;
     std::pair<ScrollableScreenBuffer, TextLines> getLineNumbersText() const;
     TextLines getTextInBuffer(ClientSiteDocument& doc) const;
+
     void moveHorizontal(const int units);
     void moveVertical(const int units);
     void scrollToCursor(const RenderCursor& cursor);
@@ -51,6 +53,7 @@ public:
     std::vector<Frame> getFrames() const;
 
 private:
+    void setBufferAbsoluteSizeNoValidation(const int newLeft, const int newTop, const int newRight, const int newBottom);
     void scrollScreen(const int units);
     Pos<double>& validatePos(Pos<double>& pos);
     int validateAbsolutePosX(int X);
