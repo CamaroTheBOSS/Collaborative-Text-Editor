@@ -65,7 +65,10 @@ bool Terminal::resizeScreenBufferIfNeeded() {
             newScreenInfo.srWindow.Right - newScreenInfo.srWindow.Left + 1,
             newScreenInfo.srWindow.Bottom - newScreenInfo.srWindow.Top + 1
     };
-    SetConsoleScreenBufferSize(hConsole, size);
+    if (screenSize.X < size.X && screenSize.Y < size.Y) {
+        SetConsoleWindowInfo(hConsole, TRUE, &newScreenInfo.srWindow);
+        SetConsoleScreenBufferSize(hConsole, size);        
+    }
     SetConsoleCursorInfo(hConsole, &cursorInfo);
     screenInfo = std::move(newScreenInfo);
     screenSize = std::move(size);
