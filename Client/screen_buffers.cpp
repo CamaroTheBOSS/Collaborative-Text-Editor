@@ -44,27 +44,18 @@ COORD ScrollableScreenBuffer::getEndPos() const {
 }
 
 COORD ScrollableScreenBuffer::getTerminalCursorPos(ClientSiteDocument& doc, const COORD& docCursor) const {
-	const auto& data = doc.get();
 	int screenWidth = width();
-	if (docCursor.X < 0 || screenWidth <= 0) {
-		return COORD{0, 0};
+	if (screenWidth <= 0) {
+		return {};
 	}
-
-	COORD terminalCursor{ 0, 0 };
-	for (int i = 0; i <= docCursor.Y; i++) {
-		if (i >= data.size()) {
-			continue;
-		}
-		bool endlPresent = i != docCursor.Y;
-		int base = i != docCursor.Y ? data[i].size() : docCursor.X;
-		terminalCursor.Y += base / screenWidth + endlPresent;
-		if (data[i].size() == screenWidth && endlPresent) {
-			terminalCursor.Y--;
-		}
+	COORD tCursor{0, 0};
+	const auto& data = doc.get();
+	for (int row = 0; row < docCursor.Y; row++) {
+		tCursor.Y += data[row].size() / screenWidth + 1;
 	}
-	terminalCursor.Y += top - scroll;
-	terminalCursor.X += left + (docCursor.X % screenWidth);
-	return terminalCursor;
+	tCursor.Y += docCursor.X / screenWidth + top - scroll;
+	tCursor.X = left + (docCursor.X % screenWidth);
+	return tCursor;
 }
 
 std::vector<std::pair<COORD, COORD>> ScrollableScreenBuffer::getSegmentsTerminalCursorPos(ClientSiteDocument& doc, const TextContainer::Segments& segments) const {
@@ -72,47 +63,23 @@ std::vector<std::pair<COORD, COORD>> ScrollableScreenBuffer::getSegmentsTerminal
 	if (screenWidth <= 0) {
 		return {};
 	}
-	const auto& data = doc.get();
-	int docCurrentY = 0;
 	std::vector<std::pair<COORD, COORD>> terminalCursorPairs;
-	COORD terminalCursor1{ 0, top - scroll };
-	COORD terminalCursor2{ 0, top - scroll };
+	const auto& data = doc.get();
+	int tGlobalY = 0;
+	int row = 0;
 	for (int i = 0; i < segments.size(); i++) {
-		if (docCurrentY >= data.size()) {
-			break;
+		auto& dCursor1 = segments[i].first;
+		auto& dCursor2 = segments[i].second;
+		for (row; row < dCursor1.Y; row++) {
+			tGlobalY += data[row].size() / screenWidth + 1;
 		}
-		auto& docCursor1 = segments[i].first;
-		auto& docCursor2 = segments[i].second;
-		if (docCursor1.X < 0 || docCursor2.X < 0 || docCurrentY > docCursor1.Y || docCurrentY > docCursor2.Y) {
-			continue;
-		}
-		for (docCurrentY; docCurrentY <= docCursor1.Y; docCurrentY++) {
-			if (docCurrentY >= data.size()) {
-				break;
-			}
-			bool endlPresent1 = docCurrentY != docCursor1.Y;
-			bool endlPresent2 = docCurrentY != docCursor2.Y;
-			int base1 = docCurrentY != docCursor1.Y ? data[docCurrentY].size() : docCursor1.X;
-			int base2 = docCurrentY != docCursor2.Y ? data[docCurrentY].size() : docCursor2.X;
-			terminalCursor1.Y += base1 / screenWidth + endlPresent1;
-			terminalCursor2.Y += base2 / screenWidth + endlPresent2;
-			if (data[docCurrentY].size() == screenWidth && endlPresent1) {
-				terminalCursor1.Y--;
-			}
-			if (data[docCurrentY].size() == screenWidth && endlPresent2) {
-				terminalCursor2.Y--;
-			}
-		}
-		docCurrentY--;
-		if (terminalCursor1.Y < top) {
-			continue;
-		}
-		if (terminalCursor1.Y > bottom) {
-			break;
-		}
-		terminalCursor1.X = left + (docCursor1.X % screenWidth);
-		terminalCursor2.X = left + (docCursor2.X % screenWidth);
-		terminalCursorPairs.emplace_back(std::make_pair(terminalCursor1, terminalCursor2));
+		COORD tCursor1;
+		COORD tCursor2;
+		tCursor1.Y = tGlobalY + dCursor1.X / screenWidth + top - scroll;
+		tCursor2.Y = tGlobalY + dCursor2.X / screenWidth + top - scroll;
+		tCursor1.X = left + (dCursor1.X % screenWidth);
+		tCursor2.X = left + (dCursor2.X % screenWidth);
+		terminalCursorPairs.emplace_back(std::make_pair(tCursor1, tCursor2));
 	}
 	return terminalCursorPairs;
 }

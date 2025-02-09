@@ -41,6 +41,18 @@ void ClientSiteDocument::findSegments(const std::string& pattern) {
 
 void ClientSiteDocument::resetSegments() {
 	segments.clear();
+	chosenSegment = -1;
+}
+
+void ClientSiteDocument::setCursorOnNextSegmentStart(const int index) {
+	if (!validateUserIdx(index) || segments.empty()) {
+		return;
+	}
+	chosenSegment++;
+	if (chosenSegment > segments.size()) {
+		chosenSegment = 0;
+	}
+	setCursorPos(index, segments[chosenSegment].first);
 }
 
 const TextContainer::Segments& ClientSiteDocument::getSegments() const {

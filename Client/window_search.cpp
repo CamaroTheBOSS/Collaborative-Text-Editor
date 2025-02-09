@@ -29,6 +29,9 @@ ActionDone SearchWindow::processChar(TCPClient& client, const KeyPack& key, cons
         doc.erase(0, 1);
         docToSearch->findSegments(doc.getText());
         return ActionDone::render;
+    case ENTER:
+        docToSearch->setCursorOnNextSegmentStart(docToSearch->getMyCursor());
+        return ActionDone::render;
     case ARROW_LEFT:
         doc.moveCursorLeft(0, key.shiftPressed);
         return ActionDone::render;

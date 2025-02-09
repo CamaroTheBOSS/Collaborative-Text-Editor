@@ -9,6 +9,7 @@ public:
 
 	void findSegments(const std::string& pattern);
 	void resetSegments();
+	void setCursorOnNextSegmentStart(const int index);
 	const TextContainer::Segments& getSegments() const;
 private:
 	void moveSegment(std::pair<COORD, COORD>& segment, const COORD& startPos, const COORD& diff) const;
@@ -16,4 +17,5 @@ private:
 	void afterEraseAction(const int index, const COORD& startPos, const COORD& endPos, std::vector<std::string>& erasedText) override;
 
 	TextContainer::Segments segments;
+	int chosenSegment = -1;
 };
