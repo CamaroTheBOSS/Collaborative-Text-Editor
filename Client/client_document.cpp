@@ -49,7 +49,7 @@ void ClientSiteDocument::setCursorOnNextSegmentStart(const int index) {
 		return;
 	}
 	chosenSegment++;
-	if (chosenSegment > segments.size()) {
+	if (chosenSegment >= segments.size()) {
 		chosenSegment = 0;
 	}
 	setCursorPos(index, segments[chosenSegment].first);
@@ -57,6 +57,10 @@ void ClientSiteDocument::setCursorOnNextSegmentStart(const int index) {
 
 const TextContainer::Segments& ClientSiteDocument::getSegments() const {
 	return segments;
+}
+
+int ClientSiteDocument::getChosenSegmentIndex() const {
+	return chosenSegment;
 }
 
 void ClientSiteDocument::moveSegment(std::pair<COORD, COORD>& segment, const COORD& startPos, const COORD& diff) const {

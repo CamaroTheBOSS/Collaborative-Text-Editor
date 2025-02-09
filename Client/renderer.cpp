@@ -5,6 +5,7 @@
 #include <array>
 
 constexpr std::array<int, 8> colors = { 240, 128, 144, 160, 48, 192, 208, 96 };
+constexpr int foundSegmentsColor = 31;
 constexpr int defaultColor = 7;
 
 void Renderer::render(const std::unique_ptr<BaseWindow>& window) const {
@@ -21,25 +22,30 @@ void Renderer::render(const std::unique_ptr<BaseWindow>& window) const {
     }
     // Render found segments if applicable
     auto& segments = doc.getSegments();
+    int myCursorIdx = doc.getMyCursor();
+    int chosenSegmentIndex = doc.getChosenSegmentIndex();
     auto terminalSegments = buffer.getSegmentsTerminalCursorPos(doc, segments);
-    for (const auto& segment : terminalSegments) {
-        renderSelection(visibleLines, buffer, segment.first, segment.second, colors[doc.getMyCursor()]);
+    for (int i = 0; i < terminalSegments.size(); i++) {
+        int color = i == chosenSegmentIndex ? colors[myCursorIdx] : foundSegmentsColor;
+        renderSelection(visibleLines, buffer, terminalSegments[i].first, terminalSegments[i].second, color);
     }
-    
-    if (!window->isActive()) {
-        return;
-    }
+
     // Render selection if applicable
     auto cursors = buffer.getTerminalCursors(doc);
-    auto myCursorSelectionAnchor = doc.getCursorSelectionAnchor(doc.getMyCursor());
-    if (myCursorSelectionAnchor.has_value()) {
-        auto terminalSelectionAnchor = buffer.getTerminalCursorPos(doc, myCursorSelectionAnchor.value());
-        renderSelection(visibleLines, buffer, cursors[doc.getMyCursor()].pos, terminalSelectionAnchor, colors[doc.getMyCursor()]);
+    if (window->isActive()) {
+        auto myCursorSelectionAnchor = doc.getCursorSelectionAnchor(doc.getMyCursor());
+        if (myCursorSelectionAnchor.has_value()) {
+            auto terminalSelectionAnchor = buffer.getTerminalCursorPos(doc, myCursorSelectionAnchor.value());
+            renderSelection(visibleLines, buffer, cursors[doc.getMyCursor()].pos, terminalSelectionAnchor, colors[doc.getMyCursor()]);
+        }
     }
-    
+        
     // Render cursors if applicable
     auto nCursors = (std::min)(cursors.size(), colors.size());
     for (int i = 0; i < nCursors; i++) {
+        if (i == myCursorIdx && !window->isActive()) {
+            continue;
+        }
         renderCursor(buffer, cursors[i], colors[i]);
     }
 }

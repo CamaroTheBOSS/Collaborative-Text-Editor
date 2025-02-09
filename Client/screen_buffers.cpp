@@ -79,6 +79,12 @@ std::vector<std::pair<COORD, COORD>> ScrollableScreenBuffer::getSegmentsTerminal
 		tCursor2.Y = tGlobalY + dCursor2.X / screenWidth + top - scroll;
 		tCursor1.X = left + (dCursor1.X % screenWidth);
 		tCursor2.X = left + (dCursor2.X % screenWidth);
+		if (tCursor1.Y < top) {
+			continue;
+		}
+		else if (tCursor1.Y > bottom) {
+			break;
+		}
 		terminalCursorPairs.emplace_back(std::make_pair(tCursor1, tCursor2));
 	}
 	return terminalCursorPairs;

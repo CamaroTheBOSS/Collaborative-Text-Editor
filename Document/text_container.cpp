@@ -92,6 +92,9 @@ COORD TextContainer::eraseBetween(const COORD& start, const COORD& end, std::vec
 }
 
 TextContainer::Segments TextContainer::findAll(const std::string& pattern) const {
+	if (pattern.empty()) {
+		return {};
+	}
 	Segments segments;
 	for (int i = 0; i < data.size(); i++) {
 		size_t pos = 0;
