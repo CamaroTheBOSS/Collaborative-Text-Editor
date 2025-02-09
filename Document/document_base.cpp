@@ -185,7 +185,7 @@ COORD BaseDocument::moveCursorDown(const int index, const int bufferWidth, const
 	auto cursorPos = cursor.position();
 	cursor.setOffset(cursor.offset() % bufferWidth);
 	auto offset = cursor.offset();
-	if (container.getLineSize(cursorPos.Y) > (cursorPos.X / bufferWidth + 1) * bufferWidth) {
+	if (container.getLineSize(cursorPos.Y) >= (cursorPos.X / bufferWidth + 1) * bufferWidth) {
 		cursorPos.X = (std::min)(cursorPos.X + bufferWidth, (int)container.getLineSize(cursorPos.Y));
 	}
 	else if (cursorPos.Y != container.getHeight() - 1) {
