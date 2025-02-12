@@ -63,6 +63,9 @@
     <ClCompile Include="screen_buffers_builder.cpp">
       <Filter>Pliki źródłowe\Windows</Filter>
     </ClCompile>
+    <ClCompile Include="canvas.cpp">
+      <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="terminal.h">
@@ -100,6 +103,9 @@
     </ClInclude>
     <ClInclude Include="screen_buffers_builder.h">
       <Filter>Pliki nagłówkowe\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="canvas.h">
+      <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

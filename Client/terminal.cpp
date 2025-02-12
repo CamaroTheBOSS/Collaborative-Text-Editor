@@ -31,6 +31,7 @@ Terminal::Terminal() {
         cursorInfo.bVisible = 0;
         SetConsoleCursorInfo(hConsole, &cursorInfo);
     }
+    resizeScreenBufferIfNeeded();
 }
 
 Terminal::~Terminal() {
@@ -48,7 +49,6 @@ Terminal::~Terminal() {
     auto stdInput = GetStdHandle(STD_INPUT_HANDLE);
     GetConsoleMode(stdInput, &currMode);
     SetConsoleMode(stdInput, currMode | features);
-    resizeScreenBufferIfNeeded();
 }
 
 COORD Terminal::getScreenSize() const {
@@ -72,7 +72,8 @@ bool Terminal::resizeScreenBufferIfNeeded() {
     SetConsoleCursorInfo(hConsole, &cursorInfo);
     screenInfo = std::move(newScreenInfo);
     screenSize = std::move(size);
-    clear();
+    renderer.resize(screenSize);
+    //clear();
     return true;
 }
 
@@ -94,11 +95,15 @@ void Terminal::clear() const {
     printf("\033[1;1H"); // move cursor home
 }
 
-void Terminal::render(const std::unique_ptr<BaseWindow>& window) {
-    auto& docBuffer = window->getBuffer();
-    auto& doc = window->getDoc();
-    docBuffer.scrollToCursor(docBuffer.getMyTerminalCursor(doc));
-    return renderer.render(window);
+void Terminal::render(const std::vector<std::unique_ptr<BaseWindow>>& windows) {
+    renderer.clear();
+    for (const auto& window : windows) {
+        auto& docBuffer = window->getBuffer();
+        auto& doc = window->getDoc();
+        docBuffer.scrollToCursor(docBuffer.getMyTerminalCursor(doc));
+        renderer.addToBuffer(window);
+    }
+    renderer.render();
 }
 
 std::string Terminal::getClipboardData() const {

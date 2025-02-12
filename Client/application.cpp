@@ -148,9 +148,7 @@ bool Application::requestDocument(const std::chrono::milliseconds& timeout, cons
 }
 
 void Application::render() {
-    for (auto& window : windows) {
-        terminal.render(window);
-    }
+    terminal.render(windows);
 }
 
 void Application::setFocus(const int windowIdx) {

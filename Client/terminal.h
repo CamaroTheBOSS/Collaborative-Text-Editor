@@ -12,14 +12,13 @@ public:
 	Terminal();
 	~Terminal();
 	KeyPack readChar() const;
-	void render(const std::unique_ptr<BaseWindow>& window);
+	void render(const std::vector<std::unique_ptr<BaseWindow>>& windows);
 	void clear() const;
 	std::string getClipboardData() const;
 	bool setClipboardData(const std::string& txt) const;
 	bool resizeScreenBufferIfNeeded();
 	COORD getScreenSize() const;
 private:
-
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_SCREEN_BUFFER_INFO screenInfo{};
 	CONSOLE_CURSOR_INFO cursorInfo{};

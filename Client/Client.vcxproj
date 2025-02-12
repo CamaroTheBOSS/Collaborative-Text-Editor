@@ -135,6 +135,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="canvas.cpp" />
     <ClCompile Include="client_document.cpp" />
     <ClCompile Include="screen_buffers_builder.cpp" />
     <ClCompile Include="window_base.cpp" />
@@ -151,6 +152,7 @@
     <ClCompile Include="terminal.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="canvas.h" />
     <ClInclude Include="client_document.h" />
     <ClInclude Include="keypack.h" />
     <ClInclude Include="screen_buffers_builder.h" />
