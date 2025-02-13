@@ -26,6 +26,9 @@ void Canvas::reset() {
 }
 
 void Canvas::write(const std::string& data) {
+	if (_size.X == 0 || _size.Y == 0) {
+		return;
+	}
 	int pos = 0;
 	while (pos < data.size()) {
 		auto& line = _canvas[cursor.Y];
@@ -79,11 +82,11 @@ void Canvas::putColorInterval(const COORD& start, const COORD& end, const int co
 }
 
 void Canvas::render() const {
+	if (_size.X == 0 || _size.Y == 0) {
+		return;
+	}
 	COORD start{ 0, 0 };
 	int color = defaultColor;
-	if (_canvas[0][20] == '-') {
-		int x = 0;
-	}
 	for (const auto& [end, nextColor] : colorIntervals) {
 		_render(start, end, color);
 		color = nextColor;

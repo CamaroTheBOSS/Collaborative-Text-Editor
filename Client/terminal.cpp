@@ -61,6 +61,7 @@ bool Terminal::resizeScreenBufferIfNeeded() {
     if (screenBuffersEqual(screenInfo.srWindow, newScreenInfo.srWindow)) {
         return false;
     }
+    clear();
     COORD size = {
             newScreenInfo.srWindow.Right - newScreenInfo.srWindow.Left + 1,
             newScreenInfo.srWindow.Bottom - newScreenInfo.srWindow.Top + 1
@@ -73,7 +74,6 @@ bool Terminal::resizeScreenBufferIfNeeded() {
     screenInfo = std::move(newScreenInfo);
     screenSize = std::move(size);
     renderer.resize(screenSize);
-    //clear();
     return true;
 }
 
