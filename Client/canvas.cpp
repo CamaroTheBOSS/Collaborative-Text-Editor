@@ -81,6 +81,9 @@ void Canvas::putColorInterval(const COORD& start, const COORD& end, const int co
 void Canvas::render() const {
 	COORD start{ 0, 0 };
 	int color = defaultColor;
+	if (_canvas[0][20] == '-') {
+		int x = 0;
+	}
 	for (const auto& [end, nextColor] : colorIntervals) {
 		_render(start, end, color);
 		color = nextColor;
@@ -90,7 +93,7 @@ void Canvas::render() const {
 			start.Y++;
 		}
 	}
-	_render(start, _size - COORD{0, 1}, defaultColor);
+	_render(start, _size - COORD{1, 1}, defaultColor);
 }
 
 void Canvas::_render(const COORD& start, const COORD& end, const int color) const {
