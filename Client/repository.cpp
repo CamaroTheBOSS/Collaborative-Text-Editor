@@ -24,6 +24,8 @@ namespace client {
 			return connectNewUser(doc, buffer);
 		case msg::Type::disconnect:
 			return disconnectUser(doc, buffer);
+		case msg::Type::replace:
+			return replace(doc, buffer);
 		}
 		assert(false && "Unrecognized msg type. Aborting...");
 		return false;
@@ -52,6 +54,20 @@ namespace client {
 		parse(buffer, 1, msg.version, msg.user);
 		logger.logInfo("Disconnected user", msg.user);
 		return doc.eraseUser(msg.user);
+	}
+
+	bool Repository::replace(ClientSiteDocument& doc, msg::Buffer& buffer) {
+		msg::ReplaceResponse msg;
+		parse(buffer, 1, msg.version, msg.user, msg.text, msg.segments);
+		for (auto segment = msg.segments.rbegin(); segment != msg.segments.rend(); segment++) {
+			if (!doc.setCursorPos(msg.user, segment->first) || !doc.setCursorAnchor(msg.user, segment->second)) {
+				logger.logError("Replace failed with one segment");
+				continue;
+			}
+			doc.erase(msg.user, 1);
+			doc.write(msg.user, msg.text);
+		}
+		return true;
 	}
 
 	bool Repository::write(ClientSiteDocument& doc, msg::Buffer& buffer) {

@@ -16,5 +16,6 @@ namespace client {
 		bool sync(ClientSiteDocument& doc, msg::Buffer& buffer);
 		bool connectNewUser(ClientSiteDocument& doc, msg::Buffer& buffer);
 		bool disconnectUser(ClientSiteDocument& doc, msg::Buffer& buffer);
+		bool replace(ClientSiteDocument& doc, msg::Buffer& buffer);
 	};
 }

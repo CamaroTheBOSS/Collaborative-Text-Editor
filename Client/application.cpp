@@ -3,6 +3,7 @@
 
 #include "window_text_editor.h"
 #include "window_search.h"
+#include "window_replace.h"
 #include "application.h"
 #include "logging.h"
 
@@ -50,11 +51,13 @@ KeyPack Application::readChar() const {
 
 void Application::changeFocusUp() {
     int newFocus = focus;
-    double curr = windows[focus]->getBuffer().getCenter().Y;
+    float curr = windows[focus]->getBuffer().getCenter().Y;
+    float diff = INT_MAX;
     for (int i = 0; i < windows.size(); i++) {
-        double other = windows[i]->getBuffer().getCenter().Y;
-        if (other <= curr) {
-            curr = other;
+        float other = windows[i]->getBuffer().getCenter().Y;
+        float newDiff = curr - other;
+        if (newDiff > 0 && newDiff < diff) {
+            diff = newDiff;
             newFocus = i;
         }
     }
@@ -63,11 +66,13 @@ void Application::changeFocusUp() {
 
 void Application::changeFocusDown() {
     int newFocus = focus;
-    double curr = windows[focus]->getBuffer().getCenter().Y;
+    float curr = windows[focus]->getBuffer().getCenter().Y;
+    float diff = INT_MAX;
     for (int i = 0; i < windows.size(); i++) {
-        double other = windows[i]->getBuffer().getCenter().Y;
-        if (other > curr) {
-            curr = other;
+        float other = windows[i]->getBuffer().getCenter().Y;
+        float newDiff = other - curr;
+        if (newDiff > 0 && newDiff < diff) {
+            diff = newDiff;
             newFocus = i;
         }
     }
@@ -84,8 +89,14 @@ ActionDone Application::processChar(const KeyPack& key) {
     case CTRL_X:
         terminal.setClipboardData(windows[focus]->getDoc().getSelectedText());
         return windows[focus]->processChar(client, key);
+    case CTRL_F:
     case F3:
         showSearchWindow();
+        return ActionDone::render;
+    case CTRL_R:
+        if (key.shiftPressed) {
+            showReplaceWindow();
+        }
         return ActionDone::render;
     case ESC:
         destroyLastWindow();
@@ -162,9 +173,9 @@ void Application::setFocus(const int windowIdx) {
     windows[focus]->activate();
 }
 
-void Application::showSearchWindow() {
+WindowsIt Application::showSearchWindow() {
     if (windowsRegistry.find(SearchWindow::className) != windowsRegistry.cend()) {
-        return;
+        return findWindow(SearchWindow::className);
     }
     COORD consoleSize = terminal.getScreenSize();
     ScrollableScreenBufferBuilder builder;
@@ -183,6 +194,42 @@ void Application::showSearchWindow() {
     windowsRegistry[window->name()] = true;
     windows.emplace_back(std::move(window));
     setFocus(windows.size() - 1);
+    return windows.cend() - 1;
+
+}
+
+WindowsIt Application::showReplaceWindow() {
+    if (windowsRegistry.find(ReplaceWindow::className) != windowsRegistry.cend()) {
+        return findWindow(ReplaceWindow::className);
+    }
+    auto& searchBuffer = showSearchWindow()->get()->getBuffer();
+    COORD consoleSize = terminal.getScreenSize();
+    ScrollableScreenBufferBuilder builder;
+    builder.setScrollHisteresis(0)
+        .setTitle(ReplaceWindow::className)
+        .setAbsoluteLeft(searchBuffer.getLeft())
+        .setAbsoluteTop(searchBuffer.getBottom() + 2)
+        .setAbsoluteRight(searchBuffer.getRight())
+        .setAbsoluteBot(2 * searchBuffer.getBottom() - searchBuffer.getTop() + 2)
+        .setConsoleSize(Pos<int>{consoleSize.X, consoleSize.Y})
+        .showLeftFramePattern("|")
+        .showRightFramePattern("|")
+        .showTopFramePattern("-")
+        .showBottomFramePattern("-");
+    auto window = std::make_unique<ReplaceWindow>(builder, &windows[0]->getDoc());
+    windowsRegistry[window->name()] = true;
+    windows.emplace_back(std::move(window));
+    setFocus(windows.size() - 1);
+    return windows.cend() - 1;
+}
+
+WindowsIt Application::findWindow(const std::string& name) const {
+    for (auto it = windows.cbegin(); it != windows.cend(); it++) {
+        if (it->get()->name() == name) {
+            return it;
+        }
+    }
+    windows.cend();
 }
 
 void Application::destroyLastWindow() {

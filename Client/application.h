@@ -4,7 +4,9 @@
 #include "repository.h"
 
 #include <unordered_map>
-
+using Windows = std::vector<std::unique_ptr<BaseWindow>>;
+using WindowsRegistry = std::unordered_map<std::string, bool>;
+using WindowsIt = Windows::const_iterator;
 class Application {
 	friend class SyncTester;
 public:
@@ -20,7 +22,9 @@ public:
 	void render();
 private:
 	void setFocus(const int windowIdx);
-	void showSearchWindow();
+	WindowsIt showSearchWindow();
+	WindowsIt showReplaceWindow();
+	WindowsIt findWindow(const std::string& name) const;
 	void destroyLastWindow();
 	void changeFocusUp();
 	void changeFocusDown();
@@ -29,8 +33,8 @@ private:
 	client::Repository repo;
 
 	int focus = 0;
-	std::vector<std::unique_ptr<BaseWindow>> windows;
-	std::unordered_map<std::string, bool> windowsRegistry;
+	Windows windows;
+	WindowsRegistry windowsRegistry;
 	
 	
 };

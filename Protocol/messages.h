@@ -28,6 +28,7 @@ namespace msg {
 		// Modifiers
 		write,
 		erase,
+		replace,
 		moveVertical,
 		moveHorizontal,
 		sync,
@@ -94,6 +95,16 @@ namespace msg {
 			memcpy(data.get() + size, other->get() + start, cpsize);
 			size += cpsize;
 		}
+		void add(const std::pair<COORD, COORD>* val) {
+			unsigned int x1 = val->first.X;
+			unsigned int y1 = val->first.Y;
+			unsigned int x2 = val->second.X;
+			unsigned int y2 = val->second.Y;
+			add(&x1);
+			add(&y1);
+			add(&x2);
+			add(&y2);
+		}
 		template<typename T>
 		void add(const std::vector<T>* arr) {
 			unsigned int arrSize = arr->size();
@@ -120,6 +131,7 @@ namespace msg {
 		memcpy(&obj, buffer.get() + offset, sizeof(T));
 		return sizeof(T);
 	}
+	int parseObj(std::pair<COORD, COORD>& obj, const Buffer& buffer, const int offset);
 	int parseObj(std::string& obj, const Buffer& buffer, const int offset);
 	int parseObj(unsigned int& obj, const Buffer& buffer, const int offset); 
 	int parseObj(Type& obj, const Buffer& buffer, const int offset);
@@ -130,11 +142,12 @@ namespace msg {
 		int pos = offset;
 		pos += parseObj(arrSize, buffer, pos);
 		for (int i = 0; i < arrSize; i++) {
-			arr.push_back(T{ 0 });
+			arr.push_back(T{});
 			pos += parseObj(arr[arr.size() - 1], buffer, pos);
 		}
 		return pos;
 	}
+
 	template<typename... Args>
 	int parse(const Buffer& buffer, int pos, Args&... args) {
 		([&] {
@@ -204,6 +217,22 @@ namespace msg {
 		unsigned int eraseSize = 0;
 		unsigned int X = 0;
 		unsigned int Y = 0;
+	};
+
+	struct Replace {
+		Type type = Type::replace;
+		OneByteInt version = 0;
+		std::string token;
+		std::string text; // new text
+		std::vector<std::pair<COORD, COORD>> segments;
+	};
+
+	struct ReplaceResponse {
+		Type type = Type::replace;
+		OneByteInt version = 0;
+		OneByteInt user = 0;
+		std::string text; // new text
+		std::vector<std::pair<COORD, COORD>> segments;
 	};
 
 	struct MoveHorizontal {

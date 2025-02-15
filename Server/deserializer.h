@@ -11,4 +11,5 @@ public:
 	static msg::MoveVertical parseMoveVertical(const msg::Buffer& buffer);
 	static msg::MoveSelectAll parseMoveSelectAll(const msg::Buffer& buffer);
 	static msg::ControlMessage parseControlMessage(const msg::Buffer& buffer);
+	static msg::Replace parseReplaceMessage(const msg::Buffer& buffer);
 };

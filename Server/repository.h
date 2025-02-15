@@ -37,6 +37,7 @@ namespace server {
 		Response moveVertical(SOCKET client, msg::Buffer& buffer);
 		Response moveSelectAll(SOCKET client, msg::Buffer& buffer);
 		Response undoRedo(SOCKET client, msg::Buffer& buffer);
+		Response replace(SOCKET client, msg::Buffer& buffer);
 		int findClient(SOCKET client);
 
 		// TODO BETTER SYSTEM

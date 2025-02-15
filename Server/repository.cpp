@@ -31,8 +31,10 @@ namespace server {
 		case msg::Type::selectAll:
 			return moveSelectAll(client, buffer);
 		case msg::Type::undo:
-		case::msg::Type::redo:
+		case msg::Type::redo:
 			return undoRedo(client, buffer);
+		case msg::Type::replace:
+			return replace(client, buffer);
 		}
 		assert(false && "Unrecognized msg type. Aborting...");
 		return Response{ std::move(buffer), {}, msg::Type::error };
@@ -199,6 +201,26 @@ namespace server {
 		}
 		logger.logDebug(msg.type, "returned noop action. Nothing changed.");
 		return Response{ std::move(buffer), {}, msg::Type::error };
+	}
+
+	Response Repository::replace(SOCKET client, msg::Buffer& buffer) {
+		auto msg = Deserializer::parseReplaceMessage(buffer);
+		int userIdx = findClient(client);
+		if (userIdx < 0) {
+			logger.logDebug(msg.type, "command failed. User not found error");
+			return Response{ std::move(buffer), {}, msg::Type::error };
+		}
+		std::scoped_lock lock{docLock};
+		for (auto segment = msg.segments.rbegin(); segment != msg.segments.rend(); segment++) {
+			if (!doc.setCursorPos(userIdx, segment->first) || !doc.setCursorAnchor(userIdx, segment->second)) {
+				logger.logError("Replace failed with one segment");
+				continue;
+			}
+			doc.erase(userIdx, 1);
+			doc.write(userIdx, msg.text);
+		}
+		auto newBuffer = Serializer::makeReplaceResponse(userIdx, msg);
+		return Response{ std::move(newBuffer), connectedClients, msg::Type::replace };
 	}
 
 }

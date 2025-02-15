@@ -40,3 +40,9 @@ msg::ControlMessage Deserializer::parseControlMessage(const msg::Buffer& buffer)
 	msg::parse(buffer, 0, msg.type, msg.version, msg.token);
 	return msg;
 }
+
+msg::Replace Deserializer::parseReplaceMessage(const msg::Buffer& buffer) {
+	auto msg = msg::Replace{};
+	msg::parse(buffer, 0, msg.type, msg.version, msg.token, msg.text, msg.segments);
+	return msg;
+}

@@ -62,3 +62,11 @@ msg::Buffer Serializer::makeMoveResponseImpl(const ServerSiteDocument& doc, cons
 	msg::serializeTo(buffer, 0, type, version, userBuff, cursorX, cursorY, withSelect, anchorX, anchorY);
 	return buffer;
 }
+
+msg::Buffer Serializer::makeReplaceResponse(const int userIdx, const msg::Replace& msg) {
+	int bufferSize = 16 * msg.segments.size() + msg.text.size() + 10;
+	msg::Buffer buffer{ bufferSize };
+	auto userBuff = static_cast<msg::OneByteInt>(userIdx);
+	msg::serializeTo(buffer, 0, msg::Type::replace, msg.version, userBuff, msg.text, msg.segments);
+	return buffer;
+}

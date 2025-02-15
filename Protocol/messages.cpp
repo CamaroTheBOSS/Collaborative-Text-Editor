@@ -58,7 +58,17 @@ namespace msg {
 		serializeTo(newBuffer, 0, static_cast<unsigned int>(buffer.size), buffer);
 		return newBuffer;
 	}
-
+	int parseObj(std::pair<COORD, COORD>& obj, const Buffer& buffer, const int offset) {
+		unsigned int x1, y1, x2, y2;
+		int pos = offset;
+		pos += parseObj(x1, buffer, pos);
+		pos += parseObj(y1, buffer, pos);
+		pos += parseObj(x2, buffer, pos);
+		pos += parseObj(y2, buffer, pos);
+		obj.first = COORD{ static_cast<SHORT>(x1), static_cast<SHORT>(y1) };
+		obj.second = COORD{ static_cast<SHORT>(x2), static_cast<SHORT>(y2) };
+		return pos;
+	}
 	int parseObj(std::string& obj, const Buffer& buffer, const int offset) {
 		obj = std::string{ buffer.get() + offset };
 		return obj.size() + 1;
@@ -82,8 +92,8 @@ namespace msg {
 		return sizeof(OneByteInt);
 	}
 
-	constexpr std::array<const char*, 20> typeToStr = { "MASTER NOTIFICATION", "MASTER CLOSE", "REGISTRATION", "LOGIN", "CREATE" , "LOAD" ,
-	"JOIN" , "GETFILES", "SAVEFILE", "ERROR", "WRITE", "ERASE", "MOVEVERTICAL", "MOVEHORIZONTAL", "SYNC",
+	constexpr std::array<const char*, 21> typeToStr = { "MASTER NOTIFICATION", "MASTER CLOSE", "REGISTRATION", "LOGIN", "CREATE" , "LOAD" ,
+	"JOIN" , "GETFILES", "SAVEFILE", "ERROR", "WRITE", "ERASE", "REPLACE", "MOVEVERTICAL", "MOVEHORIZONTAL", "SYNC",
 	"CONNECT", "DISCONNECT", "SELECT ALL", "UNDO", "REDO"};
 
 	constexpr std::array<const char*, 4> sideToStr = { "LEFT", "RIGHT", "UP", "DOWN" };

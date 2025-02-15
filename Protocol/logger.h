@@ -41,6 +41,10 @@ namespace logs {
 		void _log(std::stringstream& ss, const T& arg) {
 			ss << arg << " ";
 		}
+		template<typename T>
+		void _log(std::stringstream& ss, const std::vector<T>& arg) {
+			ss << "vector of " << typeid(T).name();
+		}
 		void _log(std::stringstream& ss,  const msg::OneByteInt& arg) {
 			ss << static_cast<int>(arg) << " ";
 		}
