@@ -1,5 +1,3 @@
-#include <fstream>
-
 #include "repository.h"
 #include "pos_helpers.h"
 #include "logging.h"
@@ -59,13 +57,20 @@ namespace client {
 	bool Repository::replace(ClientSiteDocument& doc, msg::Buffer& buffer) {
 		msg::ReplaceResponse msg;
 		parse(buffer, 1, msg.version, msg.user, msg.text, msg.segments);
+		int myUser = doc.getMyCursor();
+		if (msg.user == myUser) {
+			doc.resetSegments();
+		}
 		for (auto segment = msg.segments.rbegin(); segment != msg.segments.rend(); segment++) {
 			if (!doc.setCursorPos(msg.user, segment->first) || !doc.setCursorAnchor(msg.user, segment->second)) {
 				logger.logError("Replace failed with one segment");
 				continue;
 			}
-			doc.erase(msg.user, 1);
-			doc.write(msg.user, msg.text);
+			COORD start = doc.erase(msg.user, 1);
+			COORD end = doc.write(msg.user, msg.text);
+			if (msg.user == myUser) {
+				doc.insertSegment(start, end, 0);
+			}
 		}
 		return true;
 	}

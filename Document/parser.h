@@ -6,4 +6,6 @@ class Parser {
 public:
 	static std::vector<std::string> parseTextToVector(const std::string& text);
 	static std::string parseVectorToText(const std::vector<std::string>& vec);
+private:
+	static void postprocess(std::vector<std::string>& vec);
 };

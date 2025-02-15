@@ -12,6 +12,8 @@ public:
 	void setCursorOnNextSegmentStart(const int index);
 	const TextContainer::Segments& getSegments() const;
 	int getChosenSegmentIndex() const;
+	void setSegments(TextContainer::Segments& newSegments);
+	void insertSegment(const COORD& startPos, const COORD& endPos, const int pos);
 private:
 	void moveSegment(std::pair<COORD, COORD>& segment, const COORD& startPos, const COORD& diff) const;
 	void afterWriteAction(const int index, const COORD& startPos, const COORD& endPos, std::vector<std::string>& writtenText) override;

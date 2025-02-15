@@ -60,11 +60,10 @@ namespace msg {
 	}
 	int parseObj(std::pair<COORD, COORD>& obj, const Buffer& buffer, const int offset) {
 		unsigned int x1, y1, x2, y2;
-		int pos = offset;
-		pos += parseObj(x1, buffer, pos);
-		pos += parseObj(y1, buffer, pos);
-		pos += parseObj(x2, buffer, pos);
-		pos += parseObj(y2, buffer, pos);
+		int pos = parseObj(x1, buffer, offset);
+		pos += parseObj(y1, buffer, offset + pos);
+		pos += parseObj(x2, buffer, offset + pos);
+		pos += parseObj(y2, buffer, offset + pos);
 		obj.first = COORD{ static_cast<SHORT>(x1), static_cast<SHORT>(y1) };
 		obj.second = COORD{ static_cast<SHORT>(x2), static_cast<SHORT>(y2) };
 		return pos;

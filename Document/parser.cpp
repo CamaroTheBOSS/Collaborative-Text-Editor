@@ -17,6 +17,7 @@ std::vector<std::string> Parser::parseTextToVector(const std::string& text) {
 	} while (end != std::string::npos);
 	std::string lineText{text.cbegin() + offset, text.cend()};
 	parsedLines.emplace_back(lineText);
+	postprocess(parsedLines);
 	return parsedLines;
 }
 
@@ -29,4 +30,17 @@ std::string Parser::parseVectorToText(const std::vector<std::string>& vec) {
 		ret.erase(ret.size() - 1);
 	}
 	return ret;
+}
+
+void Parser::postprocess(std::vector<std::string>& text) {
+	for (auto& line : text) {
+		int pos = 0;
+		while (pos < text.size()) {
+			pos = line.find('\t', pos);
+			if (pos == std::string::npos) {
+				break;
+			}
+			line.replace(pos, 1, "    ");
+		}
+	}
 }

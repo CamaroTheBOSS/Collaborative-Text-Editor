@@ -64,6 +64,14 @@ int ClientSiteDocument::getChosenSegmentIndex() const {
 	return chosenSegment;
 }
 
+void ClientSiteDocument::setSegments(TextContainer::Segments& newSegments) {
+	segments = std::move(newSegments);
+}
+
+void ClientSiteDocument::insertSegment(const COORD& startPos, const COORD& endPos, const int pos) {
+	segments.insert(segments.cbegin() + pos, std::make_pair(startPos, endPos));
+}
+
 void ClientSiteDocument::moveSegment(std::pair<COORD, COORD>& segment, const COORD& startPos, const COORD& diff) const {
 	if (segment.first.Y == startPos.Y && segment.first.X >= startPos.X) {
 		segment.first = segment.first + diff;
