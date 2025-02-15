@@ -109,7 +109,7 @@ void ClientSiteDocument::afterEraseAction(const int index, const COORD& startPos
 		moveSegment(segments[i], startPos, diff);
 	}
 	if (!indexesToDelete.empty()) {
-		segments.erase(segments.cbegin() + indexesToDelete.front(), segments.cbegin() + indexesToDelete.back());
+		segments.erase(segments.cbegin() + indexesToDelete.front(), segments.cbegin() + indexesToDelete.back() + 1);
 		if (chosenSegment >= indexesToDelete.front() && chosenSegment <= indexesToDelete.back()) {
 			chosenSegment = indexesToDelete.front() - 1;
 		}
