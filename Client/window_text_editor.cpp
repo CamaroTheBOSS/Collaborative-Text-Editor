@@ -36,10 +36,6 @@ ActionDone TextEditorWindow::processChar(TCPClient& client, const KeyPack& key, 
     case ARROW_DOWN:
         actionDone = client.sendMsg(msg::Type::moveVertical, version, std::string{""}, msg::MoveSide::down, getDocBufferWidth(), key.shiftPressed);
         break;
-    case CTRL_ARROW_DOWN:
-        return ActionDone::down;
-    case CTRL_ARROW_UP:
-        return ActionDone::up;
     case CTRL_A:
         actionDone = client.sendMsg(msg::Type::selectAll, version, std::string{""});
         break;

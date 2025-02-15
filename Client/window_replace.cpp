@@ -40,10 +40,6 @@ ActionDone ReplaceWindow::processChar(TCPClient& client, const KeyPack& key, con
     case ARROW_DOWN:
         doc.moveCursorDown(0, getDocBufferWidth(), key.shiftPressed);
         return ActionDone::render;
-    case CTRL_ARROW_DOWN:
-        return ActionDone::down;
-    case CTRL_ARROW_UP:
-        return ActionDone::up;
     case CTRL_A:
         doc.setCursorPos(0, doc.getEndPos());
         doc.setCursorAnchor(0, COORD{ 0, 0 });

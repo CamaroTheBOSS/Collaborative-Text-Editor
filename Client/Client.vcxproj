@@ -138,6 +138,7 @@
     <ClCompile Include="canvas.cpp" />
     <ClCompile Include="client_document.cpp" />
     <ClCompile Include="screen_buffers_builder.cpp" />
+    <ClCompile Include="windows_manager.cpp" />
     <ClCompile Include="window_base.cpp" />
     <ClCompile Include="window_search.cpp" />
     <ClCompile Include="window_replace.cpp" />
@@ -157,6 +158,7 @@
     <ClInclude Include="client_document.h" />
     <ClInclude Include="keypack.h" />
     <ClInclude Include="screen_buffers_builder.h" />
+    <ClInclude Include="windows_manager.h" />
     <ClInclude Include="window_base.h" />
     <ClInclude Include="window_search.h" />
     <ClInclude Include="window_replace.h" />

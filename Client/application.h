@@ -1,5 +1,5 @@
 #pragma once
-#include "window_base.h"
+#include "windows_manager.h"
 #include "terminal.h"
 #include "repository.h"
 
@@ -21,20 +21,9 @@ public:
 	bool requestDocument(const std::chrono::milliseconds& timeout, const int tries);
 	void render();
 private:
-	void setFocus(const int windowIdx);
-	WindowsIt showSearchWindow();
-	WindowsIt showReplaceWindow();
-	WindowsIt findWindow(const std::string& name) const;
-	void destroyLastWindow();
-	void changeFocusUp();
-	void changeFocusDown();
 	TCPClient client;
 	Terminal terminal;
 	client::Repository repo;
 
-	int focus = 0;
-	Windows windows;
-	WindowsRegistry windowsRegistry;
-	
-	
+	WindowsManager windowsManager;
 };
