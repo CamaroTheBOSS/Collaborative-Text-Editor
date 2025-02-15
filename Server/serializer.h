@@ -10,6 +10,7 @@ public:
 	static msg::Buffer makeEraseResponse(const COORD& startPos, const int userIdx, const msg::Erase& msg);
 	static msg::Buffer makeMoveResponse(const ServerSiteDocument& doc, const int userIdx, const msg::MoveHorizontal& msg);
 	static msg::Buffer makeMoveResponse(const ServerSiteDocument& doc, const int userIdx, const msg::MoveVertical& msg);
+	static msg::Buffer makeMoveResponse(const ServerSiteDocument& doc, const int userIdx, const msg::MoveTo& msg);
 	static msg::Buffer makeMoveResponse(const ServerSiteDocument& doc, const int userIdx, const msg::MoveSelectAll& msg);
 	static msg::Buffer makeReplaceResponse(const int userIdx, const msg::Replace& msg);
 private:

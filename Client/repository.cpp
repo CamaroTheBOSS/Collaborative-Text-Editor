@@ -15,6 +15,7 @@ namespace client {
 		case msg::Type::selectAll:
 		case msg::Type::moveHorizontal:
 		case msg::Type::moveVertical:
+		case msg::Type::moveTo:
 			return move(doc, buffer);
 		case msg::Type::sync:
 			return sync(doc, buffer);

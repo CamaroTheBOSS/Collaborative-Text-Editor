@@ -30,6 +30,11 @@ msg::MoveVertical Deserializer::parseMoveVertical(const msg::Buffer& buffer) {
 	msg::parse(buffer, 0, msg.type, msg.version, msg.token, msg.side, msg.clientWidth, msg.withSelect);
 	return msg;
 }
+msg::MoveTo Deserializer::parseMoveTo(const msg::Buffer& buffer) {
+	auto msg = msg::MoveTo{};
+	msg::parse(buffer, 0, msg.type, msg.version, msg.token, msg.X, msg.Y);
+	return msg;
+}
 msg::MoveSelectAll Deserializer::parseMoveSelectAll(const msg::Buffer& buffer) {
 	auto msg = msg::MoveSelectAll{};
 	msg::parse(buffer, 0, msg.type, msg.version, msg.token);

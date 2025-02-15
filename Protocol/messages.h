@@ -31,6 +31,7 @@ namespace msg {
 		replace,
 		moveVertical,
 		moveHorizontal,
+		moveTo,
 		sync,
 		connect,
 		disconnect,
@@ -256,6 +257,14 @@ namespace msg {
 		Type type = Type::selectAll;
 		OneByteInt version = 0;
 		std::string token;
+	};
+
+	struct MoveTo {
+		Type type = Type::moveTo;
+		OneByteInt version = 0;
+		std::string token;
+		unsigned int X = 0;
+		unsigned int Y = 0;
 	};
 
 	struct MoveResponse {

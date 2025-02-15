@@ -46,6 +46,10 @@ msg::Buffer Serializer::makeMoveResponse(const ServerSiteDocument& doc, const in
 	return makeMoveResponseImpl(doc, msg.type, msg.version, userIdx, msg.withSelect);
 }
 
+msg::Buffer Serializer::makeMoveResponse(const ServerSiteDocument& doc, const int userIdx, const msg::MoveTo& msg) {
+	return makeMoveResponseImpl(doc, msg.type, msg.version, userIdx, false);
+}
+
 msg::Buffer Serializer::makeMoveResponse(const ServerSiteDocument& doc, const int userIdx, const msg::MoveSelectAll& msg) {
 	return makeMoveResponseImpl(doc, msg.type, msg.version, userIdx, true);
 }

@@ -28,6 +28,8 @@ namespace server {
 			return moveHorizontal(client, buffer);
 		case msg::Type::moveVertical:
 			return moveVertical(client, buffer);
+		case msg::Type::moveTo:
+			return moveTo(client, buffer);
 		case msg::Type::selectAll:
 			return moveSelectAll(client, buffer);
 		case msg::Type::undo:
@@ -163,6 +165,19 @@ namespace server {
 		}
 		auto newBuffer = Serializer::makeMoveResponse(doc, userIdx, msg);
 		return Response{ std::move(newBuffer), connectedClients, msg::Type::moveVertical };
+	}
+
+	Response Repository::moveTo(SOCKET client, msg::Buffer& buffer) {
+		auto msg = Deserializer::parseMoveTo(buffer);
+		int userIdx = findClient(client);
+		if (userIdx < 0) {
+			logger.logDebug(msg.type, "command failed. User not found error");
+			return Response{ std::move(buffer), {}, msg::Type::error };
+		}
+		std::scoped_lock lock{docLock};
+		doc.setCursorPos(userIdx, COORD{ (SHORT)msg.X, (SHORT)msg.Y });
+		auto newBuffer = Serializer::makeMoveResponse(doc, userIdx, msg);
+		return Response{ std::move(newBuffer), connectedClients, msg::Type::moveTo };
 	}
 
 	Response Repository::moveSelectAll(SOCKET client, msg::Buffer& buffer) {

@@ -1,4 +1,5 @@
 #include "window_search.h"
+#include "pos_helpers.h"
 
 constexpr msg::OneByteInt version = 1;
 
@@ -30,8 +31,7 @@ ActionDone SearchWindow::processChar(TCPClient& client, const KeyPack& key, cons
         docToSearch->findSegments(doc.getText());
         return ActionDone::render;
     case ENTER:
-        docToSearch->setCursorOnNextSegmentStart(docToSearch->getMyCursor());
-        return ActionDone::render;
+        return sendGoToNextSegment(client);
     case ARROW_LEFT:
         doc.moveCursorLeft(0, key.shiftPressed);
         return ActionDone::render;
@@ -62,4 +62,15 @@ ActionDone SearchWindow::processChar(TCPClient& client, const KeyPack& key, cons
         return ActionDone::render;
     }
     return ActionDone::undone;
+}
+
+ActionDone SearchWindow::sendGoToNextSegment(TCPClient& client) {
+    COORD pos = docToSearch->getNextSegmentPos();
+    if (pos == COORD{-1, -1}) {
+        return ActionDone::undone;
+    }
+    unsigned int X = pos.X;
+    unsigned int Y = pos.Y;
+    client.sendMsg(msg::Type::moveTo, version, std::string{""}, X, Y);
+    return ActionDone::done;
 }

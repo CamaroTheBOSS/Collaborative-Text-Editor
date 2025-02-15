@@ -9,7 +9,7 @@ public:
 
 	void findSegments(const std::string& pattern);
 	void resetSegments();
-	void setCursorOnNextSegmentStart(const int index);
+	COORD getNextSegmentPos();
 	const TextContainer::Segments& getSegments() const;
 	int getChosenSegmentIndex() const;
 	void setSegments(TextContainer::Segments& newSegments);

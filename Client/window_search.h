@@ -9,6 +9,7 @@ public:
 	SearchWindow(const ScrollableScreenBufferBuilder& ssbBuilder, ClientSiteDocument* docToSearch);
 	~SearchWindow() override;
 	ActionDone processChar(TCPClient& client, const KeyPack& key, const std::string& clipboardData) override;
+	ActionDone sendGoToNextSegment(TCPClient& client);
 	std::string name() const override {
 		return className;
 	}

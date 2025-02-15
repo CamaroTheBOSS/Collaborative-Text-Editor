@@ -45,15 +45,15 @@ void ClientSiteDocument::resetSegments() {
 	chosenSegment = -1;
 }
 
-void ClientSiteDocument::setCursorOnNextSegmentStart(const int index) {
-	if (!validateUserIdx(index) || segments.empty()) {
-		return;
+COORD ClientSiteDocument::getNextSegmentPos() {
+	if (segments.size() == 0) {
+		return COORD{ -1, -1 };
 	}
 	chosenSegment++;
 	if (chosenSegment >= segments.size()) {
 		chosenSegment = 0;
 	}
-	setCursorPos(index, segments[chosenSegment].first);
+	return segments[chosenSegment].first;
 }
 
 const TextContainer::Segments& ClientSiteDocument::getSegments() const {

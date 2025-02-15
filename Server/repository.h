@@ -35,6 +35,7 @@ namespace server {
 		Response erase(SOCKET client, msg::Buffer& buffer);
 		Response moveHorizontal(SOCKET client, msg::Buffer& buffer);
 		Response moveVertical(SOCKET client, msg::Buffer& buffer);
+		Response moveTo(SOCKET client, msg::Buffer& buffer);
 		Response moveSelectAll(SOCKET client, msg::Buffer& buffer);
 		Response undoRedo(SOCKET client, msg::Buffer& buffer);
 		Response replace(SOCKET client, msg::Buffer& buffer);
