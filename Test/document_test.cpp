@@ -584,3 +584,12 @@ TEST(DocumentTests, MoreSegmentsAffectHugeEraseTest) {
 		{COORD(5, 3), COORD(8, 3)},
 		{COORD(5, 4), COORD(8, 4)} });
 }
+
+TEST(DocumentTests, SegmentsAffectEraseBetweenTest) {
+	ClientSiteDocument doc{ "some new text", 1, 0 };
+	doc.findSegments("new");
+	doc.setCursorPos(0, COORD{ 8, 0 });
+	doc.setCursorAnchor(0, COORD{ 5, 0 });
+	doc.erase(0, 1);
+	testSegments(doc.getSegments(), {});
+}
