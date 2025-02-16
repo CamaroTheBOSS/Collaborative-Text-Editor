@@ -16,6 +16,7 @@ Application::Application() :
     windowsManager(),
     repo() {
     windowsManager.showTextEditorWindow(terminal.getScreenSize());
+    windowsManager.showMainMenuWindow(terminal.getScreenSize());
 }
 
 bool Application::connect(const std::string& ip, const int port) {
@@ -66,11 +67,20 @@ ActionDone Application::processChar(const KeyPack& key) {
             windowsManager.showReplaceWindow(terminal.getScreenSize());
         }
         return ActionDone::render;
+    case CTRL_Q:
+        windowsManager.showMainMenuWindow(terminal.getScreenSize());
+        return ActionDone::render;
     case ESC:
         windowsManager.destroyLastWindow();
         return ActionDone::render;
     }
-    return window->processChar(client, key);
+    ActionDone action = window->processChar(client, key);
+    if (action == ActionDone::createdoc || action == ActionDone::loaddoc) {
+        requestDocument(std::chrono::milliseconds(500), 4000);
+        windowsManager.destroyLastWindow();
+        return ActionDone::render;
+    }
+    return action;
 }
 
 bool Application::checkBufferWasResized() {
@@ -115,6 +125,7 @@ bool Application::requestDocument(const std::chrono::milliseconds& timeout, cons
             return true;
         }
     }
+    logger.logDebug(currTry, "Requesting document from the server failed!\n");
     return false;
 }
 

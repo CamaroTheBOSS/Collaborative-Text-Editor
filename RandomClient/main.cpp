@@ -60,10 +60,7 @@ int main() {
 		std::cout << "Connection to server failed!\n";
 		return 0;
 	}
-	if (!app.requestDocument(std::chrono::milliseconds(500), 3)) {
-		std::cout << "Requesting document from the server failed!\n";
-		return 0;
-	}
+	app.processChar(KeyPack{ENTER, false});
 	app.render();
 	while (app.isConnected()) {
 		KeyPack key = app.readChar();

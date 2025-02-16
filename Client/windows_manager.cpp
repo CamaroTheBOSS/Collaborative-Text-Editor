@@ -72,6 +72,29 @@ void WindowsManager::setFocus(const int newFocus) {
     windows[focus]->activate();
 }
 
+WindowsIt WindowsManager::showMainMenuWindow(const COORD& consoleSize) {
+    if (windowsRegistry.find(MainMenuWindow::className) != windowsRegistry.cend()) {
+        return findWindow(MainMenuWindow::className);
+    }
+    ScrollableScreenBufferBuilder builder;
+    builder.setScrollHisteresis(0)
+        .setTitle(MainMenuWindow::className)
+        .setRelativeLeft(0.35)
+        .setRelativeTop(0.4)
+        .setRelativeRight(0.65)
+        .setRelativeBot(0.6)
+        .setConsoleSize(Pos<int>{consoleSize.X, consoleSize.Y})
+        .showLeftFramePattern("|")
+        .showRightFramePattern("|")
+        .showTopFramePattern("-")
+        .showBottomFramePattern("-");
+    auto window = std::make_unique<MainMenuWindow>(builder);
+    windowsRegistry[window->name()] = true;
+    windows.emplace_back(std::move(window));
+    setFocus(windows.size() - 1);
+    return windows.cend() - 1;
+}
+
 WindowsIt WindowsManager::showSearchWindow(const COORD& consoleSize) {
     if (windowsRegistry.find(SearchWindow::className) != windowsRegistry.cend()) {
         return findWindow(SearchWindow::className);

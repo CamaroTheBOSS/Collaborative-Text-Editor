@@ -2,6 +2,7 @@
 #include "window_text_editor.h"
 #include "window_search.h"
 #include "window_replace.h"
+#include "window_mainmenu.h"
 
 using Window = std::unique_ptr<BaseWindow>;
 using Windows = std::vector<Window>;
@@ -16,6 +17,7 @@ public:
 	void changeFocusRight();
 	void setFocus(const int newFocus);
 
+	WindowsIt showMainMenuWindow(const COORD& consoleSize);
 	WindowsIt showSearchWindow(const COORD& consoleSize);
 	WindowsIt showReplaceWindow(const COORD& consoleSize);
 	WindowsIt showTextEditorWindow(const COORD& consoleSize);

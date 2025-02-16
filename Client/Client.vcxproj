@@ -140,6 +140,7 @@
     <ClCompile Include="screen_buffers_builder.cpp" />
     <ClCompile Include="windows_manager.cpp" />
     <ClCompile Include="window_base.cpp" />
+    <ClCompile Include="window_mainmenu.cpp" />
     <ClCompile Include="window_search.cpp" />
     <ClCompile Include="window_replace.cpp" />
     <ClCompile Include="window_text_editor.cpp" />
@@ -160,6 +161,7 @@
     <ClInclude Include="screen_buffers_builder.h" />
     <ClInclude Include="windows_manager.h" />
     <ClInclude Include="window_base.h" />
+    <ClInclude Include="window_mainmenu.h" />
     <ClInclude Include="window_search.h" />
     <ClInclude Include="window_replace.h" />
     <ClInclude Include="window_text_editor.h" />
