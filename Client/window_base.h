@@ -3,7 +3,7 @@
 #include "screen_buffers_builder.h"
 #include "keypack.h"
 
-enum class ActionDone { done, undone, up, down, render, createdoc, loaddoc, quit };
+enum class ActionDone { done, undone, up, down, render, createdoc, loaddoc, help };
 
 class BaseWindow {
 	friend class SyncTester;

@@ -2,7 +2,8 @@
 
 #define CREATE 0
 #define LOAD 1
-#define QUIT 2
+#define HELP 2
+#define QUIT 3
 
 MainMenuWindow::MainMenuWindow() :
 	BaseWindow() {
@@ -13,7 +14,7 @@ MainMenuWindow::MainMenuWindow() :
 
 MainMenuWindow::MainMenuWindow(const ScrollableScreenBufferBuilder& ssbBuilder) :
 	BaseWindow(ssbBuilder) {
-    doc.write(0, "Create Document\nLoad Document\nQuit");
+    doc.write(0, "Create Document\nLoad Document\nHelp Control\nQuit");
     numOptions = doc.get().size();
     selectOption();
 }
@@ -59,6 +60,8 @@ ActionDone MainMenuWindow::executeOption() {
         return ActionDone::createdoc;
     case LOAD:
         return ActionDone::loaddoc;
+    case HELP:
+        return ActionDone::help;
     case QUIT:
         exit(0);
     }

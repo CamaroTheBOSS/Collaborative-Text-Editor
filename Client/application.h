@@ -26,4 +26,5 @@ private:
 	client::Repository repo;
 
 	WindowsManager windowsManager;
+	bool docRequested = false;
 };

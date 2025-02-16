@@ -75,7 +75,7 @@ ActionDone Application::processChar(const KeyPack& key) {
         return ActionDone::render;
     }
     ActionDone action = window->processChar(client, key);
-    if (action == ActionDone::createdoc || action == ActionDone::loaddoc) {
+    if ((action == ActionDone::createdoc || action == ActionDone::loaddoc) && !docRequested) {
         requestDocument(std::chrono::milliseconds(500), 4000);
         windowsManager.destroyLastWindow();
         return ActionDone::render;
@@ -122,6 +122,7 @@ bool Application::requestDocument(const std::chrono::milliseconds& timeout, cons
         msg::parse(msgBuffer, 0, msgType);
         repo.processMsg(windowsManager.getTextEditor()->getDoc(), msgBuffer);
         if (msgType == msg::Type::sync) {
+            docRequested = true;
             return true;
         }
     }
