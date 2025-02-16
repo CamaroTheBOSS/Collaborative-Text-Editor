@@ -19,6 +19,8 @@ public:
 private:
 	friend class SyncTester;
 	enum class State {opened, closing, closed};
+	bool forwardConnection(const SOCKET client);
+	bool acceptConnection(const SOCKET client);
 	int selectWorker();
 	void initWorkers(const int nWorkers);
 	int closeWorkers();
@@ -28,8 +30,11 @@ private:
 	const int port;
 	SOCKET listenSocket = INVALID_SOCKET;
 	sockaddr_in listenSocketAddress = { 0 };
+	FD_SET unassignedConns;
 
 	std::vector<Worker> workers;
 	std::vector<SOCKET> notifiers;
 	server::Repository repo;
+	MessageExtractor extractor;
+	
 };

@@ -15,7 +15,7 @@ namespace msg {
 	using OneByteInt = unsigned char;
 	enum class Type {
 		// Commands
-		masterNotification,
+		masterForwardConnect,
 		masterClose,
 		registration,
 		login,
@@ -163,6 +163,13 @@ namespace msg {
 			buffer.add(&args);
 		} (), ...);
 	}
+
+	struct ForwardConnect {
+		Type type = Type::masterForwardConnect;
+		OneByteInt version = 0;
+		unsigned int socket = 0;
+		std::string docCode;
+	};
 
 	struct Connect {
 		Type type = Type::connect;

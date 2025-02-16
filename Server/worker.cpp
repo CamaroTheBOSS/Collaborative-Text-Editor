@@ -70,7 +70,7 @@ void Worker::handleConnections() {
         int socketCount = select(0, &listenConnections, nullptr, nullptr, nullptr);
         for (int i = 0; i < socketCount; i++) {
             SOCKET client = listenConnections.fd_array[i];
-            auto msgBuffers = recvMsg(client);
+            auto msgBuffers = extractor.extractMessages(client);
             for (auto& msgBuffer : msgBuffers) {
                 server::Response response = processMsg(client, msgBuffer);
                 if (response.msgType == msg::Type::sync) {
@@ -92,21 +92,6 @@ void Worker::close() {
         closesocket(connections.fd_array[i]);
     }
     closesocket(masterListener);
-}
-
-std::vector<msg::Buffer> Worker::recvMsg(const SOCKET client) {
-    msg::Buffer recvBuff{defaultBuffSize};
-    recvBuff.size = recv(client, recvBuff.get(), recvBuff.capacity, 0);
-    if (recvBuff.size > 0) {
-        auto [it, newOne] = clientFramerMap.try_emplace(client, Framer{ defaultBuffSize });
-        auto msgBuffers = it->second.extractMessages(recvBuff);
-        if (!msgBuffers.empty()) {
-            logger.logDebug("Received", msgBuffers.size(), "messages from client", client);
-        }
-        return msgBuffers;
-    }
-    return { std::move(recvBuff) };
-    
 }
 
 server::Response Worker::processMsg(const SOCKET client, msg::Buffer& buffer) {

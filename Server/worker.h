@@ -8,7 +8,7 @@
 
 #include "messages.h"
 #include "repository.h"
-#include "framer.h"
+#include "message_extractor.h"
 
 class Worker {
 public:
@@ -22,7 +22,6 @@ private:
 	bool connectToMaster(const std::string& ip, const int port);
 	void handleConnections();
 	server::Response shutdownConnection(SOCKET client, msg::Buffer& buffer);
-	std::vector<msg::Buffer> recvMsg(SOCKET client);
 	server::Response processMsg(SOCKET client, msg::Buffer& buffer);
 	void sendResponses(server::Response& response) const;
 	void syncClientState(server::Response& response) const;
@@ -37,5 +36,5 @@ private:
 	std::thread thread;
 
 	server::Repository* repo;
-	std::unordered_map<SOCKET, Framer> clientFramerMap;
+	MessageExtractor extractor;
 };

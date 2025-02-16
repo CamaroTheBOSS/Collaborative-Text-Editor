@@ -1,5 +1,10 @@
 #include "deserializer.h"
 
+msg::ForwardConnect Deserializer::parseMasterForwardConnect(const msg::Buffer& buffer) {
+	msg::ForwardConnect msg;
+	msg::parse(buffer, 0, msg.type, msg.version, msg.socket, msg.docCode);
+	return msg;
+}
 msg::Connect Deserializer::parseConnect(const msg::Buffer& buffer) {
 	msg::Connect msg;
 	msg::parse(buffer, 0, msg.type, msg.version);

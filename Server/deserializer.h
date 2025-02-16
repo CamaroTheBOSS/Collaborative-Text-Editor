@@ -3,6 +3,7 @@
 
 class Deserializer {
 public:
+	static msg::ForwardConnect parseMasterForwardConnect(const msg::Buffer& buffer);
 	static msg::Connect parseConnect(const msg::Buffer& buffer);
 	static msg::Disconnect parseDisconnect(const msg::Buffer& buffer);
 	static msg::Write parseWrite(const msg::Buffer& buffer);

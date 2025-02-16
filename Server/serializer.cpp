@@ -1,6 +1,14 @@
 #include "serializer.h"
 
+msg::Buffer Serializer::makeConnectResponse(const ServerSiteDocument& doc, const int userIdx, const msg::ForwardConnect& msg) {
+	return makeConnectResponseImpl(doc, msg.version, userIdx);
+}
+
 msg::Buffer Serializer::makeConnectResponse(const ServerSiteDocument& doc, const int userIdx, const msg::Connect& msg) {
+	return makeConnectResponseImpl(doc, msg.version, userIdx);
+}
+
+msg::Buffer Serializer::makeConnectResponseImpl(const ServerSiteDocument& doc, const msg::OneByteInt version, const int userIdx) {
 	std::vector<unsigned int> cursorPositions;
 	for (const auto& cursorPos : doc.getCursorPositions()) {
 		cursorPositions.push_back(static_cast<unsigned int>(cursorPos.X));
@@ -9,9 +17,10 @@ msg::Buffer Serializer::makeConnectResponse(const ServerSiteDocument& doc, const
 	std::string docText = doc.getText();
 	msg::Buffer buffer{static_cast<int>(30 + docText.size() + 8 * cursorPositions.size())};
 	auto userBuff = static_cast<msg::OneByteInt>(userIdx);
-	msg::serializeTo(buffer, 0, msg::Type::sync, msg.version, userBuff, std::move(docText), std::move(cursorPositions));
+	msg::serializeTo(buffer, 0, msg::Type::sync, version, userBuff, std::move(docText), std::move(cursorPositions));
 	return buffer;
 }
+
 
 msg::Buffer Serializer::makeDisconnectResponse(const int userIdx, const msg::Disconnect& msg) {
 	msg::Buffer buffer{30};

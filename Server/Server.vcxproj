@@ -141,6 +141,7 @@
     <ClCompile Include="action_write.cpp" />
     <ClCompile Include="deserializer.cpp" />
     <ClCompile Include="history_manager.cpp" />
+    <ClCompile Include="message_extractor.cpp" />
     <ClCompile Include="server_document.cpp" />
     <ClCompile Include="logging.cpp" />
     <ClCompile Include="main.cpp" />
@@ -157,6 +158,7 @@
     <ClInclude Include="action_write.h" />
     <ClInclude Include="deserializer.h" />
     <ClInclude Include="history_manager.h" />
+    <ClInclude Include="message_extractor.h" />
     <ClInclude Include="server_document.h" />
     <ClInclude Include="logging.h" />
     <ClInclude Include="repository.h" />

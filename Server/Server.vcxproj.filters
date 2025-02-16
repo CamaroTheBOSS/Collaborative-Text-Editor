@@ -63,6 +63,9 @@
     <ClCompile Include="user_history.cpp">
       <Filter>Pliki źródłowe\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="message_extractor.cpp">
+      <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="server.h">
@@ -103,6 +106,9 @@
     </ClInclude>
     <ClInclude Include="user_history.h">
       <Filter>Pliki nagłówkowe\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="message_extractor.h">
+      <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

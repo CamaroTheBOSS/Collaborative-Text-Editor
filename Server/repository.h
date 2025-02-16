@@ -29,7 +29,7 @@ namespace server {
 	private:
 		Response connectUserToDoc(SOCKET client, msg::Buffer& buffer);
 		Response disconnectUserFromDoc(SOCKET client, msg::Buffer& buffer);
-		Response masterNotification(SOCKET client, msg::Buffer& buffer) const;
+		Response masterForwardConnect(SOCKET client, msg::Buffer& buffer);
 		Response masterClose(SOCKET client, msg::Buffer& buffer) const;
 		Response write(SOCKET client, msg::Buffer& buffer);
 		Response erase(SOCKET client, msg::Buffer& buffer);

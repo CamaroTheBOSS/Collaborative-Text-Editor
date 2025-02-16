@@ -12,8 +12,8 @@ namespace server {
 		msg::OneByteInt version;
 		msg::parse(buffer, 0, type, version);
 		switch (type) {
-		case msg::Type::masterNotification:
-			return masterNotification(client, buffer);
+		case msg::Type::masterForwardConnect:
+			return masterForwardConnect(client, buffer);
 		case msg::Type::masterClose:
 			return masterClose(client, buffer);
 		case msg::Type::sync:
@@ -79,9 +79,16 @@ namespace server {
 		return Response{ std::move(newBuffer), connectedClients, msg::Type::disconnect };
 	}
 
-	Response Repository::masterNotification(SOCKET client, msg::Buffer& buffer) const {
+	Response Repository::masterForwardConnect(SOCKET client, msg::Buffer& buffer) {
+		auto msg = Deserializer::parseMasterForwardConnect(buffer);
 		logger.logDebug("Thread", std::this_thread::get_id(), "got new connection!");
-		return Response{ std::move(buffer), {}, msg::Type::masterNotification };
+		std::scoped_lock lock{connectedClientsLock, docLock};
+		msg::OneByteInt userIdx = connectedClients.size();
+		connectedClients.push_back(msg.socket);
+		doc.addUser();
+		auto newBuffer = Serializer::makeConnectResponse(doc, userIdx, msg);
+		logger.logDebug("Thread", std::this_thread::get_id(), "connected new user to document!");
+		return Response{ std::move(newBuffer), { connectedClients }, msg::Type::sync };
 	}
 
 	Response Repository::masterClose(SOCKET client, msg::Buffer& buffer) const {

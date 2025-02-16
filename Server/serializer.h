@@ -4,6 +4,7 @@
 
 class Serializer {
 public:
+	static msg::Buffer makeConnectResponse(const ServerSiteDocument& doc, const int userIdx, const msg::ForwardConnect& msg);
 	static msg::Buffer makeConnectResponse(const ServerSiteDocument& doc, const int userIdx, const msg::Connect& msg);
 	static msg::Buffer makeDisconnectResponse(const int userIdx, const msg::Disconnect& msg);
 	static msg::Buffer makeWriteResponse(const COORD& startPos, const int userIdx, const msg::Write& msg);
@@ -15,4 +16,5 @@ public:
 	static msg::Buffer makeReplaceResponse(const int userIdx, const msg::Replace& msg);
 private:
 	static msg::Buffer makeMoveResponseImpl(const ServerSiteDocument& doc, const msg::Type type, const msg::OneByteInt version, const int userIdx, const bool withSelect);
+	static msg::Buffer makeConnectResponseImpl(const ServerSiteDocument& doc, const msg::OneByteInt version, const int userIdx);
 };

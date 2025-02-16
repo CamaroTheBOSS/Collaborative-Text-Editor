@@ -6,10 +6,8 @@
 using namespace server;
 
 constexpr int msgBufferSize = 6;
-constexpr char notifyType = static_cast<char>(msg::Type::masterNotification);
 constexpr char closeType = static_cast<char>(msg::Type::masterClose);
 constexpr char version = 1;
-constexpr char notifyMsgBuffer[msgBufferSize] = { 0, 0, 0, 2, notifyType, version }; // (0002 = length)
 constexpr char closeMsgBuffer[msgBufferSize] = { 0, 0, 0, 2, closeType, version }; // (0002 = length)
 
 Server::Server(std::string ip, const int port) :
@@ -18,6 +16,12 @@ Server::Server(std::string ip, const int port) :
 	listenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (listenSocket == INVALID_SOCKET) {
 		logger.logError(WSAGetLastError(), ": Error when creating listening socket");
+		return;
+	}
+	u_long mode = 1;
+	int result = ioctlsocket(listenSocket, FIONBIO, &mode);
+	if (result != NO_ERROR) {
+		logger.logError(WSAGetLastError(), ": Error when setting nonblocking mode to listensocket");
 		return;
 	}
 
@@ -37,33 +41,68 @@ bool Server::open(const int nWorkers) {
 	}
 	logger.logDebug("Server opened for listening.");
 	initWorkers(nWorkers);
+	state = State::opened;
 	return true;
 }
 
 void Server::start() {
+	FD_ZERO(&unassignedConns);
+	FD_SET(listenSocket, &unassignedConns);
 	logger.logDebug("Listening for connections...");
-	state = State::opened;
 	while (state == State::opened) {
-		SOCKET newConnection = accept(listenSocket, nullptr, nullptr);
-		if (newConnection == INVALID_SOCKET) {
-			logger.logError(WSAGetLastError(), ": Error when accepting new connection");
-			closesocket(newConnection);
-			continue;
+		FD_SET conns = unassignedConns;
+		int selectCount = select(0, &conns, nullptr, nullptr, nullptr);
+		for (int i = 0; i < selectCount; i++) {
+			SOCKET client = conns.fd_array[i];
+			acceptConnection(client);
+			auto msgs = extractor.extractMessages(client);
+			for (const auto& buffer : msgs) {
+				msg::Type type;
+				msg::OneByteInt version;
+				msg::parse(buffer, 0, type, version);
+				if (type == msg::Type::sync) {
+					forwardConnection(client);
+				}
+			}
 		}
-		int worker = selectWorker();
-		auto id = workers[worker].thread.get_id();
-		{
-			std::scoped_lock lock{workers[worker].connSetLock};
-			FD_SET(newConnection, &workers[worker].connections);
-		}
-		int sendBytes = send(notifiers[worker], notifyMsgBuffer, msgBufferSize, 0);
-		if (sendBytes < 0) {
-			logger.logError(WSAGetLastError(), ": Error when notifying thread", id, "about new connection");
-			continue;
-		}
-		logger.logDebug("Connection", newConnection, "has been forwarded to thread", id);
 	}
 	state = State::closed;
+}
+
+bool Server::acceptConnection(const SOCKET client) {
+	if (client != listenSocket) {
+		return false;
+	}
+	SOCKET newConnection = accept(listenSocket, nullptr, nullptr);
+	if (newConnection == INVALID_SOCKET) {
+		logger.logError(WSAGetLastError(), ": Error when accepting new connection");
+		closesocket(newConnection);
+		return false;
+	}
+	FD_SET(newConnection, &unassignedConns);
+	return true;
+}
+
+bool Server::forwardConnection(const SOCKET client) {
+	int worker = selectWorker();
+	auto id = workers[worker].thread.get_id();
+	{
+		std::scoped_lock lock{workers[worker].connSetLock};
+		FD_SET(client, &workers[worker].connections);
+	}
+	msg::Buffer buffer{8};
+	unsigned int clientBuff = client;
+	msg::serializeTo(buffer, 0, msg::Type::masterForwardConnect, version, clientBuff, "");
+	msg::Buffer bufferWithSize = msg::enrich(buffer);
+	int sendBytes = send(notifiers[worker], bufferWithSize.get(), bufferWithSize.size, 0);
+	if (sendBytes < 0) {
+		logger.logError(WSAGetLastError(), ": Error when notifying thread", id, "about new connection");
+		return false;
+	}
+	logger.logDebug("Connection", client, "has been forwarded to thread", id);
+	extractor.reset(client);
+	FD_CLR(client, &unassignedConns);
+	return true;
 }
 
 bool Server::close() {
@@ -126,8 +165,12 @@ int Server::closeWorkers() {
 void Server::initWorkers(const int nWorkers) {
 	workers.reserve(nWorkers);
 	notifiers.reserve(nWorkers);
+	FD_SET set;
+	FD_ZERO(&set);
+	FD_SET(listenSocket, &set);
 	for (int i = 0; i < nWorkers; i++) {
 		Worker worker{ip, port, &repo};
+		int socketCount = select(0, &set, nullptr, nullptr, nullptr);
 		auto notifySocket = accept(listenSocket, nullptr, nullptr);
 		if (notifySocket == INVALID_SOCKET) {
 			closesocket(notifySocket);
