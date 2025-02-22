@@ -50,13 +50,13 @@ void MainMenuWindow::selectOption() {
 Event MainMenuWindow::executeOption() {
     switch (selectedOption) {
     case CREATE:
-        return Event{ "create doc", "App", { doc.getText() }};
+        return Event{ windows::app::events::createDoc, windows::app::name, { doc.getText() }};
     case LOAD:
-        return Event{ "load doc", "App", { doc.getText() } };
+        return Event{ windows::app::events::loadDoc, windows::app::name, { doc.getText() } };
     case HELP:
         return Event{};
     case QUIT:
-        return Event{ "exit", "App", {} };
+        return Event{ windows::app::events::exit, windows::app::name, {} };
     }
     return Event{};
 }
