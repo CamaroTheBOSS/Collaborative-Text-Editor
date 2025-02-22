@@ -1,11 +1,11 @@
-#include "window_replace.h"
+#include "window_loaddoc.h"
 
 constexpr msg::OneByteInt version = 1;
 
-ReplaceWindow::ReplaceWindow(const ScrollableScreenBufferBuilder& ssbBuilder) :
+LoadDocWindow::LoadDocWindow(const ScrollableScreenBufferBuilder& ssbBuilder) :
     BaseWindow(ssbBuilder) {}
 
-Event ReplaceWindow::processChar(TCPClient& client, const KeyPack& key, const std::string& clipboardData) {
+Event LoadDocWindow::processChar(TCPClient& client, const KeyPack& key, const std::string& clipboardData) {
     if (key.keyCode >= 32 && key.keyCode <= 127) {
         doc.write(0, std::string(1, key.keyCode));
         return Event{};
@@ -18,7 +18,7 @@ Event ReplaceWindow::processChar(TCPClient& client, const KeyPack& key, const st
         doc.erase(0, 1);
         return Event{};
     case ENTER:
-        return Event{ windows::text_editor::events::replace, className, windows::text_editor::name, { doc.getText() } };
+        return Event{ windows::app::events::loadDoc, className, windows::app::name, { doc.getText() } };
     case ARROW_LEFT:
         doc.moveCursorLeft(0, key.shiftPressed);
         return Event{};

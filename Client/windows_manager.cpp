@@ -1,5 +1,16 @@
 #include "windows_manager.h"
+#include "screen_builders.h"
 
+
+WindowsManager::WindowsManager() {
+    builderMap[MainMenuWindow::className] = makeMainMenuBuilder();
+    builderMap[CreateDocWindow::className] = makeCreateDocWindowBuilder();
+    builderMap[LoadDocWindow::className] = makeLoadDocWindowBuilder();
+    builderMap[HelpWindow::className] = makeHelpWindowBuilder();
+    builderMap[SearchWindow::className] = makeSearchWindowBuilder();
+    builderMap[ReplaceWindow::className] = makeReplaceWindowBuilder();
+    builderMap[TextEditorWindow::className] = makeTextEditorWindowBuilder();
+}
 
 void WindowsManager::changeFocusUp() {
     int newFocus = focus;
@@ -72,105 +83,37 @@ void WindowsManager::setFocus(const int newFocus) {
     windows[focus]->activate();
 }
 
-WindowsIt WindowsManager::showMainMenuWindow(const COORD& consoleSize) {
-    if (windowsRegistry.find(MainMenuWindow::className) != windowsRegistry.cend()) {
-        return findWindow(MainMenuWindow::className);
-    }
-    ScrollableScreenBufferBuilder builder;
-    builder.setScrollHisteresis(0)
-        .setTitle(MainMenuWindow::className)
-        .setRelativeLeft(0.35)
-        .setRelativeTop(0.4)
-        .setRelativeRight(0.65)
-        .setRelativeBot(0.6)
-        .setConsoleSize(Pos<int>{consoleSize.X, consoleSize.Y})
-        .showLeftFramePattern("|")
-        .showRightFramePattern("|")
-        .showTopFramePattern("-")
-        .showBottomFramePattern("-");
-    auto window = std::make_unique<MainMenuWindow>(builder);
-    windowsRegistry[window->name()] = true;
-    windows.emplace_back(std::move(window));
-    setFocus(windows.size() - 1);
-    return windows.cend() - 1;
-}
-
-WindowsIt WindowsManager::showSearchWindow(const COORD& consoleSize) {
-    if (windowsRegistry.find(SearchWindow::className) != windowsRegistry.cend()) {
-        return findWindow(SearchWindow::className);
-    }
-    ScrollableScreenBufferBuilder builder;
-    builder.setScrollHisteresis(0)
-        .setTitle(SearchWindow::className)
-        .setRelativeLeft(0.7)
-        .setRelativeTop(0.1)
-        .setRelativeRight(0.9)
-        .setRelativeBot(0.12)
-        .setConsoleSize(Pos<int>{consoleSize.X, consoleSize.Y})
-        .showLeftFramePattern("|")
-        .showRightFramePattern("|")
-        .showTopFramePattern("-")
-        .showBottomFramePattern("-");
-    auto window = std::make_unique<SearchWindow>(builder, &windows[0]->getDoc());
-    windowsRegistry[window->name()] = true;
-    windows.emplace_back(std::move(window));
-    setFocus(windows.size() - 1);
-    return windows.cend() - 1;
-}
-
-WindowsIt WindowsManager::showReplaceWindow(const COORD& consoleSize) {
-    if (windowsRegistry.find(ReplaceWindow::className) != windowsRegistry.cend()) {
-        return findWindow(ReplaceWindow::className);
-    }
-    auto& searchBuffer = showSearchWindow(consoleSize)->get()->getBuffer();
-    ScrollableScreenBufferBuilder builder;
-    builder.setScrollHisteresis(0)
-        .setTitle(ReplaceWindow::className)
-        .setAbsoluteLeft(searchBuffer.getLeft())
-        .setAbsoluteTop(searchBuffer.getBottom() + 2)
-        .setAbsoluteRight(searchBuffer.getRight())
-        .setAbsoluteBot(2 * searchBuffer.getBottom() - searchBuffer.getTop() + 2)
-        .setConsoleSize(Pos<int>{consoleSize.X, consoleSize.Y})
-        .showLeftFramePattern("|")
-        .showRightFramePattern("|")
-        .showTopFramePattern("-")
-        .showBottomFramePattern("-");
-    auto window = std::make_unique<ReplaceWindow>(builder, &windows[0]->getDoc());
-    windowsRegistry[window->name()] = true;
-    windows.emplace_back(std::move(window));
-    setFocus(windows.size() - 1);
-    return windows.cend() - 1;
-}
-
-WindowsIt WindowsManager::showTextEditorWindow(const COORD& consoleSize) {
-    ScrollableScreenBufferBuilder builder;
-    builder.showLineNumbers()
-        .setTitle("Document")
-        .setScrollHisteresis(2)
-        .setRelativeLeft(0.1)
-        .setRelativeTop(0.1)
-        .setRelativeRight(0.9)
-        .setRelativeBot(0.9)
-        .setConsoleSize(Pos<int>{consoleSize.X, consoleSize.Y})
-        .showLeftFramePattern("|")
-        .showRightFramePattern("|")
-        .showTopFramePattern("-")
-        .showBottomFramePattern("-");
-    windows.emplace_back(std::make_unique<TextEditorWindow>(builder));
-    windows[0]->activate();
-    return windows.cbegin();
-}
-
-void WindowsManager::destroyLastWindow() {
+void WindowsManager::destroyLastWindow(const TCPClient& client) {
     if (windows.size() <= 1) {
         return;
     }
     auto& last = windows.back();
+    auto pEvent = last->onDelete();
+    processEvent(client, pEvent);
     bool isActive = last->isActive();
     windowsRegistry.erase(last->name());
     windows.erase(windows.cend() - 1);
     if (isActive) {
         setFocus(windows.size() - 1);
+    }
+}
+
+void WindowsManager::destroyWindow(const std::string& name, const TCPClient& client) {
+    if (windows.size() <= 1) {
+        return;
+    }
+    auto window = findWindow(name);
+    if (window == windows.cend()) {
+        return;
+    }
+    auto pEvent = window->get()->onDelete();
+    processEvent(client, pEvent);
+    std::size_t index = std::distance(windows.cbegin(), window);
+    bool needToChangeFocus = focus >= index;
+    windowsRegistry.erase(window->get()->name());
+    windows.erase(window);
+    if (needToChangeFocus) {
+        setFocus(focus - 1);
     }
 }
 
@@ -184,6 +127,15 @@ const Window& WindowsManager::getTextEditor() const {
 
 const Windows& WindowsManager::getWindows() const {
     return windows;
+}
+
+bool WindowsManager::processEvent(const TCPClient& client, const Event& pEvent) {
+    auto it = findWindow(pEvent.target);
+    if (it == windows.cend()) {
+        return false;
+    }
+    it->get()->processEvent(client, pEvent);
+    return true;
 }
 
 WindowsIt WindowsManager::findWindow(const std::string& name) const {

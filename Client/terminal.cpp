@@ -73,7 +73,7 @@ bool Terminal::resizeScreenBufferIfNeeded() {
     SetConsoleCursorInfo(hConsole, &cursorInfo);
     screenInfo = std::move(newScreenInfo);
     screenSize = std::move(size);
-    renderer.resize(screenSize);
+    canvas.resize(screenSize);
     return true;
 }
 
@@ -96,14 +96,11 @@ void Terminal::clear() const {
 }
 
 void Terminal::render(const std::vector<std::unique_ptr<BaseWindow>>& windows) {
-    renderer.clear();
+    canvas.reset();
     for (const auto& window : windows) {
-        auto& docBuffer = window->getBuffer();
-        auto& doc = window->getDoc();
-        docBuffer.scrollToCursor(docBuffer.getMyTerminalCursor(doc));
-        renderer.addToBuffer(window);
+        window->render(canvas);
     }
-    renderer.render();
+    canvas.render();
 }
 
 std::string Terminal::getClipboardData() const {

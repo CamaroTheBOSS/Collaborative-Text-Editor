@@ -1,11 +1,11 @@
 #include "window_base.h"
-
-BaseWindow::BaseWindow() :
-    doc() {}
+#include "renderer.h"
 
 BaseWindow::BaseWindow(const ScrollableScreenBufferBuilder& ssbBuilder) :
     doc(),
-    buffer(ssbBuilder.getResult()) {}
+    buffer(ssbBuilder.getResult()),
+    active(false),
+    activeChildrenIndex(-1) {}
 
 bool BaseWindow::saveDoc() const {
     std::ofstream file(doc.getFilename(), std::ios::out);
@@ -16,11 +16,15 @@ bool BaseWindow::saveDoc() const {
     return true;
 }
 
-ClientSiteDocument& BaseWindow::getDoc() {
+const ClientSiteDocument& BaseWindow::getDoc() const {
     return doc;
 }
 
-ScrollableScreenBuffer& BaseWindow::getBuffer() {
+ClientSiteDocument& BaseWindow::getDocMutable() {
+    return doc;
+}
+
+const ScrollableScreenBuffer& BaseWindow::getBuffer() const {
     return buffer;
 }
 
@@ -38,4 +42,20 @@ void BaseWindow::activate() {
 
 void BaseWindow::deactivate() {
     active = false;
+}
+
+void BaseWindow::render(Canvas& canvas) {
+    updateScroll();
+    Renderer::addToCanvas(canvas, *this);
+    for (const auto& child : children) {
+        child->render(canvas);
+    }
+}
+
+void BaseWindow::updateScroll() {
+    buffer.scrollToCursor(buffer.getMyTerminalCursor(doc));
+}
+
+void BaseWindow::updateConsoleSize(const COORD& newSize) {
+    buffer.setNewConsoleSize({ newSize.X, newSize.Y });
 }

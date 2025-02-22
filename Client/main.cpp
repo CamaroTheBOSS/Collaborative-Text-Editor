@@ -24,11 +24,13 @@ int main() {
 		return 0;
 	}
 	app.render();
+	auto actionDone = false;
+	bool render = false;
 	while (app.isConnected()) {
 		KeyPack key = app.readChar();
-		auto actionDone = app.processChar(key);
-		bool render = app.checkIncomingMessages();
-		if (render || actionDone == ActionDone::render) {
+		actionDone = key.keyCode != '\0' ? app.processChar(key) : false;
+		render = app.checkIncomingMessages();
+		if (render || actionDone) {
 			app.render();
 		}
 	}

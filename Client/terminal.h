@@ -3,9 +3,9 @@
 #include <Winsock2.h>
 #include <Windows.h>
 #include <memory>
-#include "renderer.h"
 #include "window_base.h"
 #include "keypack.h"
+#include "canvas.h"
 
 class Terminal {
 public:
@@ -19,10 +19,9 @@ public:
 	bool resizeScreenBufferIfNeeded();
 	COORD getScreenSize() const;
 private:
+	Canvas canvas{ COORD{0, 0} };
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_SCREEN_BUFFER_INFO screenInfo{};
 	CONSOLE_CURSOR_INFO cursorInfo{};
 	COORD screenSize{ 0, 0 };
-
-	Renderer renderer;
 };

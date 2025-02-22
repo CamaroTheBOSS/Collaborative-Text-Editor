@@ -7,16 +7,16 @@
 constexpr std::array<int, 8> colors = { 240, 128, 144, 160, 48, 192, 208, 96 };
 constexpr int foundSegmentsColor = 31;
 
-void Renderer::addToBuffer(const std::unique_ptr<BaseWindow>& window) {
-    auto& buffer = window->getBuffer();
-    auto& doc = window->getDoc();
+void Renderer::addToCanvas(Canvas& canvas, const BaseWindow& window) {
+    auto& buffer = window.getBuffer();
+    auto& doc = window.getDoc();
     auto visibleLines = buffer.getTextInBuffer(doc);
     auto frames = buffer.getFrames();
     // Render basic text + frame if applicable
-    addTextToBuffer(buffer, visibleLines, buffer.getStartPos(), buffer.getEndPos());
+    addTextToCanvas(canvas, buffer, visibleLines, buffer.getStartPos(), buffer.getEndPos());
     for (const auto& frame : frames) {
         if (!frame.text.empty() && frame.buffer.fitInConsole()) {
-            addTextToBuffer(frame.buffer, frame.text, frame.buffer.getStartPos(), frame.buffer.getEndPos());
+            addTextToCanvas(canvas, frame.buffer, frame.text, frame.buffer.getStartPos(), frame.buffer.getEndPos());
         }
     }
     // Render found segments if applicable
@@ -24,30 +24,30 @@ void Renderer::addToBuffer(const std::unique_ptr<BaseWindow>& window) {
     auto [terminalSegments, chosenIndex] = buffer.getSegmentsTerminalCursorPos(doc);
     for (int i = 0; i < terminalSegments.size(); i++) {
         int color = i == chosenIndex ? colors[myCursorIdx] : foundSegmentsColor;
-        addSelectionToBuffer(visibleLines, buffer, terminalSegments[i].first, terminalSegments[i].second, color);
+        addSelectionToCanvas(canvas, visibleLines, buffer, terminalSegments[i].first, terminalSegments[i].second, color);
     }
 
     // Render selection if applicable
     auto cursors = buffer.getTerminalCursors(doc);
-    if (window->isActive()) {
+    if (window.isActive()) {
         auto myCursorSelectionAnchor = doc.getCursorSelectionAnchor(doc.getMyCursor());
         if (myCursorSelectionAnchor.has_value()) {
             auto terminalSelectionAnchor = buffer.getTerminalCursorPos(doc, myCursorSelectionAnchor.value());
-            addSelectionToBuffer(visibleLines, buffer, cursors[doc.getMyCursor()].pos, terminalSelectionAnchor, colors[doc.getMyCursor()]);
+            addSelectionToCanvas(canvas, visibleLines, buffer, cursors[doc.getMyCursor()].pos, terminalSelectionAnchor, colors[doc.getMyCursor()]);
         }
     }
         
     // Render cursors if applicable
     auto nCursors = (std::min)(cursors.size(), colors.size());
     for (int i = 0; i < nCursors; i++) {
-        if (i == myCursorIdx && !window->isActive()) {
+        if (i == myCursorIdx && !window.isActive()) {
             continue;
         }
-        addCursorToBuffer(buffer, cursors[i], colors[i]);
+        addCursorToCanvas(canvas, buffer, cursors[i], colors[i]);
     }
 }
 
-void Renderer::addTextToBuffer(const ScrollableScreenBuffer& buffer, const std::vector<std::string>& linesToRender, const COORD& startPos, const COORD& endPos, const int color) {
+void Renderer::addTextToCanvas(Canvas& canvas, const ScrollableScreenBuffer& buffer, const std::vector<std::string>& linesToRender, const COORD& startPos, const COORD& endPos, const int color) {
     if (startPos >= endPos || linesToRender.empty()) {
         return;
     }
@@ -70,7 +70,7 @@ void Renderer::addTextToBuffer(const ScrollableScreenBuffer& buffer, const std::
     canvas.write(linesToRender[renderIndexingBase.Y + nLines].substr(0, endPos.X - bufferStartPos.X), color);
 }
 
-void Renderer::addCursorToBuffer(const ScrollableScreenBuffer& buffer, const RenderCursor& cursor, const int color) {
+void Renderer::addCursorToCanvas(Canvas& canvas, const ScrollableScreenBuffer& buffer, const RenderCursor& cursor, const int color) {
     if (!buffer.isVisible(cursor.pos)) {
         return;
     }
@@ -78,7 +78,7 @@ void Renderer::addCursorToBuffer(const ScrollableScreenBuffer& buffer, const Ren
     canvas.write(std::string{cursor.pointedChar}, color);
 }
 
-void Renderer::addSelectionToBuffer(const std::vector<std::string>& linesToRender, const ScrollableScreenBuffer& buffer, const COORD& cursor, const COORD& anchor, const int color) {
+void Renderer::addSelectionToCanvas(Canvas& canvas, const std::vector<std::string>& linesToRender, const ScrollableScreenBuffer& buffer, const COORD& cursor, const COORD& anchor, const int color) {
     if (cursor == anchor) {
         return;
     }
@@ -97,17 +97,5 @@ void Renderer::addSelectionToBuffer(const std::vector<std::string>& linesToRende
     auto& end = *biggerOne < endPos ? *biggerOne : endPos;
 
     canvas.setCursorPosition(start);
-    addTextToBuffer(buffer, linesToRender, start, end, color);
-}
-
-void Renderer::resize(const COORD& size) {
-    canvas.resize(size);
-}
-
-void Renderer::clear() {
-    canvas.reset();
-}
-
-void Renderer::render() const {
-    canvas.render();
+    addTextToCanvas(canvas, buffer, linesToRender, start, end, color);
 }

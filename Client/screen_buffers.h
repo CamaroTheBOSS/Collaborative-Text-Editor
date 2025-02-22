@@ -1,4 +1,5 @@
 #pragma once
+#include <winsock2.h>
 #include "Windows.h"
 #include "client_document.h"
 
@@ -26,13 +27,13 @@ public:
     COORD getStartPos() const;
     COORD getEndPos() const;
 
-    COORD getTerminalCursorPos(ClientSiteDocument& doc, const COORD& docCursor) const;
-    RenderCursor getTerminalCursor(ClientSiteDocument& doc, const int cursor) const;
-    RenderCursor getMyTerminalCursor(ClientSiteDocument& doc) const;
-    std::pair<std::vector<std::pair<COORD, COORD>>, int> getSegmentsTerminalCursorPos(ClientSiteDocument& doc) const;
-    std::vector<RenderCursor> getTerminalCursors(ClientSiteDocument& doc) const;
+    COORD getTerminalCursorPos(const ClientSiteDocument& doc, const COORD& docCursor) const;
+    RenderCursor getTerminalCursor(const ClientSiteDocument& doc, const int cursor) const;
+    RenderCursor getMyTerminalCursor(const ClientSiteDocument& doc) const;
+    std::pair<std::vector<std::pair<COORD, COORD>>, int> getSegmentsTerminalCursorPos(const ClientSiteDocument& doc) const;
+    std::vector<RenderCursor> getTerminalCursors(const ClientSiteDocument& doc) const;
     std::pair<ScrollableScreenBuffer, TextLines> getLineNumbersText() const;
-    TextLines getTextInBuffer(ClientSiteDocument& doc) const;
+    TextLines getTextInBuffer(const ClientSiteDocument& doc) const;
 
     void moveHorizontal(const int units);
     void moveVertical(const int units);
