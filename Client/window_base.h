@@ -5,11 +5,11 @@
 #include "canvas.h"
 #include "events.h"
 
-#include <functional>
 #include <unordered_map>
 
 struct Event {
 	std::string name;
+	std::string src;
 	std::string target;
 	std::vector<std::string> params;
 	bool empty() {

@@ -21,9 +21,12 @@ public:
 	void render();
 private:
 	bool processEvent(const Event& pEvent);
+	void createDocWindow(const TCPClient& client, const std::vector<std::string>& args);
 	void createDoc(const TCPClient& client, const std::vector<std::string>& args);
+	void loadDocWindow(const TCPClient& client, const std::vector<std::string>& args);
 	void loadDoc(const TCPClient& client, const std::vector<std::string>& args);
 	void exitApp(const TCPClient& client, const std::vector<std::string>& args);
+	void helpWindow(const TCPClient& client, const std::vector<std::string>& args);
 
 	TCPClient client;
 	Terminal terminal;

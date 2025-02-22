@@ -15,11 +15,14 @@ Application::Application() :
     terminal(),
     windowsManager(),
     repo() {
-    windowsManager.showTextEditorWindow(terminal.getScreenSize());
-    windowsManager.showMainMenuWindow(terminal.getScreenSize());
+    windowsManager.showWindow<TextEditorWindow>(terminal.getScreenSize());
+    windowsManager.showWindow<MainMenuWindow>(terminal.getScreenSize());
     eventHandlers.try_emplace(windows::app::events::createDoc, &Application::createDoc);
     eventHandlers.try_emplace(windows::app::events::loadDoc, &Application::loadDoc);
     eventHandlers.try_emplace(windows::app::events::exit, &Application::exitApp);
+    eventHandlers.try_emplace(windows::app::events::createDocWindow, &Application::createDocWindow);
+    eventHandlers.try_emplace(windows::app::events::loadDocWindow, &Application::loadDocWindow);
+    eventHandlers.try_emplace(windows::app::events::help, &Application::helpWindow);
 }
 
 bool Application::connect(const std::string& ip, const int port) {
@@ -65,15 +68,16 @@ bool Application::processChar(const KeyPack& key) {
         return true;
     case CTRL_F:
     case F3:
-        windowsManager.showSearchWindow(terminal.getScreenSize());
+        windowsManager.showWindow<SearchWindow>(terminal.getScreenSize());
         return true;
     case CTRL_R:
         if (key.shiftPressed) {
-            windowsManager.showReplaceWindow(terminal.getScreenSize());
+            windowsManager.showWindow<SearchWindow>(terminal.getScreenSize());
+            windowsManager.showWindow<ReplaceWindow>(terminal.getScreenSize());
         }
         return true;
     case CTRL_Q:
-        windowsManager.showMainMenuWindow(terminal.getScreenSize());
+        windowsManager.showWindow<MainMenuWindow>(terminal.getScreenSize());
         return true;
     case ESC:
         windowsManager.destroyLastWindow(client);
@@ -107,6 +111,10 @@ void Application::createDoc(const TCPClient& client, const std::vector<std::stri
     }
     requestDocument(std::chrono::milliseconds(500), 4000);
     windowsManager.destroyLastWindow(client);
+    windowsManager.destroyWindow(MainMenuWindow::className, client);
+}
+void Application::createDocWindow(const TCPClient& client, const std::vector<std::string>& args) {
+    windowsManager.showWindow<CreateDocWindow>(terminal.getScreenSize());
 }
 void Application::loadDoc(const TCPClient& client, const std::vector<std::string>& args) {
     if (docRequested) {
@@ -114,9 +122,18 @@ void Application::loadDoc(const TCPClient& client, const std::vector<std::string
     }
     requestDocument(std::chrono::milliseconds(500), 4000);
     windowsManager.destroyLastWindow(client);
+    windowsManager.destroyWindow(MainMenuWindow::className, client);
+}
+
+void Application::loadDocWindow(const TCPClient& client, const std::vector<std::string>& args) {
+    windowsManager.showWindow<LoadDocWindow>(terminal.getScreenSize());
 }
 void Application::exitApp(const TCPClient& client, const std::vector<std::string>& args) {
     exit(0);
+}
+
+void Application::helpWindow(const TCPClient& client, const std::vector<std::string>& args) {
+    windowsManager.showWindow<HelpWindow>(terminal.getScreenSize());
 }
 
 bool Application::checkBufferWasResized() {

@@ -61,6 +61,8 @@ int main() {
 		return 0;
 	}
 	app.processChar(KeyPack{ENTER, false});
+	app.processChar(KeyPack{ 's', false});
+	app.processChar(KeyPack{ ENTER, false });
 	app.render();
 	while (app.isConnected()) {
 		KeyPack key = app.readChar();

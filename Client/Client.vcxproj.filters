@@ -75,6 +75,21 @@
     <ClCompile Include="window_mainmenu.cpp">
       <Filter>Pliki źródłowe\Windows</Filter>
     </ClCompile>
+    <ClCompile Include="window_loaddoc.h">
+      <Filter>Pliki nagłówkowe\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="window_createdoc.cpp">
+      <Filter>Pliki źródłowe\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="window_loaddoc.cpp">
+      <Filter>Pliki źródłowe\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="window_help.cpp">
+      <Filter>Pliki źródłowe\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="screen_builders.cpp">
+      <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="terminal.h">
@@ -127,6 +142,15 @@
     </ClInclude>
     <ClInclude Include="events.h">
       <Filter>Pliki nagłówkowe\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="window_createdoc.h">
+      <Filter>Pliki nagłówkowe\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="window_help.h">
+      <Filter>Pliki nagłówkowe\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="screen_builders.h">
+      <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,0 +1,10 @@
+#pragma once
+#include "screen_buffers_builder.h"
+
+ScrollableScreenBufferBuilder makeMainMenuBuilder();
+ScrollableScreenBufferBuilder makeCreateDocWindowBuilder();
+ScrollableScreenBufferBuilder makeLoadDocWindowBuilder();
+ScrollableScreenBufferBuilder makeHelpWindowBuilder();
+ScrollableScreenBufferBuilder makeSearchWindowBuilder();
+ScrollableScreenBufferBuilder makeReplaceWindowBuilder();
+ScrollableScreenBufferBuilder makeTextEditorWindowBuilder();
