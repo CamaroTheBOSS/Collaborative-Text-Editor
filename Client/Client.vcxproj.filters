@@ -125,5 +125,8 @@
     <ClInclude Include="window_mainmenu.h">
       <Filter>Pliki nagłówkowe\Windows</Filter>
     </ClInclude>
+    <ClInclude Include="events.h">
+      <Filter>Pliki nagłówkowe\Windows</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

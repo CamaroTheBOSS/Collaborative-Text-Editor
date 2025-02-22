@@ -111,7 +111,7 @@ WindowsIt WindowsManager::showSearchWindow(const COORD& consoleSize) {
         .showRightFramePattern("|")
         .showTopFramePattern("-")
         .showBottomFramePattern("-");
-    auto window = std::make_unique<SearchWindow>(builder, &windows[0]->getDoc());
+    auto window = std::make_unique<SearchWindow>(builder);
     windowsRegistry[window->name()] = true;
     windows.emplace_back(std::move(window));
     setFocus(windows.size() - 1);
@@ -135,7 +135,7 @@ WindowsIt WindowsManager::showReplaceWindow(const COORD& consoleSize) {
         .showRightFramePattern("|")
         .showTopFramePattern("-")
         .showBottomFramePattern("-");
-    auto window = std::make_unique<ReplaceWindow>(builder, &windows[0]->getDoc());
+    auto window = std::make_unique<ReplaceWindow>(builder);
     windowsRegistry[window->name()] = true;
     windows.emplace_back(std::move(window));
     setFocus(windows.size() - 1);
@@ -161,11 +161,13 @@ WindowsIt WindowsManager::showTextEditorWindow(const COORD& consoleSize) {
     return windows.cbegin();
 }
 
-void WindowsManager::destroyLastWindow() {
+void WindowsManager::destroyLastWindow(const TCPClient& client) {
     if (windows.size() <= 1) {
         return;
     }
     auto& last = windows.back();
+    auto pEvent = last->onDelete();
+    processEvent(client, pEvent);
     bool isActive = last->isActive();
     windowsRegistry.erase(last->name());
     windows.erase(windows.cend() - 1);
@@ -184,6 +186,15 @@ const Window& WindowsManager::getTextEditor() const {
 
 const Windows& WindowsManager::getWindows() const {
     return windows;
+}
+
+bool WindowsManager::processEvent(const TCPClient& client, const Event& pEvent) {
+    auto it = findWindow(pEvent.target);
+    if (it == windows.cend()) {
+        return false;
+    }
+    it->get()->processEvent(client, pEvent);
+    return true;
 }
 
 WindowsIt WindowsManager::findWindow(const std::string& name) const {

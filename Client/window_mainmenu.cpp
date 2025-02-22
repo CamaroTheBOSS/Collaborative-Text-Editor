@@ -5,13 +5,6 @@
 #define HELP 2
 #define QUIT 3
 
-MainMenuWindow::MainMenuWindow() :
-	BaseWindow() {
-    doc.write(0, "Create Document\nLoad Document\nQuit");
-    numOptions = doc.get().size();
-    selectOption();
-}
-
 MainMenuWindow::MainMenuWindow(const ScrollableScreenBufferBuilder& ssbBuilder) :
 	BaseWindow(ssbBuilder) {
     doc.write(0, "Create Document\nLoad Document\nHelp Control\nQuit");
@@ -19,7 +12,7 @@ MainMenuWindow::MainMenuWindow(const ScrollableScreenBufferBuilder& ssbBuilder) 
     selectOption();
 }
 
-ActionDone MainMenuWindow::processChar(TCPClient& client, const KeyPack& key, const std::string& clipboardData) {
+Event MainMenuWindow::processChar(TCPClient& client, const KeyPack& key, const std::string& clipboardData) {
     switch (key.keyCode) {
     case ENTER:
         return executeOption();
@@ -28,25 +21,25 @@ ActionDone MainMenuWindow::processChar(TCPClient& client, const KeyPack& key, co
     case ARROW_DOWN:
         return goDown();
     }
-    return ActionDone::undone;
+    return Event{};
 }
 
-ActionDone MainMenuWindow::goUp() {
+Event MainMenuWindow::goUp() {
     selectedOption--;
     if (selectedOption < 0) {
         selectedOption = numOptions - 1;
     }
     selectOption();
-    return ActionDone::render;
+    return Event{};
 }
 
-ActionDone MainMenuWindow::goDown() {
+Event MainMenuWindow::goDown() {
     selectedOption++;
     if (selectedOption >= numOptions) {
         selectedOption = 0;
     }
     selectOption();
-    return ActionDone::render;
+    return Event{};
 }
 
 void MainMenuWindow::selectOption() {
@@ -54,16 +47,16 @@ void MainMenuWindow::selectOption() {
     doc.setCursorAnchor(0, COORD{ (SHORT)doc.get()[selectedOption].size(), (SHORT)selectedOption });
 }
 
-ActionDone MainMenuWindow::executeOption() {
+Event MainMenuWindow::executeOption() {
     switch (selectedOption) {
     case CREATE:
-        return ActionDone::createdoc;
+        return Event{ "create doc", "App", { doc.getText() }};
     case LOAD:
-        return ActionDone::loaddoc;
+        return Event{ "load doc", "App", { doc.getText() } };
     case HELP:
-        return ActionDone::help;
+        return Event{};
     case QUIT:
-        exit(0);
+        return Event{ "exit", "App", {} };
     }
-    return ActionDone::undone;
+    return Event{};
 }

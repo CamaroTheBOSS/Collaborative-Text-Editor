@@ -17,6 +17,9 @@ Application::Application() :
     repo() {
     windowsManager.showTextEditorWindow(terminal.getScreenSize());
     windowsManager.showMainMenuWindow(terminal.getScreenSize());
+    eventHandlers.try_emplace(windows::app::events::createDoc, &Application::createDoc);
+    eventHandlers.try_emplace(windows::app::events::loadDoc, &Application::loadDoc);
+    eventHandlers.try_emplace(windows::app::events::exit, &Application::exitApp);
 }
 
 bool Application::connect(const std::string& ip, const int port) {
@@ -35,52 +38,85 @@ KeyPack Application::readChar() const {
     return terminal.readChar();
 }
 
-ActionDone Application::processChar(const KeyPack& key) {
+bool Application::processChar(const KeyPack& key) {
     auto& window = windowsManager.getFocusedWindow();
     switch (key.keyCode) {
     case CTRL_ARROW_DOWN:
         windowsManager.changeFocusDown();
-        return ActionDone::render;
+        return true;
     case CTRL_ARROW_UP:
         windowsManager.changeFocusUp();
-        return ActionDone::render;
+        return true;
     case CTRL_ARROW_LEFT:
         windowsManager.changeFocusLeft();
-        return ActionDone::render;
+        return true;
     case CTRL_ARROW_RIGHT:
         windowsManager.changeFocusRight();
-        return ActionDone::render;
+        return true;
     case CTRL_V:
-        return window->processChar(client, key, terminal.getClipboardData());
+        window->processChar(client, key, terminal.getClipboardData());
+        return true;
     case CTRL_C:
         terminal.setClipboardData(window->getDoc().getSelectedText());
-        return ActionDone::done;
+        return false;
     case CTRL_X:
         terminal.setClipboardData(window->getDoc().getSelectedText());
-        return window->processChar(client, key);
+        window->processChar(client, key);
+        return true;
     case CTRL_F:
     case F3:
         windowsManager.showSearchWindow(terminal.getScreenSize());
-        return ActionDone::render;
+        return true;
     case CTRL_R:
         if (key.shiftPressed) {
             windowsManager.showReplaceWindow(terminal.getScreenSize());
         }
-        return ActionDone::render;
+        return true;
     case CTRL_Q:
         windowsManager.showMainMenuWindow(terminal.getScreenSize());
-        return ActionDone::render;
+        return true;
     case ESC:
-        windowsManager.destroyLastWindow();
-        return ActionDone::render;
+        windowsManager.destroyLastWindow(client);
+        return true;
     }
-    ActionDone action = window->processChar(client, key);
-    if ((action == ActionDone::createdoc || action == ActionDone::loaddoc) && !docRequested) {
-        requestDocument(std::chrono::milliseconds(500), 4000);
-        windowsManager.destroyLastWindow();
-        return ActionDone::render;
+    Event pEvent = window->processChar(client, key);
+    if (pEvent.empty()) {
+        return true;
     }
-    return action;
+    else if (pEvent.target == "App") {
+        processEvent(pEvent);
+    }
+    else {
+        windowsManager.processEvent(client, pEvent);
+    }
+    return true;
+}
+
+bool Application::processEvent(const Event& pEvent) {
+    auto it = eventHandlers.find(pEvent.name);
+    if (it == eventHandlers.cend()) {
+        return false;
+    }
+    (this->*it->second)(client, pEvent.params);
+    return true;
+}
+
+void Application::createDoc(const TCPClient& client, const std::vector<std::string>& args) {
+    if (docRequested) {
+        return;
+    }
+    requestDocument(std::chrono::milliseconds(500), 4000);
+    windowsManager.destroyLastWindow(client);
+}
+void Application::loadDoc(const TCPClient& client, const std::vector<std::string>& args) {
+    if (docRequested) {
+        return;
+    }
+    requestDocument(std::chrono::milliseconds(500), 4000);
+    windowsManager.destroyLastWindow(client);
+}
+void Application::exitApp(const TCPClient& client, const std::vector<std::string>& args) {
+    exit(0);
 }
 
 bool Application::checkBufferWasResized() {
@@ -88,7 +124,7 @@ bool Application::checkBufferWasResized() {
     if (screenResized) {
         COORD newConsoleSize = terminal.getScreenSize();
         for (const auto& window : windowsManager.getWindows()) {
-            window->getBuffer().setNewConsoleSize({ newConsoleSize.X, newConsoleSize.Y });
+            window->updateConsoleSize({ newConsoleSize.X, newConsoleSize.Y });
         }
     }
     return screenResized;
@@ -101,7 +137,7 @@ bool Application::checkIncomingMessages() {
         if (msgBuffer.empty()) {
             break;
         }
-        needRender += repo.processMsg(windowsManager.getTextEditor()->getDoc(), msgBuffer);
+        needRender += repo.processMsg(windowsManager.getTextEditor()->getDocMutable(), msgBuffer);
     }
     needRender += checkBufferWasResized();
     return needRender;
@@ -120,7 +156,7 @@ bool Application::requestDocument(const std::chrono::milliseconds& timeout, cons
         }
         msg::Type msgType;
         msg::parse(msgBuffer, 0, msgType);
-        repo.processMsg(windowsManager.getTextEditor()->getDoc(), msgBuffer);
+        repo.processMsg(windowsManager.getTextEditor()->getDocMutable(), msgBuffer);
         if (msgType == msg::Type::sync) {
             docRequested = true;
             return true;

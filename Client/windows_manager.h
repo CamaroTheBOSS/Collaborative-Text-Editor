@@ -21,11 +21,12 @@ public:
 	WindowsIt showSearchWindow(const COORD& consoleSize);
 	WindowsIt showReplaceWindow(const COORD& consoleSize);
 	WindowsIt showTextEditorWindow(const COORD& consoleSize);
-	void destroyLastWindow();
+	void destroyLastWindow(const TCPClient& client);
 
 	const Window& getFocusedWindow() const;
 	const Window& getTextEditor() const;
 	const Windows& getWindows() const;
+	bool processEvent(const TCPClient& client, const Event& pEvent);
 private:
 	WindowsIt findWindow(const std::string& name) const;
 

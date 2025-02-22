@@ -17,7 +17,7 @@ public:
 	bool isConnected() const;
 	msg::Buffer getNextMsg();
 	template<typename... Args>
-	bool sendMsg(Args&&... args) {
+	bool sendMsg(Args&&... args) const {
 		msg::Buffer buffer{128};
 		msg::serializeTo(buffer, 0, args...);
 		msg::Buffer msgWithSize = msg::enrich(buffer);

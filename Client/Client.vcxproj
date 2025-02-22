@@ -157,6 +157,7 @@
   <ItemGroup>
     <ClInclude Include="canvas.h" />
     <ClInclude Include="client_document.h" />
+    <ClInclude Include="events.h" />
     <ClInclude Include="keypack.h" />
     <ClInclude Include="screen_buffers_builder.h" />
     <ClInclude Include="windows_manager.h" />
