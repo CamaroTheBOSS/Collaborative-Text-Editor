@@ -1,5 +1,15 @@
 #include "deserializer.h"
 
+msg::ConnectCreateDoc Deserializer::parseConnectCreateDoc(const msg::Buffer& buffer) {
+	msg::ConnectCreateDoc msg;
+	msg::parse(buffer, 0, msg.type, msg.version, msg.socket, msg.filename);
+	return msg;
+}
+msg::ConnectLoadDoc Deserializer::parseConnectLoadDoc(const msg::Buffer& buffer) {
+	msg::ConnectLoadDoc msg;
+	msg::parse(buffer, 0, msg.type, msg.version, msg.socket, msg.acCode);
+	return msg;
+}
 msg::ForwardConnect Deserializer::parseMasterForwardConnect(const msg::Buffer& buffer) {
 	msg::ForwardConnect msg;
 	msg::parse(buffer, 0, msg.type, msg.version, msg.socket, msg.docCode);

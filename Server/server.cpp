@@ -56,12 +56,21 @@ void Server::start() {
 			SOCKET client = conns.fd_array[i];
 			acceptConnection(client);
 			auto msgs = extractor.extractMessages(client);
-			for (const auto& buffer : msgs) {
+			for (auto& buffer : msgs) {
 				msg::Type type;
 				msg::OneByteInt version;
 				msg::parse(buffer, 0, type, version);
-				if (type == msg::Type::sync) {
-					forwardConnection(client);
+				if (type == msg::Type::create) {
+					buffer.replace(2, client);
+					int worker = selectWorker();
+					forwardConnection(client, buffer, worker);
+				}
+				else if (type == msg::Type::load) {
+					std::string accessCode;
+					buffer.replace(2, client);
+					msg::parse(buffer, 6, accessCode);
+					int worker = selectWorkerWithAcCode(accessCode);
+					forwardConnection(client, buffer, worker);
 				}
 			}
 		}
@@ -83,17 +92,13 @@ bool Server::acceptConnection(const SOCKET client) {
 	return true;
 }
 
-bool Server::forwardConnection(const SOCKET client) {
-	int worker = selectWorker();
+bool Server::forwardConnection(const SOCKET client, const msg::Buffer& buffer, const int worker) {
 	auto id = workers[worker].thread.get_id();
 	{
 		std::scoped_lock lock{workers[worker].connSetLock};
 		FD_SET(client, &workers[worker].connections);
 	}
-	msg::Buffer buffer{8};
-	unsigned int clientBuff = client;
-	msg::serializeTo(buffer, 0, msg::Type::masterForwardConnect, version, clientBuff, "");
-	msg::Buffer bufferWithSize = msg::enrich(buffer);
+	auto bufferWithSize = msg::enrich(buffer);
 	int sendBytes = send(notifiers[worker], bufferWithSize.get(), bufferWithSize.size, 0);
 	if (sendBytes < 0) {
 		logger.logError(WSAGetLastError(), ": Error when notifying thread", id, "about new connection");
@@ -145,6 +150,17 @@ int Server::selectWorker() {
 	return leastConnsWorker;
 }
 
+int Server::selectWorkerWithAcCode(const std::string& acCode) {
+	for (int i = 0; i < workers.size(); i++) {
+		std::scoped_lock lock{workers[i].acCodesLock};
+		auto it = workers[i].acCodes.find(acCode);
+		if (it != workers[i].acCodes.cend()) {
+			return i;
+		}
+	}
+	return 0;
+}
+
 int Server::closeWorkers() {
 	int closed = 0;
 	for (int i = workers.size() - 1; i >= 0; i--) {
@@ -169,7 +185,7 @@ void Server::initWorkers(const int nWorkers) {
 	FD_ZERO(&set);
 	FD_SET(listenSocket, &set);
 	for (int i = 0; i < nWorkers; i++) {
-		Worker worker{ip, port, &repo};
+		Worker worker{ip, port};
 		int socketCount = select(0, &set, nullptr, nullptr, nullptr);
 		auto notifySocket = accept(listenSocket, nullptr, nullptr);
 		if (notifySocket == INVALID_SOCKET) {

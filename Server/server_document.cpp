@@ -11,8 +11,9 @@ ServerSiteDocument::ServerSiteDocument(const std::string& text) :
 	addUser();
 }
 
-ServerSiteDocument::ServerSiteDocument(const std::string& text, const int nCursors, const int myUserIdx) :
+ServerSiteDocument::ServerSiteDocument(const std::string& text, const int nCursors, const int myUserIdx, const std::string& docName) :
 	BaseDocument(text, nCursors, myUserIdx) {
+	filename = docName;
 	for (int i = 0; i < nCursors; i++) {
 		addUser();
 	}
@@ -26,10 +27,29 @@ ServerSiteDocument::ServerSiteDocument(const std::string& text, const int nCurso
 	}
 }
 
+int ServerSiteDocument::findUser(SOCKET client) const {
+	int userIdx = -1;
+	for (int i = 0; i < connectedClients.size(); i++) {
+		if (connectedClients[i] == client) {
+			userIdx = i;
+			break;
+		}
+	}
+	return userIdx;
+}
+
+std::vector<SOCKET>& ServerSiteDocument::getConnectedClients() {
+	return connectedClients;
+}
 
 bool ServerSiteDocument::addUser() {
 	users.emplace_back(User());
 	historyManager.addHistory();
+	return true;
+}
+
+bool ServerSiteDocument::addClient(SOCKET client) {
+	connectedClients.push_back(client);
 	return true;
 }
 
@@ -42,6 +62,15 @@ bool ServerSiteDocument::eraseUser(const int index) {
 	if (myUserIdx > index) {
 		myUserIdx--;
 	}
+	return true;
+}
+
+bool ServerSiteDocument::eraseClient(SOCKET client) {
+	int index = findUser(client);
+	if (index < 0) {
+		return false;
+	}
+	connectedClients.erase(connectedClients.cbegin() + index);
 	return true;
 }
 

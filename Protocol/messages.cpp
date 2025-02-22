@@ -53,7 +53,7 @@ namespace msg {
 		return other.data == data;
 	}
 
-	Buffer enrich(Buffer& buffer) {
+	Buffer enrich(const Buffer& buffer) {
 		Buffer newBuffer{ buffer.capacity + 4 };
 		serializeTo(newBuffer, 0, static_cast<unsigned int>(buffer.size), buffer);
 		return newBuffer;

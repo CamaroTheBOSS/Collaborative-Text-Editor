@@ -8,8 +8,7 @@ using namespace server;
 
 constexpr int defaultBuffSize = 128;
 
-Worker::Worker(const std::string& ip, const int port, server::Repository* repo):
-    repo(repo) {
+Worker::Worker(const std::string& ip, const int port) {
     std::scoped_lock lock{connSetLock};
     FD_ZERO(&connections);
 	thread = std::thread{ &Worker::connectToMaster, this, ip, port };
@@ -19,8 +18,7 @@ Worker::Worker(Worker&& worker) noexcept :
     connSetLock(),
     masterListener(std::move(worker.masterListener)),
     connections(std::move(worker.connections)),
-    masterAddress(std::move(worker.masterAddress)),
-    repo(worker.repo) {
+    masterAddress(std::move(worker.masterAddress)) {
     thread = std::thread{ &Worker::handleConnections, this };
 }
 
@@ -28,7 +26,6 @@ Worker& Worker::operator=(Worker&& worker) noexcept {
     masterListener = std::move(worker.masterListener);
     connections = std::move(worker.connections);
     masterAddress = std::move(worker.masterAddress);
-    repo = std::move(worker.repo);
     thread = std::move(worker.thread);
     return *this;
 }
@@ -73,10 +70,14 @@ void Worker::handleConnections() {
             auto msgBuffers = extractor.extractMessages(client);
             for (auto& msgBuffer : msgBuffers) {
                 server::Response response = processMsg(client, msgBuffer);
-                if (response.msgType == msg::Type::sync) {
+                if (response.msgType == msg::Type::create || response.msgType == msg::Type::load) {
                     syncClientState(response);
+                    addToAcCodes();
                 }
-                if (response.msgType == msg::Type::masterClose) {
+                else if (response.msgType == msg::Type::disconnect) {
+                    deleteFromAcCodes();
+                }
+                else if (response.msgType == msg::Type::masterClose) {
                     opened = false;
                 }
                 sendResponses(response);
@@ -84,6 +85,24 @@ void Worker::handleConnections() {
         }
     }
     close();
+}
+
+void Worker::addToAcCodes() {
+    auto acCode = repo.getLastAddedAcCode();
+    if (!acCode.empty()) {
+        return;
+    }
+    std::scoped_lock lock{acCodesLock};
+    acCodes.insert(acCode);
+}
+
+void Worker::deleteFromAcCodes() {
+    auto acCode = repo.getLastDeletedAcCode();
+    if (!acCode.empty()) {
+        return;
+    }
+    std::scoped_lock lock{acCodesLock};
+    acCodes.erase(acCode);
 }
 
 void Worker::close() {
@@ -96,7 +115,7 @@ void Worker::close() {
 
 server::Response Worker::processMsg(const SOCKET client, msg::Buffer& buffer) {
     if (buffer.size > 0) {
-        return repo->process(client, buffer);
+        return repo.process(client, buffer);
     }
     if (buffer.size < 0) {
         logger.logError(WSAGetLastError(), ": Error on receiving data from", client, "! Closing connection");
@@ -134,5 +153,5 @@ server::Response Worker::shutdownConnection(const SOCKET client, msg::Buffer& bu
     msg::serializeTo(buffer, 0, msg::Type::disconnect, static_cast<msg::OneByteInt>(1));
     std::scoped_lock lock{connSetLock};
     FD_CLR(client, &connections);
-    return repo->process(client, buffer);
+    return repo.process(client, buffer);
 }

@@ -33,6 +33,24 @@ namespace random {
 		return dist(engine);
 	}
 
+	std::string Engine::getRandomString(const int length) {
+		std::string str;
+		std::uniform_int_distribution numberOrLetterDist(0, 10);
+		std::uniform_int_distribution numberDist(48, 57);
+		std::uniform_int_distribution letterDist(65, 90);
+		std::scoped_lock lock{engineLock};
+		for (int i = 0; i < length; i++) {
+			int n = numberOrLetterDist(engine);
+			if (n < 3) {
+				str += std::string{ (char)numberDist(engine) };
+			}
+			else {
+				str += std::string{ (char)letterDist(engine) };
+			}
+		}
+		return str;
+	}
+
 	//Keygen
 	Engine::Key Engine::getInvalidKey() const { 
 		return -1; 

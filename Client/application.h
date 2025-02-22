@@ -17,7 +17,7 @@ public:
 	bool processChar(const KeyPack& key);
 	bool checkIncomingMessages();
 	bool checkBufferWasResized();
-	bool requestDocument(const std::chrono::milliseconds& timeout, const int tries);
+	bool waitForDocument(const std::chrono::milliseconds& timeout, const int tries);
 	void render();
 private:
 	bool processEvent(const Event& pEvent);

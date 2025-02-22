@@ -1,26 +1,27 @@
 #include "serializer.h"
 
-msg::Buffer Serializer::makeConnectResponse(const ServerSiteDocument& doc, const int userIdx, const msg::ForwardConnect& msg) {
-	return makeConnectResponseImpl(doc, msg.version, userIdx);
-}
-
-msg::Buffer Serializer::makeConnectResponse(const ServerSiteDocument& doc, const int userIdx, const msg::Connect& msg) {
-	return makeConnectResponseImpl(doc, msg.version, userIdx);
-}
-
-msg::Buffer Serializer::makeConnectResponseImpl(const ServerSiteDocument& doc, const msg::OneByteInt version, const int userIdx) {
+msg::Buffer Serializer::makeConnectResponse(const msg::Type& type, const ServerSiteDocument& doc, const msg::OneByteInt version, const int userIdx, const std::string& authToken, const std::string& acCode) {
 	std::vector<unsigned int> cursorPositions;
 	for (const auto& cursorPos : doc.getCursorPositions()) {
 		cursorPositions.push_back(static_cast<unsigned int>(cursorPos.X));
 		cursorPositions.push_back(static_cast<unsigned int>(cursorPos.Y));
 	}
 	std::string docText = doc.getText();
-	msg::Buffer buffer{static_cast<int>(30 + docText.size() + 8 * cursorPositions.size())};
+	msg::Buffer buffer{static_cast<int>(30 + docText.size() + 8 * cursorPositions.size() + authToken.size() + acCode.size())};
 	auto userBuff = static_cast<msg::OneByteInt>(userIdx);
-	msg::serializeTo(buffer, 0, msg::Type::sync, version, userBuff, std::move(docText), std::move(cursorPositions));
+	std::string errMsg;
+	msg::serializeTo(buffer, 0, type, version, userBuff, errMsg, authToken, acCode, docText, cursorPositions);
 	return buffer;
 }
 
+msg::Buffer Serializer::makeConnectResponseWithError(const msg::Type& type, const std::string& errorMsg, const msg::OneByteInt version) {
+	msg::Buffer buffer{static_cast<int>(30 + errorMsg.size())};
+	msg::OneByteInt userBuff = 0;
+	std::string authToken, acCode, docText;
+	std::vector<unsigned int> cursorPositions;
+	msg::serializeTo(buffer, 0, type, version, userBuff, errorMsg, authToken, acCode, docText, cursorPositions);
+	return buffer;
+}
 
 msg::Buffer Serializer::makeDisconnectResponse(const int userIdx, const msg::Disconnect& msg) {
 	msg::Buffer buffer{30};

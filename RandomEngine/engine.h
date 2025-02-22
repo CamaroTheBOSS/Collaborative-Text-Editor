@@ -23,6 +23,7 @@ namespace random {
 		//Random number gen
 		void setSeed(const int seed);
 		int getRandFromDist(std::uniform_int_distribution<>& dist);
+		std::string getRandomString(const int length);
 
 		//Keygen
 		Key getInvalidKey() const;

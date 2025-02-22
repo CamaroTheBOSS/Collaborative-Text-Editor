@@ -106,10 +106,12 @@ bool Application::processEvent(const Event& pEvent) {
 }
 
 void Application::createDoc(const TCPClient& client, const std::vector<std::string>& args) {
-    if (docRequested) {
+    if (docRequested || args.empty()) {
         return;
     }
-    requestDocument(std::chrono::milliseconds(500), 4000);
+    unsigned int socket = 0;
+    client.sendMsg(msg::Type::create, version, socket, args[0]);
+    waitForDocument(std::chrono::milliseconds(500), 4000);
     windowsManager.destroyLastWindow(client);
     windowsManager.destroyWindow(MainMenuWindow::className, client);
 }
@@ -117,10 +119,12 @@ void Application::createDocWindow(const TCPClient& client, const std::vector<std
     windowsManager.showWindow<CreateDocWindow>(terminal.getScreenSize());
 }
 void Application::loadDoc(const TCPClient& client, const std::vector<std::string>& args) {
-    if (docRequested) {
+    if (docRequested || args.empty()) {
         return;
     }
-    requestDocument(std::chrono::milliseconds(500), 4000);
+    unsigned int socket = 0;
+    client.sendMsg(msg::Type::load, version, socket, args[0]);
+    waitForDocument(std::chrono::milliseconds(500), 4000);
     windowsManager.destroyLastWindow(client);
     windowsManager.destroyWindow(MainMenuWindow::className, client);
 }
@@ -160,9 +164,8 @@ bool Application::checkIncomingMessages() {
     return needRender;
 }
 
-bool Application::requestDocument(const std::chrono::milliseconds& timeout, const int tries) {
+bool Application::waitForDocument(const std::chrono::milliseconds& timeout, const int tries) {
     int currTry = 0;
-    client.sendMsg(msg::Type::sync, version);
     while (currTry < tries) {
         msg::Buffer msgBuffer = client.getNextMsg();
         if (msgBuffer.empty()) {
@@ -174,7 +177,7 @@ bool Application::requestDocument(const std::chrono::milliseconds& timeout, cons
         msg::Type msgType;
         msg::parse(msgBuffer, 0, msgType);
         repo.processMsg(windowsManager.getTextEditor()->getDocMutable(), msgBuffer);
-        if (msgType == msg::Type::sync) {
+        if (msgType == msg::Type::create || msgType == msg::Type::load) {
             docRequested = true;
             return true;
         }

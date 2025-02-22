@@ -17,7 +17,8 @@ namespace client {
 		case msg::Type::moveVertical:
 		case msg::Type::moveTo:
 			return move(doc, buffer);
-		case msg::Type::sync:
+		case msg::Type::create:
+		case msg::Type::load:
 			return sync(doc, buffer);
 		case msg::Type::connect:
 			return connectNewUser(doc, buffer);
@@ -32,7 +33,8 @@ namespace client {
 
 	bool Repository::sync(ClientSiteDocument& doc, msg::Buffer& buffer) {
 		msg::ConnectResponse msg;
-		parse(buffer, 1, msg.version, msg.user, msg.text, msg.cursorPositions);
+		parse(buffer, 1, msg.version, msg.user, msg.error, msg.token, msg.acCode, msg.text, msg.cursorPositions);
+		assert(msg.error.empty());
 		assert(msg.cursorPositions.size() == (msg.user + 1) * 2);
 		doc = ClientSiteDocument(msg.text, msg.user + 1, msg.user);
 		for (int i = 1; i < msg.cursorPositions.size(); i += 2) {

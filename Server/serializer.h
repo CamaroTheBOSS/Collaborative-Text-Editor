@@ -4,8 +4,8 @@
 
 class Serializer {
 public:
-	static msg::Buffer makeConnectResponse(const ServerSiteDocument& doc, const int userIdx, const msg::ForwardConnect& msg);
-	static msg::Buffer makeConnectResponse(const ServerSiteDocument& doc, const int userIdx, const msg::Connect& msg);
+	static msg::Buffer makeConnectResponse(const msg::Type& type, const ServerSiteDocument& doc, const msg::OneByteInt version, const int userIdx, const std::string& authToken, const std::string& acCode);
+	static msg::Buffer makeConnectResponseWithError(const msg::Type& type, const std::string& errorMsg, const msg::OneByteInt version);
 	static msg::Buffer makeDisconnectResponse(const int userIdx, const msg::Disconnect& msg);
 	static msg::Buffer makeWriteResponse(const COORD& startPos, const int userIdx, const msg::Write& msg);
 	static msg::Buffer makeEraseResponse(const COORD& startPos, const int userIdx, const msg::Erase& msg);
@@ -16,5 +16,4 @@ public:
 	static msg::Buffer makeReplaceResponse(const int userIdx, const msg::Replace& msg);
 private:
 	static msg::Buffer makeMoveResponseImpl(const ServerSiteDocument& doc, const msg::Type type, const msg::OneByteInt version, const int userIdx, const bool withSelect);
-	static msg::Buffer makeConnectResponseImpl(const ServerSiteDocument& doc, const msg::OneByteInt version, const int userIdx);
 };

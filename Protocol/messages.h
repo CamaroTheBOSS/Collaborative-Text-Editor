@@ -114,6 +114,11 @@ namespace msg {
 				add(&element);
 			}
 		}
+		void replace(const int pos, const unsigned int val) {
+			assert(pos + sizeof(val) <= size);
+			u_long uLongVal = htonl(val);
+			memcpy(data.get() + pos, &uLongVal, sizeof(uLongVal));
+		}
 		void clear();
 		char* get() const;
 		bool empty() const;
@@ -125,7 +130,7 @@ namespace msg {
 		int size;
 		int capacity;
 	};
-	Buffer enrich(Buffer& buffer);
+	Buffer enrich(const Buffer& buffer);
 
 	template<typename T>
 	int parseObj(T& obj, const Buffer& buffer, const int offset) {
@@ -164,6 +169,20 @@ namespace msg {
 		} (), ...);
 	}
 
+	struct ConnectCreateDoc {
+		Type type = Type::create;
+		OneByteInt version = 0;
+		unsigned int socket = 0;
+		std::string filename;
+	};
+
+	struct ConnectLoadDoc {
+		Type type = Type::load;
+		OneByteInt version = 0;
+		unsigned int socket = 0;
+		std::string acCode;
+	};
+
 	struct ForwardConnect {
 		Type type = Type::masterForwardConnect;
 		OneByteInt version = 0;
@@ -180,6 +199,9 @@ namespace msg {
 		Type type = Type::connect;
 		OneByteInt version = 0;
 		OneByteInt user = 0; // Which user idx you are in doc
+		std::string error; // If not empty -> error happened
+		std::string token; // Authorization token needed for communication
+		std::string acCode; //Access code to document
 		std::string text; // Whole current state of the document
 		std::vector<unsigned int> cursorPositions;
 	};

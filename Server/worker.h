@@ -2,9 +2,7 @@
 #include <WinSock2.h>
 #include <thread>
 #include <mutex>
-#include <vector>
-#include <memory>
-#include <unordered_map>
+#include <set>
 
 #include "messages.h"
 #include "repository.h"
@@ -12,12 +10,15 @@
 
 class Worker {
 public:
-	Worker(const std::string& ip, const int port, server::Repository* repo);
+	friend class Server;
+	Worker(const std::string& ip, const int port);
 	Worker(Worker&& worker) noexcept;
 	Worker& operator=(Worker&& worker) noexcept;
 	Worker(const Worker&) = delete;
 	Worker& operator=(const Worker&) = delete;
 private:
+	void addToAcCodes();
+	void deleteFromAcCodes();
 	void close();
 	bool connectToMaster(const std::string& ip, const int port);
 	void handleConnections();
@@ -26,7 +27,6 @@ private:
 	void sendResponses(server::Response& response) const;
 	void syncClientState(server::Response& response) const;
 	
-	friend class Server;
 	bool opened = true;
 	std::mutex connSetLock;
 	FD_SET connections;
@@ -35,6 +35,8 @@ private:
 	SOCKET masterListener = INVALID_SOCKET;
 	std::thread thread;
 
-	server::Repository* repo;
+	std::mutex acCodesLock;
+	std::set<std::string> acCodes;
+	server::Repository repo;
 	MessageExtractor extractor;
 };
