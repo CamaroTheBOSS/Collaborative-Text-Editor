@@ -27,6 +27,7 @@ private:
 	void loadDoc(const TCPClient& client, const std::vector<std::string>& args);
 	void exitApp(const TCPClient& client, const std::vector<std::string>& args);
 	void helpWindow(const TCPClient& client, const std::vector<std::string>& args);
+	bool loadCreateDoc(const msg::Type type, const TCPClient& client, const std::vector<std::string>& args);
 
 	TCPClient client;
 	Terminal terminal;
@@ -34,7 +35,6 @@ private:
 	EventHandlersMap<Application> eventHandlers;
 
 	WindowsManager windowsManager;
-	bool docRequested = false;
 
 	std::string srvIp;
 	int srvPort;

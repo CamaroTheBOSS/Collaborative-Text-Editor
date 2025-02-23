@@ -108,66 +108,56 @@ bool Application::processEvent(const Event& pEvent) {
 }
 
 void Application::createDoc(const TCPClient& client, const std::vector<std::string>& args) {
-    if (docRequested || args.empty()) {
-        return;
+    bool success = loadCreateDoc(msg::Type::create, client, args);
+    if (success) {
+        windowsManager.showInfoWindow(terminal.getScreenSize(), "Success", "Access code for document: " + repo.getAcCode());
     }
-    if (!isConnected() && !connect(srvIp, srvPort)) {
-        windowsManager.showInfoWindow(terminal.getScreenSize(), "Error", "Cannot connect to the server");
-        return;
-    }
-    unsigned int socket = 0;
-    client.sendMsg(msg::Type::create, version, socket, args[0]);
-    bool connected = waitForDocument(std::chrono::milliseconds(500), 4);
-    if (!connected) {
-        windowsManager.showInfoWindow(terminal.getScreenSize(), "Error", "Timeout during document synchronization");
-        disconnect();
-        return;
-    }
-    std::string errorMsg = repo.getLastError();
-    if (!errorMsg.empty()) {
-        windowsManager.showInfoWindow(terminal.getScreenSize(), "Error", errorMsg);
-        disconnect();
-        return;
-    }
-    docRequested = true;
-    windowsManager.destroyLastWindow(client);
-    windowsManager.destroyWindow(MainMenuWindow::className, client);
-    windowsManager.showInfoWindow(terminal.getScreenSize(), "Success", "Access code for document: " + repo.getAcCode());
 }
 void Application::createDocWindow(const TCPClient& client, const std::vector<std::string>& args) {
     windowsManager.showWindow<CreateDocWindow>(terminal.getScreenSize());
 }
 void Application::loadDoc(const TCPClient& client, const std::vector<std::string>& args) {
-    if (docRequested || args.empty()) {
-        return;
+    bool success = loadCreateDoc(msg::Type::join, client, args);
+    if (success) {
+        windowsManager.showInfoWindow(terminal.getScreenSize(), "Success", "You connected successfuly");
     }
-    if (!isConnected() && !connect(srvIp, srvPort)) {
-        windowsManager.showInfoWindow(terminal.getScreenSize(), "Error", "Cannot connect to the server");
-        return;
-    }
-    unsigned int socket = 0;
-    client.sendMsg(msg::Type::join, version, socket, args[0]);
-    bool connected = waitForDocument(std::chrono::milliseconds(500), 4);
-    if (!connected) {
-        windowsManager.showInfoWindow(terminal.getScreenSize(), "Error", "Timeout during document synchronization");
-        disconnect();
-        return;
-    }
-    std::string errorMsg = repo.getLastError();
-    if (!errorMsg.empty()) {
-        windowsManager.showInfoWindow(terminal.getScreenSize(), "Error", errorMsg);
-        disconnect();
-        return;
-    }
-    docRequested = true;
-    windowsManager.destroyLastWindow(client);
-    windowsManager.destroyWindow(MainMenuWindow::className, client);
-    windowsManager.showInfoWindow(terminal.getScreenSize(), "Success", "You connected successfuly");
 }
 
 void Application::loadDocWindow(const TCPClient& client, const std::vector<std::string>& args) {
     windowsManager.showWindow<LoadDocWindow>(terminal.getScreenSize());
 }
+
+bool Application::loadCreateDoc(const msg::Type type, const TCPClient& client, const std::vector<std::string>& args) {
+    if (args.empty()) {
+        return false;
+    }
+    if (isConnected()) {
+        windowsManager.showInfoWindow(terminal.getScreenSize(), "Failure", "You are already connected to the document. Please disconnect first.");
+        return false;
+    }
+    if (!connect(srvIp, srvPort)) {
+        windowsManager.showInfoWindow(terminal.getScreenSize(), "Failure", "Cannot connect to the server");
+        return false;
+    }
+    unsigned int socket = 0;
+    client.sendMsg(type, version, socket, args[0]);
+    bool connected = waitForDocument(std::chrono::milliseconds(500), 4);
+    if (!connected) {
+        windowsManager.showInfoWindow(terminal.getScreenSize(), "Failure", "Timeout during document synchronization");
+        disconnect();
+        return false;
+    }
+    std::string errorMsg = repo.getLastError();
+    if (!errorMsg.empty()) {
+        windowsManager.showInfoWindow(terminal.getScreenSize(), "Failure", errorMsg);
+        disconnect();
+        return false;
+    }
+    windowsManager.destroyLastWindow(client);
+    windowsManager.destroyWindow(MainMenuWindow::className, client);
+    return true;
+}
+
 void Application::exitApp(const TCPClient& client, const std::vector<std::string>& args) {
     exit(0);
 }

@@ -6,8 +6,9 @@
 using namespace client;
 
 bool TCPClient::connectServer(const std::string& ip, const int port) {
-    //std::chrono::seconds waitTime{1};
-    //std::this_thread::sleep_for(waitTime);
+    if (isConnected()) {
+        return true;
+    }
     client = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (client == INVALID_SOCKET) {
         logger.logError(WSAGetLastError(), ": Error when creating socket for server connection!");
@@ -29,6 +30,9 @@ bool TCPClient::connectServer(const std::string& ip, const int port) {
 }
 
 bool TCPClient::disconnect() {
+    if (!isConnected()) {
+        return true;
+    }
     connected = false;
     closesocket(client);
     if (recvThread.joinable()) {
