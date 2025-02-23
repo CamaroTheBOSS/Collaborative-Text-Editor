@@ -17,6 +17,9 @@ namespace random {
 		return std::mt19937(reproducibleSeed);
 	}
 
+	Engine::Engine() :
+		engine(getRandomEngine(-1)) {}
+
 	Engine& Engine::get() {
 		static Engine instance;
 		return instance;

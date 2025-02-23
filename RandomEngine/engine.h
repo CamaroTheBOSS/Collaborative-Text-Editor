@@ -30,7 +30,7 @@ namespace random {
 		Key isKeyInvalid(const Key key) const;
 		Key getRandomKey();
 	private:
-		Engine() = default;
+		Engine();
 		std::mt19937 engine;
 		std::mutex engineLock;
 	};
