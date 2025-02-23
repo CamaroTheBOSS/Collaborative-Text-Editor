@@ -1,12 +1,12 @@
 #pragma once
 #include "window_base.h"
 
-class HelpWindow : public BaseWindow {
+class InfoWindow : public BaseWindow {
 public:
-	HelpWindow(const ScrollableScreenBufferBuilder& ssbBuilder);
+	InfoWindow(const ScrollableScreenBufferBuilder& ssbBuilder, const std::string& title, const std::string& msg);
 	Event processChar(TCPClient& client, const KeyPack& key, const std::string& clipboardData) override;
 	std::string name() const override {
 		return className;
 	}
-	static constexpr const char* className = "HelpWindow";
+	const std::string className;
 };

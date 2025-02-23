@@ -84,11 +84,11 @@
     <ClCompile Include="window_loaddoc.cpp">
       <Filter>Pliki źródłowe\Windows</Filter>
     </ClCompile>
-    <ClCompile Include="window_help.cpp">
-      <Filter>Pliki źródłowe\Windows</Filter>
-    </ClCompile>
     <ClCompile Include="screen_builders.cpp">
       <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
+    <ClCompile Include="window_info.cpp">
+      <Filter>Pliki źródłowe\Windows</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -146,11 +146,11 @@
     <ClInclude Include="window_createdoc.h">
       <Filter>Pliki nagłówkowe\Windows</Filter>
     </ClInclude>
-    <ClInclude Include="window_help.h">
-      <Filter>Pliki nagłówkowe\Windows</Filter>
-    </ClInclude>
     <ClInclude Include="screen_builders.h">
       <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
+    <ClInclude Include="window_info.h">
+      <Filter>Pliki nagłówkowe\Windows</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

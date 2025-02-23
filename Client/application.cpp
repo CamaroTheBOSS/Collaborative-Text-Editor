@@ -114,6 +114,12 @@ void Application::createDoc(const TCPClient& client, const std::vector<std::stri
     waitForDocument(std::chrono::milliseconds(500), 4000);
     windowsManager.destroyLastWindow(client);
     windowsManager.destroyWindow(MainMenuWindow::className, client);
+    std::string errorMsg = repo.getLastError();
+    if (!errorMsg.empty()) {
+        windowsManager.showInfoWindow(terminal.getScreenSize(), "Error", errorMsg);
+        return;
+    }
+    windowsManager.showInfoWindow(terminal.getScreenSize(), "Success", "Access code for document: " + repo.getAcCode());
 }
 void Application::createDocWindow(const TCPClient& client, const std::vector<std::string>& args) {
     windowsManager.showWindow<CreateDocWindow>(terminal.getScreenSize());
@@ -127,6 +133,12 @@ void Application::loadDoc(const TCPClient& client, const std::vector<std::string
     waitForDocument(std::chrono::milliseconds(500), 4000);
     windowsManager.destroyLastWindow(client);
     windowsManager.destroyWindow(MainMenuWindow::className, client);
+    std::string errorMsg = repo.getLastError();
+    if (!errorMsg.empty()) {
+        windowsManager.showInfoWindow(terminal.getScreenSize(), "Error", errorMsg);
+        return;
+    }
+    windowsManager.showInfoWindow(terminal.getScreenSize(), "Success", "You connected successfuly");
 }
 
 void Application::loadDocWindow(const TCPClient& client, const std::vector<std::string>& args) {
@@ -137,7 +149,21 @@ void Application::exitApp(const TCPClient& client, const std::vector<std::string
 }
 
 void Application::helpWindow(const TCPClient& client, const std::vector<std::string>& args) {
-    windowsManager.showWindow<HelpWindow>(terminal.getScreenSize());
+    windowsManager.showInfoWindow(terminal.getScreenSize(), "Help Control", 
+        "Collaborative Text Editor!\n"
+        "Choose 'Create Document' to create document on the server\n"
+        "Choose 'Load Document' to connect to existing document\n"
+        "F3/CTRL+F - find\n"
+        "CTRL+SHIFT+F - find and replace\n"
+        "CTRL+Q - open main menu\n"
+        "ESC - close last window\n"
+        "CTRL+Arrow(up/down/left/right) - change active window\n\n"
+        "Credits\n"
+        "Main programmer: Kacper Plesiak\n"
+        "Main designer: Kacper Plesiak\n"
+        "LICENSE: MIT\n"
+        "C++ is cool\n"
+    );
 }
 
 bool Application::checkBufferWasResized() {

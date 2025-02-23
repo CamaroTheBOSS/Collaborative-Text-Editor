@@ -3,9 +3,9 @@
 #include "window_search.h"
 #include "window_replace.h"
 #include "window_mainmenu.h"
-#include "window_help.h"
 #include "window_createdoc.h"
 #include "window_loaddoc.h"
+#include "window_info.h"
 
 #include <array>
 
@@ -23,6 +23,7 @@ public:
 	void changeFocusLeft();
 	void changeFocusRight();
 	void setFocus(const int newFocus);
+	WindowsIt showInfoWindow(const COORD& consoleSize, const std::string& title, const std::string& msg);
 	template <typename T>
 	WindowsIt showWindow(const COORD& consoleSize) {
 		if (windowsRegistry.find(T::className) != windowsRegistry.cend()) {

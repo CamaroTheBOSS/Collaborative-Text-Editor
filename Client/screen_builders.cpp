@@ -3,7 +3,6 @@
 #include "window_search.h"
 #include "window_replace.h"
 #include "window_mainmenu.h"
-#include "window_help.h"
 #include "window_createdoc.h"
 #include "window_loaddoc.h"
 
@@ -49,20 +48,6 @@ ScrollableScreenBufferBuilder makeLoadDocWindowBuilder() {
         .showBottomFramePattern("-");
     return builder;
 }
-ScrollableScreenBufferBuilder makeHelpWindowBuilder() {
-    ScrollableScreenBufferBuilder builder;
-    builder.setTitle("Help Control")
-        .setScrollHisteresis(0)
-        .setRelativeLeft(0.30)
-        .setRelativeTop(0.35)
-        .setRelativeRight(0.7)
-        .setRelativeBot(0.65)
-        .showLeftFramePattern("|")
-        .showRightFramePattern("|")
-        .showTopFramePattern("-")
-        .showBottomFramePattern("-");
-    return builder;
-}
 ScrollableScreenBufferBuilder makeSearchWindowBuilder() {
     ScrollableScreenBufferBuilder builder;
     builder.setScrollHisteresis(0)
@@ -100,6 +85,20 @@ ScrollableScreenBufferBuilder makeTextEditorWindowBuilder() {
         .setRelativeTop(0.1)
         .setRelativeRight(0.9)
         .setRelativeBot(0.9)
+        .showLeftFramePattern("|")
+        .showRightFramePattern("|")
+        .showTopFramePattern("-")
+        .showBottomFramePattern("-");
+    return builder;
+}
+ScrollableScreenBufferBuilder makeInfoWindowBuilder(const std::string& title) {
+    ScrollableScreenBufferBuilder builder;
+    builder.setTitle(title)
+        .setScrollHisteresis(0)
+        .setRelativeLeft(0.30)
+        .setRelativeTop(0.35)
+        .setRelativeRight(0.7)
+        .setRelativeBot(0.65)
         .showLeftFramePattern("|")
         .showRightFramePattern("|")
         .showTopFramePattern("-")

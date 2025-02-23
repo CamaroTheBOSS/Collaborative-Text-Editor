@@ -4,7 +4,7 @@
 ScrollableScreenBufferBuilder makeMainMenuBuilder();
 ScrollableScreenBufferBuilder makeCreateDocWindowBuilder();
 ScrollableScreenBufferBuilder makeLoadDocWindowBuilder();
-ScrollableScreenBufferBuilder makeHelpWindowBuilder();
 ScrollableScreenBufferBuilder makeSearchWindowBuilder();
 ScrollableScreenBufferBuilder makeReplaceWindowBuilder();
 ScrollableScreenBufferBuilder makeTextEditorWindowBuilder();
+ScrollableScreenBufferBuilder makeInfoWindowBuilder(const std::string& title);

@@ -142,7 +142,7 @@
     <ClCompile Include="windows_manager.cpp" />
     <ClCompile Include="window_base.cpp" />
     <ClCompile Include="window_createdoc.cpp" />
-    <ClCompile Include="window_help.cpp" />
+    <ClCompile Include="window_info.cpp" />
     <ClCompile Include="window_loaddoc.cpp" />
     <ClCompile Include="window_loaddoc.h" />
     <ClCompile Include="window_mainmenu.cpp" />
@@ -169,7 +169,7 @@
     <ClInclude Include="windows_manager.h" />
     <ClInclude Include="window_base.h" />
     <ClInclude Include="window_createdoc.h" />
-    <ClInclude Include="window_help.h" />
+    <ClInclude Include="window_info.h" />
     <ClInclude Include="window_mainmenu.h" />
     <ClInclude Include="window_search.h" />
     <ClInclude Include="window_replace.h" />

@@ -33,7 +33,7 @@ namespace client {
 
 	bool Repository::sync(ClientSiteDocument& doc, msg::Buffer& buffer) {
 		msg::ConnectResponse msg;
-		parse(buffer, 1, msg.version, msg.user, msg.error, msg.token, msg.acCode, msg.text, msg.cursorPositions);
+		parse(buffer, 1, msg.version, msg.user, lastError, authToken, acCode, msg.text, msg.cursorPositions);
 		assert(msg.error.empty());
 		assert(msg.cursorPositions.size() == (msg.user + 1) * 2);
 		doc = ClientSiteDocument(msg.text, msg.user + 1, msg.user);
@@ -102,6 +102,16 @@ namespace client {
 		doc.moveTo(msg.user, makeCoord(msg.X, msg.Y), makeCoord(msg.anchorX, msg.anchorY), msg.withSelect);
 		logger.logInfo("User", msg.user, "moved his cursor to", msg.X, ",", msg.Y);
 		return true;
+	}
+
+	std::string Repository::getAcCode() const {
+		return acCode;
+	}
+	std::string Repository::getAuthToken() const {
+		return authToken;
+	}
+	std::string Repository::getLastError() const {
+		return lastError;
 	}
 
 }

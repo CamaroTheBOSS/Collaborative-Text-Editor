@@ -9,6 +9,9 @@ namespace client {
 		friend class SyncTester;
 	public:
 		bool processMsg(ClientSiteDocument& doc, msg::Buffer& buffer);
+		std::string getAcCode() const;
+		std::string getAuthToken() const;
+		std::string getLastError() const;
 	private:
 		bool write(ClientSiteDocument& doc, msg::Buffer& buffer);
 		bool erase(ClientSiteDocument& doc, msg::Buffer& buffer);
@@ -17,5 +20,9 @@ namespace client {
 		bool connectNewUser(ClientSiteDocument& doc, msg::Buffer& buffer);
 		bool disconnectUser(ClientSiteDocument& doc, msg::Buffer& buffer);
 		bool replace(ClientSiteDocument& doc, msg::Buffer& buffer);
+
+		std::string acCode;
+		std::string authToken;
+		std::string lastError;
 	};
 }

@@ -6,7 +6,6 @@ WindowsManager::WindowsManager() {
     builderMap[MainMenuWindow::className] = makeMainMenuBuilder();
     builderMap[CreateDocWindow::className] = makeCreateDocWindowBuilder();
     builderMap[LoadDocWindow::className] = makeLoadDocWindowBuilder();
-    builderMap[HelpWindow::className] = makeHelpWindowBuilder();
     builderMap[SearchWindow::className] = makeSearchWindowBuilder();
     builderMap[ReplaceWindow::className] = makeReplaceWindowBuilder();
     builderMap[TextEditorWindow::className] = makeTextEditorWindowBuilder();
@@ -81,6 +80,19 @@ void WindowsManager::setFocus(const int newFocus) {
     }
     focus = newFocus;
     windows[focus]->activate();
+}
+
+WindowsIt WindowsManager::showInfoWindow(const COORD& consoleSize, const std::string& title, const std::string& msg) {
+    if (windowsRegistry.find(title) != windowsRegistry.cend()) {
+        return findWindow(title);
+    }
+    auto builder = makeInfoWindowBuilder(title);
+    builder.setConsoleSize({ consoleSize.X, consoleSize.Y });
+    auto window = std::make_unique<InfoWindow>(builder, title, msg);
+    windowsRegistry[window->name()] = true;
+    windows.emplace_back(std::move(window));
+    setFocus(windows.size() - 1);
+    return windows.cend() - 1;
 }
 
 void WindowsManager::destroyLastWindow(const TCPClient& client) {
