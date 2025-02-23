@@ -34,7 +34,10 @@ namespace client {
 	bool Repository::sync(ClientSiteDocument& doc, msg::Buffer& buffer) {
 		msg::ConnectResponse msg;
 		parse(buffer, 1, msg.version, msg.user, lastError, authToken, acCode, msg.text, msg.cursorPositions);
-		assert(msg.error.empty());
+		if (!lastError.empty()) {
+			logger.logDebug(lastError);
+			return false;
+		}
 		assert(msg.cursorPositions.size() == (msg.user + 1) * 2);
 		doc = ClientSiteDocument(msg.text, msg.user + 1, msg.user);
 		for (int i = 1; i < msg.cursorPositions.size(); i += 2) {
@@ -110,8 +113,10 @@ namespace client {
 	std::string Repository::getAuthToken() const {
 		return authToken;
 	}
-	std::string Repository::getLastError() const {
-		return lastError;
+	std::string Repository::getLastError() {
+		std::string err = lastError;
+		lastError.clear();
+		return err;
 	}
 
 }

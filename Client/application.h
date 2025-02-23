@@ -9,7 +9,7 @@ using WindowsIt = Windows::const_iterator;
 class Application {
 	friend class SyncTester;
 public:
-	Application();
+	Application(const std::string& ip, const int port);
 	bool connect(const std::string& ip, const int port);
 	bool disconnect();
 	bool isConnected() const;
@@ -35,4 +35,7 @@ private:
 
 	WindowsManager windowsManager;
 	bool docRequested = false;
+
+	std::string srvIp;
+	int srvPort;
 };

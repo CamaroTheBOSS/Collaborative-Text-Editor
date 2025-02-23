@@ -10,7 +10,9 @@
 using namespace client;
 constexpr msg::OneByteInt version = 1;
 
-Application::Application() :
+Application::Application(const std::string& ip, const int port) :
+    srvIp(ip),
+    srvPort(port),
     client(),
     terminal(),
     windowsManager(),
@@ -109,16 +111,22 @@ void Application::createDoc(const TCPClient& client, const std::vector<std::stri
     if (docRequested || args.empty()) {
         return;
     }
+    if (!isConnected() && !connect(srvIp, srvPort)) {
+        windowsManager.showInfoWindow(terminal.getScreenSize(), "Error", "Cannot connect to the server");
+        return;
+    }
     unsigned int socket = 0;
     client.sendMsg(msg::Type::create, version, socket, args[0]);
     waitForDocument(std::chrono::milliseconds(500), 4000);
-    windowsManager.destroyLastWindow(client);
-    windowsManager.destroyWindow(MainMenuWindow::className, client);
     std::string errorMsg = repo.getLastError();
     if (!errorMsg.empty()) {
         windowsManager.showInfoWindow(terminal.getScreenSize(), "Error", errorMsg);
+        disconnect();
         return;
     }
+    docRequested = true;
+    windowsManager.destroyLastWindow(client);
+    windowsManager.destroyWindow(MainMenuWindow::className, client);
     windowsManager.showInfoWindow(terminal.getScreenSize(), "Success", "Access code for document: " + repo.getAcCode());
 }
 void Application::createDocWindow(const TCPClient& client, const std::vector<std::string>& args) {
@@ -128,16 +136,22 @@ void Application::loadDoc(const TCPClient& client, const std::vector<std::string
     if (docRequested || args.empty()) {
         return;
     }
+    if (!isConnected() && !connect(srvIp, srvPort)) {
+        windowsManager.showInfoWindow(terminal.getScreenSize(), "Error", "Cannot connect to the server");
+        return;
+    }
     unsigned int socket = 0;
     client.sendMsg(msg::Type::join, version, socket, args[0]);
     waitForDocument(std::chrono::milliseconds(500), 4000);
-    windowsManager.destroyLastWindow(client);
-    windowsManager.destroyWindow(MainMenuWindow::className, client);
     std::string errorMsg = repo.getLastError();
     if (!errorMsg.empty()) {
         windowsManager.showInfoWindow(terminal.getScreenSize(), "Error", errorMsg);
+        disconnect();
         return;
     }
+    docRequested = true;
+    windowsManager.destroyLastWindow(client);
+    windowsManager.destroyWindow(MainMenuWindow::className, client);
     windowsManager.showInfoWindow(terminal.getScreenSize(), "Success", "You connected successfuly");
 }
 
@@ -204,7 +218,6 @@ bool Application::waitForDocument(const std::chrono::milliseconds& timeout, cons
         msg::parse(msgBuffer, 0, msgType);
         repo.processMsg(windowsManager.getTextEditor()->getDocMutable(), msgBuffer);
         if (msgType == msg::Type::create || msgType == msg::Type::join) {
-            docRequested = true;
             return true;
         }
     }

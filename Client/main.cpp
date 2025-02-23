@@ -18,15 +18,11 @@ int main() {
 		return 0;
 	}
 
-	Application app;
-	if (!app.connect("192.168.1.10", 8081)) {
-		std::cout << "Connection to server failed!\n";
-		return 0;
-	}
+	Application app{ "192.168.1.10", 8081 };
 	app.render();
 	auto actionDone = false;
 	bool render = false;
-	while (app.isConnected()) {
+	while (true) {
 		KeyPack key = app.readChar();
 		actionDone = key.keyCode != '\0' ? app.processChar(key) : false;
 		render = app.checkIncomingMessages();

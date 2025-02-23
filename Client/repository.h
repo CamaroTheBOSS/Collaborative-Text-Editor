@@ -11,7 +11,7 @@ namespace client {
 		bool processMsg(ClientSiteDocument& doc, msg::Buffer& buffer);
 		std::string getAcCode() const;
 		std::string getAuthToken() const;
-		std::string getLastError() const;
+		std::string getLastError();
 	private:
 		bool write(ClientSiteDocument& doc, msg::Buffer& buffer);
 		bool erase(ClientSiteDocument& doc, msg::Buffer& buffer);
