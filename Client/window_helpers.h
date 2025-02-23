@@ -13,6 +13,8 @@ ScrollableScreenBufferBuilder makeMenuWindowBuilder(const std::string& title);
 std::vector<Option> makeMainMenuOptions();
 std::vector<Option> makeLoggedMainMenuOptions();
 
+std::string getHelpWindowText();
+
 
 
 

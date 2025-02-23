@@ -117,9 +117,27 @@ std::vector<Option> makeMainMenuOptions() {
 std::vector<Option> makeLoggedMainMenuOptions() {
     return std::vector<Option>{
         Option{ "Disconnect", [](MenuWindow& obj) { return Event{ windows::app::events::disconnect, obj.name(), windows::app::name, {} }; } },
+        Option{ "Show access code", [](MenuWindow& obj) { return Event{ windows::app::events::showAcCode, obj.name(), windows::app::name, {} }; } },
         Option{ "Create document", [](MenuWindow& obj) { return Event{ windows::app::events::createDocWindow, obj.name(), windows::app::name, {} }; } },
         Option{ "Load document", [](MenuWindow& obj) { return Event{ windows::app::events::loadDocWindow, obj.name(), windows::app::name, {} }; } },
         Option{ "Help", [](MenuWindow& obj) { return Event{ windows::app::events::help, obj.name(), windows::app::name, {} }; } },
         Option{ "Quit", [](MenuWindow& obj) { return Event{ windows::app::events::exit, obj.name(), windows::app::name, {} }; } }
     };
+}
+
+std::string getHelpWindowText() {
+    return
+        "Collaborative Text Editor!\n"
+        "Choose 'Create Document' to create document on the server\n"
+        "Choose 'Load Document' to connect to existing document\n"
+        "F3/CTRL+F - find\n"
+        "CTRL+SHIFT+F - find and replace\n"
+        "CTRL+Q - open main menu\n"
+        "ESC - close last window\n"
+        "CTRL+Arrow(up/down/left/right) - change active window\n\n"
+        "Credits\n"
+        "Main programmer: Kacper Plesiak\n"
+        "Main designer: Kacper Plesiak\n"
+        "LICENSE: MIT\n"
+        "C++ is cool\n";
 }

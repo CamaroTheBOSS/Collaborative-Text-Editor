@@ -27,6 +27,7 @@ Application::Application(const std::string& ip, const int port) :
     eventHandlers.try_emplace(windows::app::events::loadDocWindow, &Application::loadDocWindow);
     eventHandlers.try_emplace(windows::app::events::help, &Application::helpWindow);
     eventHandlers.try_emplace(windows::app::events::disconnect, &Application::disconnectEvent);
+    eventHandlers.try_emplace(windows::app::events::showAcCode, &Application::showAcCode);
 }
 
 bool Application::connect(const std::string& ip, const int port) {
@@ -173,21 +174,11 @@ void Application::exitApp(const TCPClient& client, const std::vector<std::string
 }
 
 void Application::helpWindow(const TCPClient& client, const std::vector<std::string>& args) {
-    windowsManager.showInfoWindow(terminal.getScreenSize(), "Help Control", 
-        "Collaborative Text Editor!\n"
-        "Choose 'Create Document' to create document on the server\n"
-        "Choose 'Load Document' to connect to existing document\n"
-        "F3/CTRL+F - find\n"
-        "CTRL+SHIFT+F - find and replace\n"
-        "CTRL+Q - open main menu\n"
-        "ESC - close last window\n"
-        "CTRL+Arrow(up/down/left/right) - change active window\n\n"
-        "Credits\n"
-        "Main programmer: Kacper Plesiak\n"
-        "Main designer: Kacper Plesiak\n"
-        "LICENSE: MIT\n"
-        "C++ is cool\n"
-    );
+    windowsManager.showInfoWindow(terminal.getScreenSize(), "Help Control", getHelpWindowText());
+}
+
+void Application::showAcCode(const TCPClient& client, const std::vector<std::string>& args) {
+    windowsManager.showInfoWindow(terminal.getScreenSize(), "Access code", repo.getAcCode());
 }
 
 bool Application::checkBufferWasResized() {

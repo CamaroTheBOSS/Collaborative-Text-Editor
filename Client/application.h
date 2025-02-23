@@ -28,6 +28,7 @@ private:
 	void loadDoc(const TCPClient& client, const std::vector<std::string>& args);
 	void exitApp(const TCPClient& client, const std::vector<std::string>& args);
 	void helpWindow(const TCPClient& client, const std::vector<std::string>& args);
+	void showAcCode(const TCPClient& client, const std::vector<std::string>& args);
 	bool loadCreateDoc(const msg::Type type, const TCPClient& client, const std::vector<std::string>& args);
 
 	TCPClient client;
