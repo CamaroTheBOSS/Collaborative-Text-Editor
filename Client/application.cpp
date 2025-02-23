@@ -117,7 +117,12 @@ void Application::createDoc(const TCPClient& client, const std::vector<std::stri
     }
     unsigned int socket = 0;
     client.sendMsg(msg::Type::create, version, socket, args[0]);
-    waitForDocument(std::chrono::milliseconds(500), 4000);
+    bool connected = waitForDocument(std::chrono::milliseconds(500), 4);
+    if (!connected) {
+        windowsManager.showInfoWindow(terminal.getScreenSize(), "Error", "Timeout during document synchronization");
+        disconnect();
+        return;
+    }
     std::string errorMsg = repo.getLastError();
     if (!errorMsg.empty()) {
         windowsManager.showInfoWindow(terminal.getScreenSize(), "Error", errorMsg);
@@ -142,7 +147,12 @@ void Application::loadDoc(const TCPClient& client, const std::vector<std::string
     }
     unsigned int socket = 0;
     client.sendMsg(msg::Type::join, version, socket, args[0]);
-    waitForDocument(std::chrono::milliseconds(500), 4000);
+    bool connected = waitForDocument(std::chrono::milliseconds(500), 4);
+    if (!connected) {
+        windowsManager.showInfoWindow(terminal.getScreenSize(), "Error", "Timeout during document synchronization");
+        disconnect();
+        return;
+    }
     std::string errorMsg = repo.getLastError();
     if (!errorMsg.empty()) {
         windowsManager.showInfoWindow(terminal.getScreenSize(), "Error", errorMsg);
