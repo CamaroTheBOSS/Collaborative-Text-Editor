@@ -35,7 +35,6 @@ private:
 
 	std::vector<Worker> workers;
 	std::vector<SOCKET> notifiers;
-	server::Repository repo;
 	MessageExtractor extractor;
 	
 };
