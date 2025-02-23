@@ -65,7 +65,7 @@ void Server::start() {
 					int worker = selectWorker();
 					forwardConnection(client, buffer, worker);
 				}
-				else if (type == msg::Type::load) {
+				else if (type == msg::Type::join) {
 					std::string accessCode;
 					buffer.replace(2, client);
 					msg::parse(buffer, 6, accessCode);

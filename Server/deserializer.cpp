@@ -5,8 +5,8 @@ msg::ConnectCreateDoc Deserializer::parseConnectCreateDoc(const msg::Buffer& buf
 	msg::parse(buffer, 0, msg.type, msg.version, msg.socket, msg.filename);
 	return msg;
 }
-msg::ConnectLoadDoc Deserializer::parseConnectLoadDoc(const msg::Buffer& buffer) {
-	msg::ConnectLoadDoc msg;
+msg::ConnectJoinDoc Deserializer::parseConnectJoinDoc(const msg::Buffer& buffer) {
+	msg::ConnectJoinDoc msg;
 	msg::parse(buffer, 0, msg.type, msg.version, msg.socket, msg.acCode);
 	return msg;
 }

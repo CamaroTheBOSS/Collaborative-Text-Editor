@@ -65,47 +65,13 @@ namespace msg {
 			size += sizeof(T);
 		}
 		// Swap to BigEndian if system is LittleEndian
-		void add(const unsigned int* val) {
-			u_long uLongVal = htonl(*val);
-			add(&uLongVal);
-		}
-		void add(const Type* type) {
-			OneByteInt byteVal = static_cast<OneByteInt>(*type);
-			add(&byteVal);
-		}
-		void add(const MoveSide* type) {
-			OneByteInt byteVal = static_cast<OneByteInt>(*type);
-			add(&byteVal);
-		}
-		void add(const std::string* str) {
-			reserveIfNeeded(str->size() + 1);
-			assert(capacity >= size + str->size() + 1 && "Error, buffer size excedeed!");
-			memcpy(data.get() + size, str->c_str(), str->size() + 1);
-			size += str->size() + 1;
-		}
-		void add(const Buffer* other) {
-			reserveIfNeeded(other->size);
-			assert(capacity >= size + other->size && "Error, buffer size excedeed!");
-			memcpy(data.get() + size, other->get(), other->size);
-			size += other->size;
-		}
-		void add(const Buffer* other, const int start, const int cpsize) {
-			reserveIfNeeded(cpsize);
-			assert(capacity >= size + cpsize && "Error, buffer size excedeed!");
-			assert(start + cpsize <= other->size && "Error, buffer size excedeed!");
-			memcpy(data.get() + size, other->get() + start, cpsize);
-			size += cpsize;
-		}
-		void add(const std::pair<COORD, COORD>* val) {
-			unsigned int x1 = val->first.X;
-			unsigned int y1 = val->first.Y;
-			unsigned int x2 = val->second.X;
-			unsigned int y2 = val->second.Y;
-			add(&x1);
-			add(&y1);
-			add(&x2);
-			add(&y2);
-		}
+		void add(const unsigned int* val);
+		void add(const Type* type);
+		void add(const MoveSide* type);
+		void add(const std::string* str);
+		void add(const Buffer* other);
+		void add(const Buffer* other, const int start, const int cpsize);
+		void add(const std::pair<COORD, COORD>* val);
 		template<typename T>
 		void add(const std::vector<T>* arr) {
 			unsigned int arrSize = arr->size();
@@ -114,11 +80,7 @@ namespace msg {
 				add(&element);
 			}
 		}
-		void replace(const int pos, const unsigned int val) {
-			assert(pos + sizeof(val) <= size);
-			u_long uLongVal = htonl(val);
-			memcpy(data.get() + pos, &uLongVal, sizeof(uLongVal));
-		}
+		void replace(const int pos, const unsigned int val);
 		void clear();
 		char* get() const;
 		bool empty() const;
@@ -176,8 +138,8 @@ namespace msg {
 		std::string filename;
 	};
 
-	struct ConnectLoadDoc {
-		Type type = Type::load;
+	struct ConnectJoinDoc {
+		Type type = Type::join;
 		OneByteInt version = 0;
 		unsigned int socket = 0;
 		std::string acCode;

@@ -15,7 +15,7 @@ namespace server {
 		switch (type) {
 		case msg::Type::create:
 			return createDoc(client, buffer);
-		case msg::Type::load:
+		case msg::Type::join:
 			return loadDoc(client, buffer);
 		case msg::Type::masterClose:
 			return masterClose(buffer);
@@ -96,12 +96,12 @@ namespace server {
 	}
 
 	Response Repository::loadDoc(const SOCKET client, msg::Buffer& buffer) {
-		auto msg = Deserializer::parseConnectLoadDoc(buffer);
+		auto msg = Deserializer::parseConnectJoinDoc(buffer);
 		auto docIt = acCodeToDocMap.find(msg.acCode);
 		if (docIt == acCodeToDocMap.cend()) {
 			std::string errMsg = "Incorrect access code!";
 			auto newBuffer = Serializer::makeConnectResponseWithError(msg.type, errMsg, 1);
-			return Response{ std::move(newBuffer), { msg.socket }, msg::Type::load };
+			return Response{ std::move(newBuffer), { msg.socket }, msg::Type::join };
 		}
 		clientToAcCodeMap.emplace(msg.socket, msg.acCode);
 		docIt->second.addUser();
@@ -109,7 +109,7 @@ namespace server {
 		int userIdx = docIt->second.getCursorNum() - 1;
 		auto newBuffer = Serializer::makeConnectResponse(msg.type, docIt->second, msg.version, userIdx, "", msg.acCode);
 		logger.logDebug("User", client, "connected to document");
-		return Response{ std::move(newBuffer), docIt->second.getConnectedClients(), msg::Type::load };
+		return Response{ std::move(newBuffer), docIt->second.getConnectedClients(), msg::Type::join };
 	}
 
 	Response Repository::disconnectUserFromDoc(const ArgPack& argPack) {

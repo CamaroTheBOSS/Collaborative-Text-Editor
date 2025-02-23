@@ -123,7 +123,7 @@ void Application::loadDoc(const TCPClient& client, const std::vector<std::string
         return;
     }
     unsigned int socket = 0;
-    client.sendMsg(msg::Type::load, version, socket, args[0]);
+    client.sendMsg(msg::Type::join, version, socket, args[0]);
     waitForDocument(std::chrono::milliseconds(500), 4000);
     windowsManager.destroyLastWindow(client);
     windowsManager.destroyWindow(MainMenuWindow::className, client);
@@ -177,7 +177,7 @@ bool Application::waitForDocument(const std::chrono::milliseconds& timeout, cons
         msg::Type msgType;
         msg::parse(msgBuffer, 0, msgType);
         repo.processMsg(windowsManager.getTextEditor()->getDocMutable(), msgBuffer);
-        if (msgType == msg::Type::create || msgType == msg::Type::load) {
+        if (msgType == msg::Type::create || msgType == msg::Type::join) {
             docRequested = true;
             return true;
         }

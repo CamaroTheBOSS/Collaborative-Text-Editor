@@ -18,7 +18,7 @@ namespace client {
 		case msg::Type::moveTo:
 			return move(doc, buffer);
 		case msg::Type::create:
-		case msg::Type::load:
+		case msg::Type::join:
 			return sync(doc, buffer);
 		case msg::Type::connect:
 			return connectNewUser(doc, buffer);

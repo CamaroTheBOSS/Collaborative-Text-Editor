@@ -70,7 +70,7 @@ void Worker::handleConnections() {
             auto msgBuffers = extractor.extractMessages(client);
             for (auto& msgBuffer : msgBuffers) {
                 server::Response response = processMsg(client, msgBuffer);
-                if (response.msgType == msg::Type::create || response.msgType == msg::Type::load) {
+                if (response.msgType == msg::Type::create || response.msgType == msg::Type::join) {
                     syncClientState(response);
                     addToAcCodes();
                 }
