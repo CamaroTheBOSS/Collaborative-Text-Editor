@@ -6,6 +6,7 @@
 #include "window_replace.h"
 #include "application.h"
 #include "logging.h"
+#include "window_helpers.h"
 
 using namespace client;
 constexpr msg::OneByteInt version = 1;
@@ -18,13 +19,14 @@ Application::Application(const std::string& ip, const int port) :
     windowsManager(),
     repo() {
     windowsManager.showWindow<TextEditorWindow>(terminal.getScreenSize());
-    windowsManager.showWindow<MainMenuWindow>(terminal.getScreenSize());
+    windowsManager.showMenuWindow(terminal.getScreenSize(), "Main Menu", std::move(makeMainMenuOptions()));
     eventHandlers.try_emplace(windows::app::events::createDoc, &Application::createDoc);
     eventHandlers.try_emplace(windows::app::events::loadDoc, &Application::loadDoc);
     eventHandlers.try_emplace(windows::app::events::exit, &Application::exitApp);
     eventHandlers.try_emplace(windows::app::events::createDocWindow, &Application::createDocWindow);
     eventHandlers.try_emplace(windows::app::events::loadDocWindow, &Application::loadDocWindow);
     eventHandlers.try_emplace(windows::app::events::help, &Application::helpWindow);
+    eventHandlers.try_emplace(windows::app::events::disconnect, &Application::disconnectEvent);
 }
 
 bool Application::connect(const std::string& ip, const int port) {
@@ -79,7 +81,8 @@ bool Application::processChar(const KeyPack& key) {
         }
         return true;
     case CTRL_Q:
-        windowsManager.showWindow<MainMenuWindow>(terminal.getScreenSize());
+        windowsManager.showMenuWindow(terminal.getScreenSize(), "Main Menu", std::move( isConnected() ?
+            makeLoggedMainMenuOptions() : makeMainMenuOptions()));
         return true;
     case ESC:
         windowsManager.destroyLastWindow(client);
@@ -105,6 +108,12 @@ bool Application::processEvent(const Event& pEvent) {
     }
     (this->*it->second)(client, pEvent.params);
     return true;
+}
+
+void Application::disconnectEvent(const TCPClient& client, const std::vector<std::string>& args) {
+    disconnect();
+    windowsManager.showInfoWindow(terminal.getScreenSize(), "Success", "Disconnected successfuly");
+    windowsManager.destroyWindow("Main Menu", client);
 }
 
 void Application::createDoc(const TCPClient& client, const std::vector<std::string>& args) {
@@ -154,11 +163,12 @@ bool Application::loadCreateDoc(const msg::Type type, const TCPClient& client, c
         return false;
     }
     windowsManager.destroyLastWindow(client);
-    windowsManager.destroyWindow(MainMenuWindow::className, client);
+    windowsManager.destroyWindow("Main Menu", client);
     return true;
 }
 
 void Application::exitApp(const TCPClient& client, const std::vector<std::string>& args) {
+    disconnect();
     exit(0);
 }
 

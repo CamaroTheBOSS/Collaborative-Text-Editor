@@ -21,6 +21,7 @@ public:
 	void render();
 private:
 	bool processEvent(const Event& pEvent);
+	void disconnectEvent(const TCPClient& client, const std::vector<std::string>& args);
 	void createDocWindow(const TCPClient& client, const std::vector<std::string>& args);
 	void createDoc(const TCPClient& client, const std::vector<std::string>& args);
 	void loadDocWindow(const TCPClient& client, const std::vector<std::string>& args);

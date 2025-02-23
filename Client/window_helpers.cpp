@@ -1,25 +1,10 @@
-#include "screen_builders.h"
+#include "window_helpers.h"
 #include "window_text_editor.h"
 #include "window_search.h"
 #include "window_replace.h"
-#include "window_mainmenu.h"
 #include "window_createdoc.h"
 #include "window_loaddoc.h"
 
-ScrollableScreenBufferBuilder makeMainMenuBuilder() {
-    ScrollableScreenBufferBuilder builder;
-    builder.setScrollHisteresis(0)
-        .setTitle(MainMenuWindow::className)
-        .setRelativeLeft(0.35)
-        .setRelativeTop(0.4)
-        .setRelativeRight(0.65)
-        .setRelativeBot(0.6)
-        .showLeftFramePattern("|")
-        .showRightFramePattern("|")
-        .showTopFramePattern("-")
-        .showBottomFramePattern("-");
-    return builder;
-}
 ScrollableScreenBufferBuilder makeCreateDocWindowBuilder() {
     ScrollableScreenBufferBuilder builder;
     builder.setTitle("Enter name for document")
@@ -104,4 +89,37 @@ ScrollableScreenBufferBuilder makeInfoWindowBuilder(const std::string& title) {
         .showTopFramePattern("-")
         .showBottomFramePattern("-");
     return builder;
+}
+
+ScrollableScreenBufferBuilder makeMenuWindowBuilder(const std::string& title) {
+    ScrollableScreenBufferBuilder builder;
+    builder.setScrollHisteresis(0)
+        .setTitle(title)
+        .setRelativeLeft(0.35)
+        .setRelativeTop(0.4)
+        .setRelativeRight(0.65)
+        .setRelativeBot(0.6)
+        .showLeftFramePattern("|")
+        .showRightFramePattern("|")
+        .showTopFramePattern("-")
+        .showBottomFramePattern("-");
+    return builder;
+}
+
+std::vector<Option> makeMainMenuOptions() {
+    return std::vector<Option>{
+        Option{ "Create document", [](MenuWindow& obj) { return Event{ windows::app::events::createDocWindow, obj.name(), windows::app::name, {} }; } },
+        Option{ "Load document", [](MenuWindow& obj) { return Event{ windows::app::events::loadDocWindow, obj.name(), windows::app::name, {} }; } },
+        Option{ "Help", [](MenuWindow& obj) { return Event{ windows::app::events::help, obj.name(), windows::app::name, {} }; } },
+        Option{ "Quit", [](MenuWindow& obj) { return Event{ windows::app::events::exit, obj.name(), windows::app::name, {} }; } }
+    };
+}
+std::vector<Option> makeLoggedMainMenuOptions() {
+    return std::vector<Option>{
+        Option{ "Disconnect", [](MenuWindow& obj) { return Event{ windows::app::events::disconnect, obj.name(), windows::app::name, {} }; } },
+        Option{ "Create document", [](MenuWindow& obj) { return Event{ windows::app::events::createDocWindow, obj.name(), windows::app::name, {} }; } },
+        Option{ "Load document", [](MenuWindow& obj) { return Event{ windows::app::events::loadDocWindow, obj.name(), windows::app::name, {} }; } },
+        Option{ "Help", [](MenuWindow& obj) { return Event{ windows::app::events::help, obj.name(), windows::app::name, {} }; } },
+        Option{ "Quit", [](MenuWindow& obj) { return Event{ windows::app::events::exit, obj.name(), windows::app::name, {} }; } }
+    };
 }

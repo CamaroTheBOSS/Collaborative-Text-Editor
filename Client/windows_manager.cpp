@@ -1,9 +1,8 @@
 #include "windows_manager.h"
-#include "screen_builders.h"
+#include "window_helpers.h"
 
 
 WindowsManager::WindowsManager() {
-    builderMap[MainMenuWindow::className] = makeMainMenuBuilder();
     builderMap[CreateDocWindow::className] = makeCreateDocWindowBuilder();
     builderMap[LoadDocWindow::className] = makeLoadDocWindowBuilder();
     builderMap[SearchWindow::className] = makeSearchWindowBuilder();
@@ -89,6 +88,19 @@ WindowsIt WindowsManager::showInfoWindow(const COORD& consoleSize, const std::st
     auto builder = makeInfoWindowBuilder(title);
     builder.setConsoleSize({ consoleSize.X, consoleSize.Y });
     auto window = std::make_unique<InfoWindow>(builder, title, msg);
+    windowsRegistry[window->name()] = true;
+    windows.emplace_back(std::move(window));
+    setFocus(windows.size() - 1);
+    return windows.cend() - 1;
+}
+
+WindowsIt WindowsManager::showMenuWindow(const COORD& consoleSize, const std::string& title, std::vector<Option>&& options) {
+    if (windowsRegistry.find(title) != windowsRegistry.cend()) {
+        return findWindow(title);
+    }
+    auto builder = makeMenuWindowBuilder(title);
+    builder.setConsoleSize({ consoleSize.X, consoleSize.Y });
+    auto window = std::make_unique<MenuWindow>(builder, title, std::move(options));
     windowsRegistry[window->name()] = true;
     windows.emplace_back(std::move(window));
     setFocus(windows.size() - 1);

@@ -2,10 +2,10 @@
 #include "window_text_editor.h"
 #include "window_search.h"
 #include "window_replace.h"
-#include "window_mainmenu.h"
 #include "window_createdoc.h"
 #include "window_loaddoc.h"
 #include "window_info.h"
+#include "window_menu.h"
 
 #include <array>
 
@@ -24,6 +24,7 @@ public:
 	void changeFocusRight();
 	void setFocus(const int newFocus);
 	WindowsIt showInfoWindow(const COORD& consoleSize, const std::string& title, const std::string& msg);
+	WindowsIt showMenuWindow(const COORD& consoleSize, const std::string& title, std::vector<Option>&& options);
 	template <typename T>
 	WindowsIt showWindow(const COORD& consoleSize) {
 		if (windowsRegistry.find(T::className) != windowsRegistry.cend()) {
