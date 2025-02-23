@@ -6,8 +6,8 @@
 using namespace client;
 
 bool TCPClient::connectServer(const std::string& ip, const int port) {
-    std::chrono::seconds waitTime{1};
-    std::this_thread::sleep_for(waitTime);
+    //std::chrono::seconds waitTime{1};
+    //std::this_thread::sleep_for(waitTime);
     client = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (client == INVALID_SOCKET) {
         logger.logError(WSAGetLastError(), ": Error when creating socket for server connection!");
