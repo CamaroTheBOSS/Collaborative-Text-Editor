@@ -1,5 +1,5 @@
 # Collaborative Text Editor
-Server-client archituctere console text editor. Built on purpose for learning socket-based network programming. Currently under development
+Server-client architecture console text editor. Built on purpose for learning socket-based network programming. Currently under development
 
 ## Main goal
 Main goal of this project is to provide text editor for writing shared documents in real time for Windows without using third-party libraries except winsock api. Most important features
