@@ -8,7 +8,7 @@ Main goal of this project is to provide text editor for writing shared documents
 - :white_check_mark: Up to 8 connected clients per document and up to ~32k lines long documents
 - :white_check_mark:Low CPU and memory, thread pool based server where load is balanced evenly (based on number of documents served by the thread) with defined, finite number of threads
 - :white_check_mark: Own communication protocol based on TCP/IP
-- :white_check_mark: AI free
+- :white_check_mark: AI free code
 
 ## Prerequisities
 - Windows
