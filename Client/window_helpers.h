@@ -1,17 +1,30 @@
 #pragma once
 #include "screen_buffers_builder.h"
 #include "window_menu.h"
+#include "window_info.h"
+#include "window_text_input.h"
+#include "window_text_editor.h"
 
-ScrollableScreenBufferBuilder makeCreateDocWindowBuilder();
-ScrollableScreenBufferBuilder makeLoadDocWindowBuilder();
-ScrollableScreenBufferBuilder makeSearchWindowBuilder();
-ScrollableScreenBufferBuilder makeReplaceWindowBuilder();
-ScrollableScreenBufferBuilder makeTextEditorWindowBuilder();
-ScrollableScreenBufferBuilder makeInfoWindowBuilder(const std::string& title);
-ScrollableScreenBufferBuilder makeMenuWindowBuilder(const std::string& title);
+// Specific window builders
+ScrollableScreenBufferBuilder makeCreateDocWindowBuilder(const COORD& consoleSize);
+ScrollableScreenBufferBuilder makeLoadDocWindowBuilder(const COORD& consoleSize);
+ScrollableScreenBufferBuilder makeSearchWindowBuilder(const COORD& consoleSize);
+ScrollableScreenBufferBuilder makeReplaceWindowBuilder(const COORD& consoleSize);
+ScrollableScreenBufferBuilder makeTextEditorWindowBuilder(const COORD& consoleSize);
+ScrollableScreenBufferBuilder makeInfoWindowBuilder(const COORD& consoleSize, const std::string& title);
+ScrollableScreenBufferBuilder makeMenuWindowBuilder(const COORD& consoleSize, const std::string& title);
 
+// Menu options
 std::vector<Option> makeMainMenuOptions();
 std::vector<Option> makeLoggedMainMenuOptions();
+
+// TextInputHandlers
+TextInputWindow::TextInputHandler funcSearchModifyEvent();
+TextInputWindow::TextInputHandler funcSearchSubmitEvent();
+TextInputWindow::TextInputHandler funcSearchDeleteEvent();
+TextInputWindow::TextInputHandler funcReplaceSubmitEvent();
+TextInputWindow::TextInputHandler funcLoadDocSubmitEvent();
+TextInputWindow::TextInputHandler funcCreateDocSubmitEvent();
 
 std::string getHelpWindowText();
 

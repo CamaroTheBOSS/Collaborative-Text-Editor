@@ -54,9 +54,6 @@
     <ClCompile Include="window_base.cpp">
       <Filter>Pliki źródłowe\Windows</Filter>
     </ClCompile>
-    <ClCompile Include="window_search.cpp">
-      <Filter>Pliki źródłowe\Windows</Filter>
-    </ClCompile>
     <ClCompile Include="screen_buffers.cpp">
       <Filter>Pliki źródłowe\Windows</Filter>
     </ClCompile>
@@ -66,20 +63,8 @@
     <ClCompile Include="canvas.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
-    <ClCompile Include="window_replace.cpp">
-      <Filter>Pliki źródłowe\Windows</Filter>
-    </ClCompile>
     <ClCompile Include="windows_manager.cpp">
       <Filter>Pliki źródłowe</Filter>
-    </ClCompile>
-    <ClCompile Include="window_loaddoc.h">
-      <Filter>Pliki nagłówkowe\Windows</Filter>
-    </ClCompile>
-    <ClCompile Include="window_createdoc.cpp">
-      <Filter>Pliki źródłowe\Windows</Filter>
-    </ClCompile>
-    <ClCompile Include="window_loaddoc.cpp">
-      <Filter>Pliki źródłowe\Windows</Filter>
     </ClCompile>
     <ClCompile Include="window_info.cpp">
       <Filter>Pliki źródłowe\Windows</Filter>
@@ -91,6 +76,9 @@
       <Filter>Pliki źródłowe\Windows</Filter>
     </ClCompile>
     <ClCompile Include="window_helpers.cpp">
+      <Filter>Pliki źródłowe\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="window_text_input.cpp">
       <Filter>Pliki źródłowe\Windows</Filter>
     </ClCompile>
   </ItemGroup>
@@ -122,9 +110,6 @@
     <ClInclude Include="window_text_editor.h">
       <Filter>Pliki nagłówkowe\Windows</Filter>
     </ClInclude>
-    <ClInclude Include="window_search.h">
-      <Filter>Pliki nagłówkowe\Windows</Filter>
-    </ClInclude>
     <ClInclude Include="screen_buffers.h">
       <Filter>Pliki nagłówkowe\Windows</Filter>
     </ClInclude>
@@ -134,22 +119,19 @@
     <ClInclude Include="canvas.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
-    <ClInclude Include="window_replace.h">
-      <Filter>Pliki nagłówkowe\Windows</Filter>
-    </ClInclude>
     <ClInclude Include="windows_manager.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
     <ClInclude Include="events.h">
       <Filter>Pliki nagłówkowe\Windows</Filter>
     </ClInclude>
-    <ClInclude Include="window_createdoc.h">
-      <Filter>Pliki nagłówkowe\Windows</Filter>
-    </ClInclude>
     <ClInclude Include="window_info.h">
       <Filter>Pliki nagłówkowe\Windows</Filter>
     </ClInclude>
     <ClInclude Include="window_helpers.h">
+      <Filter>Pliki nagłówkowe\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="window_text_input.h">
       <Filter>Pliki nagłówkowe\Windows</Filter>
     </ClInclude>
   </ItemGroup>

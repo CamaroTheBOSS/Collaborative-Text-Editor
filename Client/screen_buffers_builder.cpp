@@ -1,5 +1,9 @@
 #include "screen_buffers_builder.h"
 
+std::string ScrollableScreenBufferBuilder::getTitle() const {
+	return title;
+}
+
 ScrollableScreenBufferBuilder& ScrollableScreenBufferBuilder::showLineNumbers() {
 	lineNumbers = true;
 	return *this;

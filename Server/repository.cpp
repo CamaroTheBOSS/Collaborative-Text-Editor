@@ -27,10 +27,6 @@ namespace server {
 		}
 		ArgPack argPack{ client, buffer, doc };
 		switch (type) {
-		/*case msg::Type::masterForwardConnect:
-			return masterForwardConnect(argPack);*/
-		/*case msg::Type::sync:
-			return connectUserToDoc(argPack);*/
 		case msg::Type::disconnect:
 			return disconnectUserFromDoc(argPack);
 		case msg::Type::write:

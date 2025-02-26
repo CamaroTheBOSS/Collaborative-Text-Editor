@@ -2,8 +2,6 @@
 #include <thread>
 
 #include "window_text_editor.h"
-#include "window_search.h"
-#include "window_replace.h"
 #include "application.h"
 #include "logging.h"
 #include "window_helpers.h"
@@ -16,10 +14,10 @@ Application::Application(const std::string& ip, const int port) :
     srvPort(port),
     client(),
     terminal(),
-    windowsManager(),
+    windowsManager(terminal.getScreenSize()),
     repo() {
-    windowsManager.showWindow<TextEditorWindow>(terminal.getScreenSize());
-    windowsManager.showMenuWindow(terminal.getScreenSize(), "Main Menu", std::move(makeMainMenuOptions()));
+    windowsManager.showWindow<TextEditorWindow>(makeTextEditorWindowBuilder(terminal.getScreenSize()));
+    windowsManager.showWindow<MenuWindow>(makeMenuWindowBuilder(terminal.getScreenSize(), "Main Menu"), makeMainMenuOptions());
     eventHandlers.try_emplace(windows::app::events::createDoc, &Application::createDoc);
     eventHandlers.try_emplace(windows::app::events::loadDoc, &Application::loadDoc);
     eventHandlers.try_emplace(windows::app::events::exit, &Application::exitApp);
@@ -73,17 +71,19 @@ bool Application::processChar(const KeyPack& key) {
         return true;
     case CTRL_F:
     case F3:
-        windowsManager.showWindow<SearchWindow>(terminal.getScreenSize());
+        windowsManager.showWindow<TextInputWindow>(makeSearchWindowBuilder(terminal.getScreenSize()), 
+            funcSearchSubmitEvent(), funcSearchModifyEvent(), funcSearchDeleteEvent());
         return true;
     case CTRL_R:
         if (key.shiftPressed) {
-            windowsManager.showWindow<SearchWindow>(terminal.getScreenSize());
-            windowsManager.showWindow<ReplaceWindow>(terminal.getScreenSize());
+            windowsManager.showWindow<TextInputWindow>(makeSearchWindowBuilder(terminal.getScreenSize()), 
+                funcSearchSubmitEvent(), funcSearchModifyEvent(), funcSearchDeleteEvent());
+            windowsManager.showWindow<TextInputWindow>(makeReplaceWindowBuilder(terminal.getScreenSize()), funcReplaceSubmitEvent());
         }
         return true;
     case CTRL_Q:
-        windowsManager.showMenuWindow(terminal.getScreenSize(), "Main Menu", std::move( isConnected() ?
-            makeLoggedMainMenuOptions() : makeMainMenuOptions()));
+        windowsManager.showWindow<MenuWindow>(makeMenuWindowBuilder(terminal.getScreenSize(), "Main Menu"),
+            isConnected() ? makeLoggedMainMenuOptions() : makeMainMenuOptions());
         return true;
     case ESC:
         windowsManager.destroyLastWindow(client);
@@ -113,28 +113,30 @@ bool Application::processEvent(const Event& pEvent) {
 
 void Application::disconnectEvent(const TCPClient& client, const std::vector<std::string>& args) {
     disconnect();
-    windowsManager.showInfoWindow(terminal.getScreenSize(), "Success", "Disconnected successfuly");
+    windowsManager.showWindow<InfoWindow>(makeInfoWindowBuilder(terminal.getScreenSize(), "Success"), "Disconnected successfuly");
     windowsManager.destroyWindow("Main Menu", client);
 }
 
 void Application::createDoc(const TCPClient& client, const std::vector<std::string>& args) {
     bool success = loadCreateDoc(msg::Type::create, client, args);
     if (success) {
-        windowsManager.showInfoWindow(terminal.getScreenSize(), "Success", "Access code for document: " + repo.getAcCode());
+        windowsManager.showWindow<InfoWindow>(makeInfoWindowBuilder(terminal.getScreenSize(), "Success"), "Access code for document: " + repo.getAcCode());
     }
 }
 void Application::createDocWindow(const TCPClient& client, const std::vector<std::string>& args) {
-    windowsManager.showWindow<CreateDocWindow>(terminal.getScreenSize());
+    /*windowsManager.showTextInputWindow(makeCreateDocWindowBuilder(terminal.getScreenSize()),
+        funcCreateDocSubmitEvent());*/
+    windowsManager.showWindow<TextInputWindow>(makeCreateDocWindowBuilder(terminal.getScreenSize()), funcCreateDocSubmitEvent());
 }
 void Application::loadDoc(const TCPClient& client, const std::vector<std::string>& args) {
     bool success = loadCreateDoc(msg::Type::join, client, args);
     if (success) {
-        windowsManager.showInfoWindow(terminal.getScreenSize(), "Success", "You connected successfuly");
+        windowsManager.showWindow<InfoWindow>(makeInfoWindowBuilder(terminal.getScreenSize(), "Success"), "You connected successfuly");
     }
 }
 
 void Application::loadDocWindow(const TCPClient& client, const std::vector<std::string>& args) {
-    windowsManager.showWindow<LoadDocWindow>(terminal.getScreenSize());
+    windowsManager.showWindow<TextInputWindow>(makeLoadDocWindowBuilder(terminal.getScreenSize()), funcLoadDocSubmitEvent());
 }
 
 bool Application::loadCreateDoc(const msg::Type type, const TCPClient& client, const std::vector<std::string>& args) {
@@ -142,24 +144,24 @@ bool Application::loadCreateDoc(const msg::Type type, const TCPClient& client, c
         return false;
     }
     if (isConnected()) {
-        windowsManager.showInfoWindow(terminal.getScreenSize(), "Failure", "You are already connected to the document. Please disconnect first.");
+        windowsManager.showWindow<InfoWindow>(makeInfoWindowBuilder(terminal.getScreenSize(), "Failure"), "You are already connected to the document. Please disconnect first.");
         return false;
     }
     if (!connect(srvIp, srvPort)) {
-        windowsManager.showInfoWindow(terminal.getScreenSize(), "Failure", "Cannot connect to the server");
+        windowsManager.showWindow<InfoWindow>(makeInfoWindowBuilder(terminal.getScreenSize(), "Failure"), "Cannot connect to the server");
         return false;
     }
     unsigned int socket = 0;
     client.sendMsg(type, version, socket, args[0]);
     bool connected = waitForDocument(std::chrono::milliseconds(500), 4);
     if (!connected) {
-        windowsManager.showInfoWindow(terminal.getScreenSize(), "Failure", "Timeout during document synchronization");
+        windowsManager.showWindow<InfoWindow>(makeInfoWindowBuilder(terminal.getScreenSize(), "Failure"), "Timeout during document synchronization");
         disconnect();
         return false;
     }
     std::string errorMsg = repo.getLastError();
     if (!errorMsg.empty()) {
-        windowsManager.showInfoWindow(terminal.getScreenSize(), "Failure", errorMsg);
+        windowsManager.showWindow<InfoWindow>(makeInfoWindowBuilder(terminal.getScreenSize(), "Failure"), errorMsg);
         disconnect();
         return false;
     }
@@ -174,11 +176,11 @@ void Application::exitApp(const TCPClient& client, const std::vector<std::string
 }
 
 void Application::helpWindow(const TCPClient& client, const std::vector<std::string>& args) {
-    windowsManager.showInfoWindow(terminal.getScreenSize(), "Help Control", getHelpWindowText());
+    windowsManager.showWindow<InfoWindow>(makeInfoWindowBuilder(terminal.getScreenSize(), "Help Control"), getHelpWindowText());
 }
 
 void Application::showAcCode(const TCPClient& client, const std::vector<std::string>& args) {
-    windowsManager.showInfoWindow(terminal.getScreenSize(), "Access code", repo.getAcCode());
+    windowsManager.showWindow<InfoWindow>(makeInfoWindowBuilder(terminal.getScreenSize(), "Access code"), repo.getAcCode());
 }
 
 bool Application::checkBufferWasResized() {

@@ -2,9 +2,16 @@
 
 constexpr msg::OneByteInt version = 1;
 
-InfoWindow::InfoWindow(const ScrollableScreenBufferBuilder& ssbBuilder, const std::string& title, const std::string& msg) :
+InfoWindow::InfoWindow(const ScrollableScreenBufferBuilder& ssbBuilder, const std::string& msg) :
     BaseWindow(ssbBuilder),
-    className(title) {
+    winName(ssbBuilder.getTitle()) {
+    doc.write(0, msg);
+    doc.setCursorPos(0, COORD{ 0, 0 });
+}
+
+InfoWindow::InfoWindow(const ScrollableScreenBufferBuilder& ssbBuilder, const std::string&& msg) :
+    BaseWindow(ssbBuilder),
+    winName(ssbBuilder.getTitle()) {
     doc.write(0, msg);
     doc.setCursorPos(0, COORD{ 0, 0 });
 }
@@ -29,4 +36,8 @@ Event InfoWindow::processChar(TCPClient& client, const KeyPack& key, const std::
         return Event{};
     }
     return Event{};
+}
+
+std::string InfoWindow::name() const {
+    return winName;
 }

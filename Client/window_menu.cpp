@@ -1,8 +1,8 @@
 #include "window_menu.h"
 
-MenuWindow::MenuWindow(const ScrollableScreenBufferBuilder& ssbBuilder, const std::string& title, std::vector<Option>&& menuOptions) :
+MenuWindow::MenuWindow(const ScrollableScreenBufferBuilder& ssbBuilder, std::vector<Option>&& menuOptions) :
     BaseWindow(ssbBuilder),
-    className(title),
+    winName(ssbBuilder.getTitle()),
     options(std::move(menuOptions)) {
     for (const auto& option : options) {
         doc.write(0, option.name + "\n");
@@ -50,4 +50,8 @@ Event MenuWindow::executeOption() {
         return Event{};
     }
     return options[selectedOption].handler(*this);
+}
+
+std::string MenuWindow::name() const {
+    return winName;
 }

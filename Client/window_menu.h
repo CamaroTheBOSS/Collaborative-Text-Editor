@@ -10,12 +10,9 @@ struct Option {
 
 class MenuWindow : public BaseWindow {
 public:
-	MenuWindow(const ScrollableScreenBufferBuilder& ssbBuilder, const std::string& title, std::vector<Option>&& options);
+	MenuWindow(const ScrollableScreenBufferBuilder& ssbBuilder, std::vector<Option>&& options);
 	Event processChar(TCPClient& client, const KeyPack& key, const std::string& clipboardData) override;
-	std::string name() const override {
-		return className;
-	}
-	std::string className;
+	std::string name() const override;
 private:
 	Event goUp();
 	Event goDown();
@@ -23,4 +20,5 @@ private:
 	Event executeOption();
 	int selectedOption;
 	std::vector<Option> options;
+	const std::string winName;
 };

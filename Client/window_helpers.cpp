@@ -1,11 +1,6 @@
 #include "window_helpers.h"
-#include "window_text_editor.h"
-#include "window_search.h"
-#include "window_replace.h"
-#include "window_createdoc.h"
-#include "window_loaddoc.h"
 
-ScrollableScreenBufferBuilder makeCreateDocWindowBuilder() {
+ScrollableScreenBufferBuilder makeCreateDocWindowBuilder(const COORD& consoleSize) {
     ScrollableScreenBufferBuilder builder;
     builder.setTitle("Enter name for document")
         .setScrollHisteresis(0)
@@ -13,13 +8,14 @@ ScrollableScreenBufferBuilder makeCreateDocWindowBuilder() {
         .setRelativeTop(0.44)
         .setRelativeRight(0.65)
         .setRelativeBot(0.56)
+        .setConsoleSize({consoleSize.X, consoleSize.Y})
         .showLeftFramePattern("|")
         .showRightFramePattern("|")
         .showTopFramePattern("-")
         .showBottomFramePattern("-");
     return builder;
 }
-ScrollableScreenBufferBuilder makeLoadDocWindowBuilder() {
+ScrollableScreenBufferBuilder makeLoadDocWindowBuilder(const COORD& consoleSize) {
     ScrollableScreenBufferBuilder builder;
     builder.setTitle("Enter access code")
         .setScrollHisteresis(0)
@@ -27,41 +23,44 @@ ScrollableScreenBufferBuilder makeLoadDocWindowBuilder() {
         .setRelativeTop(0.44)
         .setRelativeRight(0.65)
         .setRelativeBot(0.56)
+        .setConsoleSize({ consoleSize.X, consoleSize.Y })
         .showLeftFramePattern("|")
         .showRightFramePattern("|")
         .showTopFramePattern("-")
         .showBottomFramePattern("-");
     return builder;
 }
-ScrollableScreenBufferBuilder makeSearchWindowBuilder() {
+ScrollableScreenBufferBuilder makeSearchWindowBuilder(const COORD& consoleSize) {
     ScrollableScreenBufferBuilder builder;
     builder.setScrollHisteresis(0)
-        .setTitle(SearchWindow::className)
+        .setTitle("Search Window")
         .setRelativeLeft(0.7)
         .setRelativeTop(0.1)
         .setRelativeRight(0.9)
         .setRelativeBot(0.12)
+        .setConsoleSize({ consoleSize.X, consoleSize.Y })
         .showLeftFramePattern("|")
         .showRightFramePattern("|")
         .showTopFramePattern("-")
         .showBottomFramePattern("-");
     return builder;
 }
-ScrollableScreenBufferBuilder makeReplaceWindowBuilder() {
+ScrollableScreenBufferBuilder makeReplaceWindowBuilder(const COORD& consoleSize) {
     ScrollableScreenBufferBuilder builder;
     builder.setScrollHisteresis(0)
-        .setTitle(ReplaceWindow::className)
+        .setTitle("Replace Window")
         .setRelativeLeft(0.7)
         .setRelativeTop(0.2)
         .setRelativeRight(0.9)
         .setRelativeBot(0.22)
+        .setConsoleSize({ consoleSize.X, consoleSize.Y })
         .showLeftFramePattern("|")
         .showRightFramePattern("|")
         .showTopFramePattern("-")
         .showBottomFramePattern("-");
     return builder;
 }
-ScrollableScreenBufferBuilder makeTextEditorWindowBuilder() {
+ScrollableScreenBufferBuilder makeTextEditorWindowBuilder(const COORD& consoleSize) {
     ScrollableScreenBufferBuilder builder;
     builder.showLineNumbers()
         .setTitle("Document")
@@ -70,13 +69,14 @@ ScrollableScreenBufferBuilder makeTextEditorWindowBuilder() {
         .setRelativeTop(0.1)
         .setRelativeRight(0.9)
         .setRelativeBot(0.9)
+        .setConsoleSize({ consoleSize.X, consoleSize.Y })
         .showLeftFramePattern("|")
         .showRightFramePattern("|")
         .showTopFramePattern("-")
         .showBottomFramePattern("-");
     return builder;
 }
-ScrollableScreenBufferBuilder makeInfoWindowBuilder(const std::string& title) {
+ScrollableScreenBufferBuilder makeInfoWindowBuilder(const COORD& consoleSize, const std::string& title) {
     ScrollableScreenBufferBuilder builder;
     builder.setTitle(title)
         .setScrollHisteresis(0)
@@ -84,6 +84,7 @@ ScrollableScreenBufferBuilder makeInfoWindowBuilder(const std::string& title) {
         .setRelativeTop(0.35)
         .setRelativeRight(0.7)
         .setRelativeBot(0.65)
+        .setConsoleSize({ consoleSize.X, consoleSize.Y })
         .showLeftFramePattern("|")
         .showRightFramePattern("|")
         .showTopFramePattern("-")
@@ -91,7 +92,7 @@ ScrollableScreenBufferBuilder makeInfoWindowBuilder(const std::string& title) {
     return builder;
 }
 
-ScrollableScreenBufferBuilder makeMenuWindowBuilder(const std::string& title) {
+ScrollableScreenBufferBuilder makeMenuWindowBuilder(const COORD& consoleSize, const std::string& title) {
     ScrollableScreenBufferBuilder builder;
     builder.setScrollHisteresis(0)
         .setTitle(title)
@@ -99,6 +100,7 @@ ScrollableScreenBufferBuilder makeMenuWindowBuilder(const std::string& title) {
         .setRelativeTop(0.4)
         .setRelativeRight(0.65)
         .setRelativeBot(0.6)
+        .setConsoleSize({ consoleSize.X, consoleSize.Y })
         .showLeftFramePattern("|")
         .showRightFramePattern("|")
         .showTopFramePattern("-")
@@ -122,6 +124,37 @@ std::vector<Option> makeLoggedMainMenuOptions() {
         Option{ "Load document", [](MenuWindow& obj) { return Event{ windows::app::events::loadDocWindow, obj.name(), windows::app::name, {} }; } },
         Option{ "Help", [](MenuWindow& obj) { return Event{ windows::app::events::help, obj.name(), windows::app::name, {} }; } },
         Option{ "Quit", [](MenuWindow& obj) { return Event{ windows::app::events::exit, obj.name(), windows::app::name, {} }; } }
+    };
+}
+
+TextInputWindow::TextInputHandler funcSearchModifyEvent() {
+    return [](const TextInputWindow& win, const ClientSiteDocument& doc) {
+        return Event{ windows::text_editor::events::find, win.name(), windows::text_editor::name, { doc.getText()} };
+    };
+}
+TextInputWindow::TextInputHandler funcSearchSubmitEvent() {
+    return [](const TextInputWindow& win, const ClientSiteDocument& doc) {
+        return Event{ windows::text_editor::events::findNext, win.name(), windows::text_editor::name, {} };
+    };
+}
+TextInputWindow::TextInputHandler funcSearchDeleteEvent() {
+    return [](const TextInputWindow& win, const ClientSiteDocument& doc) {
+        return Event{ windows::text_editor::events::findReset, win.name(), windows::text_editor::name, {} };
+    };
+}
+TextInputWindow::TextInputHandler funcReplaceSubmitEvent() {
+    return [](const TextInputWindow& win, const ClientSiteDocument& doc) {
+        return Event{ windows::text_editor::events::replace, win.name(), windows::text_editor::name, { doc.getText() } };
+    };
+}
+TextInputWindow::TextInputHandler funcLoadDocSubmitEvent() {
+    return [](const TextInputWindow& win, const ClientSiteDocument& doc) {
+        return Event{ windows::app::events::loadDoc, win.name(), windows::app::name, { doc.getText() } };
+    };
+}
+TextInputWindow::TextInputHandler funcCreateDocSubmitEvent() {
+    return [](const TextInputWindow& win, const ClientSiteDocument& doc) {
+        return Event{ windows::app::events::createDoc, win.name(), windows::app::name, { doc.getText() } };
     };
 }
 

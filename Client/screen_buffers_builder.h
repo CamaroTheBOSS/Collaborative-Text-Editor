@@ -4,6 +4,8 @@
 
 class ScrollableScreenBufferBuilder {
 public:
+    std::string getTitle() const;
+
     ScrollableScreenBufferBuilder& showLineNumbers();
     ScrollableScreenBufferBuilder& showLeftFramePattern(const std::string& pattern);
     ScrollableScreenBufferBuilder& showRightFramePattern(const std::string& pattern);

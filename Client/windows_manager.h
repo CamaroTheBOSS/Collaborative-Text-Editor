@@ -1,41 +1,29 @@
 #pragma once
-#include "window_text_editor.h"
-#include "window_search.h"
-#include "window_replace.h"
-#include "window_createdoc.h"
-#include "window_loaddoc.h"
-#include "window_info.h"
-#include "window_menu.h"
-
-#include <array>
+#include "window_helpers.h"
 
 using Window = std::unique_ptr<BaseWindow>;
 using Windows = std::vector<Window>;
 using WindowsRegistry = std::unordered_map<std::string, bool>;
 using WindowsIt = Windows::const_iterator;
+using TextInputHandler = TextInputWindow::TextInputHandler;
 enum class FocusDirection { up, down, left, right };
 
 class WindowsManager {
 public:
-	WindowsManager();
+	WindowsManager(const COORD& consoleSize);
 	void changeFocusUp();
 	void changeFocusDown();
 	void changeFocusLeft();
 	void changeFocusRight();
 	void setFocus(const int newFocus);
-	WindowsIt showInfoWindow(const COORD& consoleSize, const std::string& title, const std::string& msg);
-	WindowsIt showMenuWindow(const COORD& consoleSize, const std::string& title, std::vector<Option>&& options);
-	template <typename T>
-	WindowsIt showWindow(const COORD& consoleSize) {
-		if (windowsRegistry.find(T::className) != windowsRegistry.cend()) {
-			return findWindow(T::className);
+
+	template <typename WindowClass, typename... Args>
+	WindowsIt showWindow(const ScrollableScreenBufferBuilder& builder, Args&&... args) {
+		std::string title = builder.getTitle();
+		if (windowsRegistry.find(title) != windowsRegistry.cend()) {
+			return findWindow(title);
 		}
-		auto builder = builderMap.find(T::className);
-		if (builder == builderMap.cend()) {
-			return windows.cend();
-		}
-		builder->second.setConsoleSize({consoleSize.X, consoleSize.Y});
-		auto window = std::make_unique<T>(builder->second);
+		auto window = std::make_unique<WindowClass>(builder, std::forward<Args>(args)...);
 		windowsRegistry[window->name()] = true;
 		windows.emplace_back(std::move(window));
 		setFocus(windows.size() - 1);
