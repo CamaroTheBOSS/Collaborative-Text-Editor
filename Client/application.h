@@ -2,12 +2,14 @@
 #include "windows_manager.h"
 #include "terminal.h"
 #include "repository.h"
+#include "application_event_handlers.h"
 
 using Windows = std::vector<std::unique_ptr<BaseWindow>>;
 using WindowsRegistry = std::unordered_map<std::string, bool>;
 using WindowsIt = Windows::const_iterator;
 class Application {
 	friend class SyncTester;
+	friend class ApplicationEventHandlers;
 public:
 	Application(const std::string& ip, const int port);
 	bool connect(const std::string& ip, const int port);
@@ -20,22 +22,11 @@ public:
 	bool waitForDocument(const std::chrono::milliseconds& timeout, const int tries);
 	void render();
 private:
-	bool processEvent(const Event& pEvent);
-	void disconnectEvent(const TCPClient& client, const std::vector<std::string>& args);
-	void createDocWindow(const TCPClient& client, const std::vector<std::string>& args);
-	void createDoc(const TCPClient& client, const std::vector<std::string>& args);
-	void loadDocWindow(const TCPClient& client, const std::vector<std::string>& args);
-	void loadDoc(const TCPClient& client, const std::vector<std::string>& args);
-	void exitApp(const TCPClient& client, const std::vector<std::string>& args);
-	void helpWindow(const TCPClient& client, const std::vector<std::string>& args);
-	void showAcCode(const TCPClient& client, const std::vector<std::string>& args);
-	bool loadCreateDoc(const msg::Type type, const TCPClient& client, const std::vector<std::string>& args);
-
-	TCPClient client;
+	TCPClient tcpClient;
 	Terminal terminal;
 	client::Repository repo;
-	EventHandlersMap<Application> eventHandlers;
 
+	ApplicationEventHandlers eventHandler;
 	WindowsManager windowsManager;
 
 	std::string srvIp;

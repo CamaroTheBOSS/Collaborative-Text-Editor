@@ -81,6 +81,9 @@
     <ClCompile Include="window_text_input.cpp">
       <Filter>Pliki źródłowe\Windows</Filter>
     </ClCompile>
+    <ClCompile Include="application_event_handlers.cpp">
+      <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="terminal.h">
@@ -133,6 +136,9 @@
     </ClInclude>
     <ClInclude Include="window_text_input.h">
       <Filter>Pliki nagłówkowe\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="application_event_handlers.h">
+      <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

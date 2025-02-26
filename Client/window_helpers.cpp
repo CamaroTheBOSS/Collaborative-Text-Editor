@@ -111,7 +111,7 @@ ScrollableScreenBufferBuilder makeMenuWindowBuilder(const COORD& consoleSize, co
 std::vector<Option> makeMainMenuOptions() {
     return std::vector<Option>{
         Option{ "Create document", [](MenuWindow& obj) { return Event{ windows::app::events::createDocWindow, obj.name(), windows::app::name, {} }; } },
-        Option{ "Load document", [](MenuWindow& obj) { return Event{ windows::app::events::loadDocWindow, obj.name(), windows::app::name, {} }; } },
+        Option{ "Load document", [](MenuWindow& obj) { return Event{ windows::app::events::joinDocWindow, obj.name(), windows::app::name, {} }; } },
         Option{ "Help", [](MenuWindow& obj) { return Event{ windows::app::events::help, obj.name(), windows::app::name, {} }; } },
         Option{ "Quit", [](MenuWindow& obj) { return Event{ windows::app::events::exit, obj.name(), windows::app::name, {} }; } }
     };
@@ -121,7 +121,7 @@ std::vector<Option> makeLoggedMainMenuOptions() {
         Option{ "Disconnect", [](MenuWindow& obj) { return Event{ windows::app::events::disconnect, obj.name(), windows::app::name, {} }; } },
         Option{ "Show access code", [](MenuWindow& obj) { return Event{ windows::app::events::showAcCode, obj.name(), windows::app::name, {} }; } },
         Option{ "Create document", [](MenuWindow& obj) { return Event{ windows::app::events::createDocWindow, obj.name(), windows::app::name, {} }; } },
-        Option{ "Load document", [](MenuWindow& obj) { return Event{ windows::app::events::loadDocWindow, obj.name(), windows::app::name, {} }; } },
+        Option{ "Load document", [](MenuWindow& obj) { return Event{ windows::app::events::joinDocWindow, obj.name(), windows::app::name, {} }; } },
         Option{ "Help", [](MenuWindow& obj) { return Event{ windows::app::events::help, obj.name(), windows::app::name, {} }; } },
         Option{ "Quit", [](MenuWindow& obj) { return Event{ windows::app::events::exit, obj.name(), windows::app::name, {} }; } }
     };
@@ -149,7 +149,7 @@ TextInputWindow::TextInputHandler funcReplaceSubmitEvent() {
 }
 TextInputWindow::TextInputHandler funcLoadDocSubmitEvent() {
     return [](const TextInputWindow& win, const ClientSiteDocument& doc) {
-        return Event{ windows::app::events::loadDoc, win.name(), windows::app::name, { doc.getText() } };
+        return Event{ windows::app::events::joinDoc, win.name(), windows::app::name, { doc.getText() } };
     };
 }
 TextInputWindow::TextInputHandler funcCreateDocSubmitEvent() {

@@ -135,6 +135,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="application_event_handlers.cpp" />
     <ClCompile Include="canvas.cpp" />
     <ClCompile Include="client_document.cpp" />
     <ClCompile Include="screen_buffers_builder.cpp" />
@@ -157,6 +158,7 @@
     <ClCompile Include="window_text_input.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="application_event_handlers.h" />
     <ClInclude Include="canvas.h" />
     <ClInclude Include="client_document.h" />
     <ClInclude Include="events.h" />

@@ -18,8 +18,8 @@ namespace windows::app {
 		static constexpr const char* createDocWindow = "create doc window";
 		static constexpr const char* createDoc = "create doc";
 
-		static constexpr const char* loadDocWindow = "load doc window";
-		static constexpr const char* loadDoc = "load doc";
+		static constexpr const char* joinDocWindow = "join doc window";
+		static constexpr const char* joinDoc = "join doc";
 		static constexpr const char* help = "help";
 		static constexpr const char* exit = "exit";
 	}
