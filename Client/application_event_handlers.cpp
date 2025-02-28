@@ -1,16 +1,17 @@
 #include "application_event_handlers.h"
 #include "application.h"
 
-ApplicationEventHandlers::ApplicationEventHandlers() {
-    handlers.try_emplace(windows::app::events::createDoc, &ApplicationEventHandlers::eventCreateDoc);
-    handlers.try_emplace(windows::app::events::joinDoc, &ApplicationEventHandlers::eventJoinDoc);
-    handlers.try_emplace(windows::app::events::exit, &ApplicationEventHandlers::eventMainMenuExitChosen);
-    handlers.try_emplace(windows::app::events::createDocWindow, &ApplicationEventHandlers::eventMainMenuCreateChosen);
-    handlers.try_emplace(windows::app::events::joinDocWindow, &ApplicationEventHandlers::eventMainMenuJoinChosen);
-    handlers.try_emplace(windows::app::events::help, &ApplicationEventHandlers::eventMainMenuHelpChosen);
-    handlers.try_emplace(windows::app::events::disconnect, &ApplicationEventHandlers::eventMainMenuDisconnectChosen);
-    handlers.try_emplace(windows::app::events::showAcCode, &ApplicationEventHandlers::eventMainMenuShowAcCodeChosen);
-}
+ApplicationEventHandlers::ApplicationEventHandlers():
+    handlers({
+        {windows::app::events::createDoc, &ApplicationEventHandlers::eventCreateDoc},
+        {windows::app::events::joinDoc, &ApplicationEventHandlers::eventJoinDoc},
+        {windows::app::events::exit, &ApplicationEventHandlers::eventMainMenuExitChosen},
+        {windows::app::events::createDocWindow, &ApplicationEventHandlers::eventMainMenuCreateChosen},
+        {windows::app::events::joinDocWindow, &ApplicationEventHandlers::eventMainMenuJoinChosen},
+        {windows::app::events::help, &ApplicationEventHandlers::eventMainMenuHelpChosen},
+        {windows::app::events::disconnect, &ApplicationEventHandlers::eventMainMenuDisconnectChosen},
+        {windows::app::events::showAcCode, &ApplicationEventHandlers::eventMainMenuShowAcCodeChosen},
+        }) {}
 bool ApplicationEventHandlers::processEvent(Application& app, const Event& pEvent) {
     auto it = handlers.find(pEvent.name);
     if (it == handlers.cend()) {
