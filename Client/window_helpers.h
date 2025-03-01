@@ -17,8 +17,8 @@ ScrollableScreenBufferBuilder makeGenericBuilder(const COORD& consoleSize, const
 
 // Menu options
 std::vector<Option> makeUnloggedMainMenuOptions();
-std::vector<Option> makeMainMenuOptions();
 std::vector<Option> makeLoggedMainMenuOptions();
+std::vector<Option> makeConnectedToDocMainMenuOptions();
 
 // TextInputHandlers
 TextInputWindow::TextInputHandler funcSearchModifyEvent();

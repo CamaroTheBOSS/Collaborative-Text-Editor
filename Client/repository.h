@@ -12,6 +12,8 @@ namespace client {
 		std::string getAcCode() const;
 		std::string getAuthToken() const;
 		std::string getLastError();
+		void cleanAcCode();
+		void cleanAuthToken();
 	private:
 		bool write(ClientSiteDocument& doc, msg::Buffer& buffer);
 		bool erase(ClientSiteDocument& doc, msg::Buffer& buffer);
@@ -20,6 +22,9 @@ namespace client {
 		bool connectNewUser(ClientSiteDocument& doc, msg::Buffer& buffer);
 		bool disconnectUser(ClientSiteDocument& doc, msg::Buffer& buffer);
 		bool replace(ClientSiteDocument& doc, msg::Buffer& buffer);
+		bool login(ClientSiteDocument& doc, msg::Buffer& buffer);
+		bool logout(ClientSiteDocument& doc, msg::Buffer& buffer);
+		bool registered(ClientSiteDocument& doc, msg::Buffer& buffer);
 
 		std::string acCode;
 		std::string authToken;

@@ -1,25 +1,43 @@
 #include "serializer.h"
 
-msg::Buffer Serializer::makeConnectResponse(const msg::Type& type, const ServerSiteDocument& doc, const msg::OneByteInt version, const int userIdx, const std::string& authToken, const std::string& acCode) {
+msg::Buffer Serializer::makeAckResponse(const msg::Type& type, const msg::OneByteInt version) {
+	msg::Buffer buffer{5};
+	msg::serializeTo(buffer, 0, type, version);
+	return buffer;
+}
+
+msg::Buffer Serializer::makeLoginResponse(const msg::OneByteInt version, const std::string& authToken, const std::string& errMsg) {
+	msg::Buffer buffer{static_cast<int>(authToken.size() + errMsg.size() + 5)};
+	msg::serializeTo(buffer, 0, msg::Type::login, version, errMsg, authToken);
+	return buffer;
+}
+
+msg::Buffer Serializer::makeRegisterResponse(const msg::OneByteInt version, const std::string& errMsg) {
+	msg::Buffer buffer{static_cast<int>(errMsg.size() + 5)};
+	msg::serializeTo(buffer, 0, msg::Type::registration, version, errMsg);
+	return buffer;
+}
+
+msg::Buffer Serializer::makeConnectResponse(const msg::Type& type, const ServerSiteDocument& doc, const msg::OneByteInt version, const int userIdx, const std::string& acCode) {
 	std::vector<unsigned int> cursorPositions;
 	for (const auto& cursorPos : doc.getCursorPositions()) {
 		cursorPositions.push_back(static_cast<unsigned int>(cursorPos.X));
 		cursorPositions.push_back(static_cast<unsigned int>(cursorPos.Y));
 	}
 	std::string docText = doc.getText();
-	msg::Buffer buffer{static_cast<int>(30 + docText.size() + 8 * cursorPositions.size() + authToken.size() + acCode.size())};
+	msg::Buffer buffer{static_cast<int>(30 + docText.size() + 8 * cursorPositions.size() + acCode.size())};
 	auto userBuff = static_cast<msg::OneByteInt>(userIdx);
 	std::string errMsg;
-	msg::serializeTo(buffer, 0, type, version, userBuff, errMsg, authToken, acCode, docText, cursorPositions);
+	msg::serializeTo(buffer, 0, type, version, userBuff, errMsg, acCode, docText, cursorPositions);
 	return buffer;
 }
 
 msg::Buffer Serializer::makeConnectResponseWithError(const msg::Type& type, const std::string& errorMsg, const msg::OneByteInt version) {
 	msg::Buffer buffer{static_cast<int>(30 + errorMsg.size())};
 	msg::OneByteInt userBuff = 0;
-	std::string authToken, acCode, docText;
+	std::string acCode, docText;
 	std::vector<unsigned int> cursorPositions;
-	msg::serializeTo(buffer, 0, type, version, userBuff, errorMsg, authToken, acCode, docText, cursorPositions);
+	msg::serializeTo(buffer, 0, type, version, userBuff, errorMsg, acCode, docText, cursorPositions);
 	return buffer;
 }
 

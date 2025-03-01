@@ -87,6 +87,9 @@
     <ClCompile Include="validator.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
+    <ClCompile Include="window_text_input_obsfucated.cpp">
+      <Filter>Pliki źródłowe\Windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="terminal.h">
@@ -145,6 +148,9 @@
     </ClInclude>
     <ClInclude Include="validator.h">
       <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
+    <ClInclude Include="window_text_input_obsfucated.h">
+      <Filter>Pliki nagłówkowe\Windows</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

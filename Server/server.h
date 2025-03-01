@@ -8,6 +8,7 @@
 
 #include "worker.h"
 #include "repository.h"
+#include "authenticator.h"
 
 class Server {
 public:
@@ -25,6 +26,9 @@ private:
 	int selectWorkerWithAcCode(const std::string& acCode);
 	void initWorkers(const int nWorkers);
 	int closeWorkers();
+	void sendResponses(server::Response& response) const;
+	server::Response processMsg(const SOCKET client, msg::Buffer& buffer);
+	server::Response shutdownConnection(const SOCKET client, msg::Buffer& buffer);
 
 	std::atomic<State> state = State::closed;
 	const std::string ip;
@@ -36,5 +40,5 @@ private:
 	std::vector<Worker> workers;
 	std::vector<SOCKET> notifiers;
 	MessageExtractor extractor;
-	
+	server::Authenticator auth;
 };

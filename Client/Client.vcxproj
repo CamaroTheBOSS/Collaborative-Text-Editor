@@ -157,6 +157,7 @@
     <ClCompile Include="tcp_client_windows.cpp" />
     <ClCompile Include="terminal.cpp" />
     <ClCompile Include="window_text_input.cpp" />
+    <ClCompile Include="window_text_input_obsfucated.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application_event_handlers.h" />
@@ -178,6 +179,7 @@
     <ClInclude Include="screen_buffers.h" />
     <ClInclude Include="terminal.h" />
     <ClInclude Include="window_text_input.h" />
+    <ClInclude Include="window_text_input_obsfucated.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Document\Document.vcxproj">

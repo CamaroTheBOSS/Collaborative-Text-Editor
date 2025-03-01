@@ -1,5 +1,20 @@
 #include "deserializer.h"
 
+msg::AckMsg Deserializer::parseAck(const msg::Buffer& buffer) {
+	msg::AckMsg msg;
+	msg::parse(buffer, 0, msg.type, msg.version);
+	return msg;
+}
+msg::Login Deserializer::parseLogin(const msg::Buffer& buffer) {
+	msg::Login msg;
+	msg::parse(buffer, 0, msg.type, msg.version, msg.login, msg.password);
+	return msg;
+}
+msg::Register Deserializer::parseRegister(const msg::Buffer& buffer) {
+	msg::Register msg;
+	msg::parse(buffer, 0, msg.type, msg.version, msg.login, msg.password);
+	return msg;
+}
 msg::ConnectCreateDoc Deserializer::parseConnectCreateDoc(const msg::Buffer& buffer) {
 	msg::ConnectCreateDoc msg;
 	msg::parse(buffer, 0, msg.type, msg.version, msg.socket, msg.filename);
@@ -8,16 +23,6 @@ msg::ConnectCreateDoc Deserializer::parseConnectCreateDoc(const msg::Buffer& buf
 msg::ConnectJoinDoc Deserializer::parseConnectJoinDoc(const msg::Buffer& buffer) {
 	msg::ConnectJoinDoc msg;
 	msg::parse(buffer, 0, msg.type, msg.version, msg.socket, msg.acCode);
-	return msg;
-}
-msg::ForwardConnect Deserializer::parseMasterForwardConnect(const msg::Buffer& buffer) {
-	msg::ForwardConnect msg;
-	msg::parse(buffer, 0, msg.type, msg.version, msg.socket, msg.docCode);
-	return msg;
-}
-msg::Connect Deserializer::parseConnect(const msg::Buffer& buffer) {
-	msg::Connect msg;
-	msg::parse(buffer, 0, msg.type, msg.version);
 	return msg;
 }
 msg::Disconnect Deserializer::parseDisconnect(const msg::Buffer& buffer) {

@@ -54,7 +54,9 @@ void Server::start() {
 		int selectCount = select(0, &conns, nullptr, nullptr, nullptr);
 		for (int i = 0; i < selectCount; i++) {
 			SOCKET client = conns.fd_array[i];
-			acceptConnection(client);
+			if (acceptConnection(client)) {
+				continue;
+			}
 			auto msgs = extractor.extractMessages(client);
 			for (auto& buffer : msgs) {
 				msg::Type type;
@@ -71,6 +73,10 @@ void Server::start() {
 					msg::parse(buffer, 6, accessCode);
 					int worker = selectWorkerWithAcCode(accessCode);
 					forwardConnection(client, buffer, worker);
+				}
+				else {
+					auto response = processMsg(client, buffer);
+					sendResponses(response);
 				}
 			}
 		}
@@ -200,4 +206,34 @@ void Server::initWorkers(const int nWorkers) {
 		notifiers.push_back(notifySocket);
 	}
 	logger.logDebug("Created", workers.size(), "threads");
+}
+
+void Server::sendResponses(server::Response& response) const {
+	msg::Buffer msgWithSize = msg::enrich(response.buffer);
+	for (const auto& dst : response.destinations) {
+		int sendBytes = send(dst, msgWithSize.get(), msgWithSize.size, 0);
+		if (sendBytes <= 0) {
+			logger.logError("Error on sending data to", dst);
+		}
+	}
+}
+
+server::Response Server::processMsg(const SOCKET client, msg::Buffer& buffer) {
+	if (buffer.size > 0) {
+		return auth.process(client, buffer);
+	}
+	if (buffer.size < 0) {
+		logger.logError(WSAGetLastError(), ": Error on receiving data from", client, "! Closing connection");
+	}
+	return shutdownConnection(client, buffer);
+}
+
+server::Response Server::shutdownConnection(const SOCKET client, msg::Buffer& buffer) {
+	closesocket(client);
+	shutdown(client, SD_SEND);
+	logger.logDebug("Closing connection with", client);
+	buffer.clear();
+	msg::serializeTo(buffer, 0, msg::Type::logout, static_cast<msg::OneByteInt>(1));
+	FD_CLR(client, &unassignedConns);
+	return auth.process(client, buffer);
 }

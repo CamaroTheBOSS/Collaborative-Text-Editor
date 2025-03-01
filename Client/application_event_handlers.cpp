@@ -1,6 +1,7 @@
 #include "application_event_handlers.h"
 #include "application.h"
 #include "validator.h"
+#include "window_text_input_obsfucated.h"
 
 #include <array>
 
@@ -32,12 +33,12 @@ void ApplicationEventHandlers::eventMainMenuLoginRegisterChosen(Application& app
     auto screenSize = app.terminal.getScreenSize();
     int width = 15;
     double left = getCenteredLeft(screenSize, width);
-    app.windowsManager.showWindow<TextInputWindow>(
-        makeGenericBuilder(screenSize, windows::login::name, left, 0.2, width, 1),
+    app.windowsManager.showWindow<ObsfucatedTextInputWindow>(
+        makeGenericBuilder(screenSize, windows::password::name, left, 0.35, width, 1),
         funcSubmitLoginPasswordEvent(pEvent.params[0] == windows::registration::name)
     );
     app.windowsManager.showWindow<TextInputWindow>(
-        makeGenericBuilder(screenSize, windows::password::name, left, 0.35, width, 1),
+        makeGenericBuilder(screenSize, windows::login::name, left, 0.2, width, 1),
         funcSubmitLoginPasswordEvent(pEvent.params[0] == windows::registration::name)
     );
 }
@@ -52,7 +53,7 @@ void ApplicationEventHandlers::eventLoginPasswordAccepted(Application& app, cons
         WinWithComplementaryName{app.windowsManager.findWindow(windows::login::name), windows::password::name},
         WinWithComplementaryName{app.windowsManager.findWindow(windows::password::name), windows::login::name}
     };
-    int width = 15;
+    int width = 20;
     auto screenSize = app.terminal.getScreenSize();
     double left = getCenteredLeft(screenSize, width);
     for (const auto& winAndName : checkedWindows) {
@@ -63,17 +64,29 @@ void ApplicationEventHandlers::eventLoginPasswordAccepted(Application& app, cons
             );
             return;
         }
-        auto txt = winAndName.window->get()->getDoc().getText();
-        auto msg = Validator::validateString(txt);
-        if (!msg.empty()) {
-            auto winMsg = winAndName.window->get()->name() + " doesn't meet required criteria '" + msg + "'";
-            app.windowsManager.showWindow<InfoWindow>(
-                makeGenericBuilder(screenSize, "Failed", left, 0.4, width, 3), winMsg
-            );
+        if (!validateTextInputWindow(app, winAndName.window)) {
             return;
         }
     }
-    // LOGING/REGISTERING IMPL
+    assert(pEvent.params.size() == 1);
+    auto type = pEvent.params[0] == windows::registration::name ? msg::Type::registration : msg::Type::login;
+    msg::OneByteInt version = 1;
+    if (!validateConnection(app)) {
+        return;
+    }
+    app.tcpClient.sendMsg(type, version, checkedWindows[0].window->get()->getDoc().getText(), checkedWindows[1].window->get()->getDoc().getText());
+    if (!waitForResponseAndProccessIt(app, type)) {
+        return;
+    }
+    app.windowsManager.destroyWindow(windows::login::name, app.tcpClient);
+    app.windowsManager.destroyWindow(windows::password::name, app.tcpClient);
+    app.windowsManager.destroyWindow(windows::mainmenu::name, app.tcpClient);
+    app.windowsManager.showWindow<MenuWindow>(
+        makeMenuWindowBuilder(screenSize, windows::mainmenu::name), app.getMainMenuOptions()
+    );
+    app.windowsManager.showWindow<InfoWindow>(
+        makeGenericBuilder(screenSize, "Success", left, 0.4, width, 1), pEvent.params[0] + " successful"
+    );
 }
 
 void ApplicationEventHandlers::eventLogout(Application& app, const Event& pEvent) {
@@ -81,14 +94,14 @@ void ApplicationEventHandlers::eventLogout(Application& app, const Event& pEvent
 }
 
 void ApplicationEventHandlers::eventMainMenuDisconnectChosen(Application& app, const Event& pEvent) {
-    int width = 15;
+    int width = 25;
     auto screenSize = app.terminal.getScreenSize();
     double left = getCenteredLeft(screenSize, width);
     app.disconnect();
     app.windowsManager.showWindow<InfoWindow>(
-        makeGenericBuilder(screenSize, "Success", left, 0.4, width, 1), "Disconnected successfuly"
+        makeGenericBuilder(screenSize, "Success", left, 0.4, width, 1), "Logged out successfuly"
     );
-    app.windowsManager.destroyWindow("Main Menu", app.tcpClient);
+    app.windowsManager.destroyWindow(windows::mainmenu::name, app.tcpClient);
 }
 
 void ApplicationEventHandlers::eventMainMenuCreateChosen(Application& app, const Event& pEvent) {
@@ -155,24 +168,34 @@ bool ApplicationEventHandlers::joinCreateDocImpl(const msg::Type type, msg::OneB
     int width = 25;
     auto screenSize = app.terminal.getScreenSize();
     double left = getCenteredLeft(screenSize, width);
-    if (app.isConnected()) {
+    assert(app.isLogged());
+    if (app.isConnectedToDoc()) {
         app.windowsManager.showWindow<InfoWindow>(
             makeGenericBuilder(app.terminal.getScreenSize(), "Failure", left, 0.4, width, 2), "You are already connected to the document. Please disconnect first."
         );
         return false;
     }
-    if (!app.connect(app.srvIp, app.srvPort)) {
-        app.windowsManager.showWindow<InfoWindow>(
-            makeGenericBuilder(app.terminal.getScreenSize(), "Failure", left, 0.4, width, 2), "Cannot connect to the server"
-        );
+    if (!validateConnection(app)) {
         return false;
     }
     unsigned int socket = 0;
     app.tcpClient.sendMsg(type, version, socket, params[0]);
-    bool connected = app.waitForDocument(std::chrono::milliseconds(500), 4);
-    if (!connected) {
+    if (!waitForResponseAndProccessIt(app, type)) {
+        return false;
+    }
+    app.windowsManager.destroyLastWindow(app.tcpClient);
+    app.windowsManager.destroyWindow(windows::mainmenu::name, app.tcpClient);
+    return true;
+}
+
+bool ApplicationEventHandlers::waitForResponseAndProccessIt(Application& app, const msg::Type type) {
+    bool success = app.waitForResponse(type, std::chrono::milliseconds(500), 4);
+    int width = 25;
+    auto screenSize = app.terminal.getScreenSize();
+    double left = getCenteredLeft(screenSize, width);
+    if (!success) {
         app.windowsManager.showWindow<InfoWindow>(
-            makeGenericBuilder(app.terminal.getScreenSize(), "Failure", left, 0.4, width, 2), "Timeout during document synchronization"
+            makeGenericBuilder(app.terminal.getScreenSize(), "Failure", left, 0.4, width, 2), "No response from the server"
         );
         app.disconnect();
         return false;
@@ -185,7 +208,35 @@ bool ApplicationEventHandlers::joinCreateDocImpl(const msg::Type type, msg::OneB
         app.disconnect();
         return false;
     }
-    app.windowsManager.destroyLastWindow(app.tcpClient);
-    app.windowsManager.destroyWindow("Main Menu", app.tcpClient);
+    
+    return true;
+}
+
+bool ApplicationEventHandlers::validateTextInputWindow(Application& app, const WindowsIt& window) const {
+    auto txt = window->get()->getDoc().getText();
+    auto msg = Validator::validateString(txt);
+    if (!msg.empty()) {
+        int width = 25;
+        auto screenSize = app.terminal.getScreenSize();
+        double left = getCenteredLeft(screenSize, width);
+        auto winMsg = window->get()->name() + " doesn't meet required criteria '" + msg + "'";
+        app.windowsManager.showWindow<InfoWindow>(
+            makeGenericBuilder(screenSize, "Failed", left, 0.4, width, 3), winMsg
+        );
+        return false;
+    }
+    return true;
+}
+
+bool ApplicationEventHandlers::validateConnection(Application& app) {
+    int width = 15;
+    auto screenSize = app.terminal.getScreenSize();
+    double left = getCenteredLeft(screenSize, width);
+    if (!app.connect(app.srvIp, app.srvPort)) {
+        app.windowsManager.showWindow<InfoWindow>(
+            makeGenericBuilder(app.terminal.getScreenSize(), "Failure", left, 0.4, width, 2), "Cannot connect to the server"
+        );
+        return false;
+    }
     return true;
 }

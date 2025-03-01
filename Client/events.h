@@ -41,3 +41,7 @@ namespace windows::registration {
 namespace windows::password {
 	static constexpr const char* name = "Password";
 }
+
+namespace windows::mainmenu {
+	static constexpr const char* name = "Main Menu";
+}

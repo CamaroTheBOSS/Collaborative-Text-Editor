@@ -86,7 +86,7 @@ namespace server {
 		auto docIt = acCodeToDocMap.emplace(acCode, ServerSiteDocument("", 1, 0, msg.filename));
 		docIt.first->second.addClient(msg.socket);
 		logger.logDebug("User", client, "created new document!");
-		auto newBuffer = Serializer::makeConnectResponse(msg.type, docIt.first->second, msg.version, 0, "", acCode);
+		auto newBuffer = Serializer::makeConnectResponse(msg.type, docIt.first->second, msg.version, 0, acCode);
 		lastAddedAcCode = acCode;
 		return Response{ std::move(newBuffer), docIt.first->second.getConnectedClients(), msg::Type::create };
 	}
@@ -103,7 +103,7 @@ namespace server {
 		docIt->second.addUser();
 		docIt->second.addClient(msg.socket);
 		int userIdx = docIt->second.getCursorNum() - 1;
-		auto newBuffer = Serializer::makeConnectResponse(msg.type, docIt->second, msg.version, userIdx, "", msg.acCode);
+		auto newBuffer = Serializer::makeConnectResponse(msg.type, docIt->second, msg.version, userIdx, msg.acCode);
 		logger.logDebug("User", client, "connected to document");
 		return Response{ std::move(newBuffer), docIt->second.getConnectedClients(), msg::Type::join };
 	}

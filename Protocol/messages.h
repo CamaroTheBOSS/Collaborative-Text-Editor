@@ -19,6 +19,7 @@ namespace msg {
 		masterClose,
 		registration,
 		login,
+		logout,
 		create,
 		load,
 		join,
@@ -131,6 +132,43 @@ namespace msg {
 		} (), ...);
 	}
 
+	struct AckMsg {
+		Type type = Type::logout;
+		OneByteInt version = 0;
+	};
+
+	struct AckResponse {
+		Type type = Type::logout;
+		OneByteInt version = 0;
+	};
+
+	struct Login {
+		Type type = Type::login;
+		OneByteInt version = 0;
+		std::string login;
+		std::string password;
+	};
+
+	struct LoginResponse {
+		Type type = Type::login;
+		OneByteInt version = 0;
+		std::string errMsg;
+		std::string authToken;
+	};
+
+	struct Register {
+		Type type = Type::registration;
+		OneByteInt version = 0;
+		std::string login;
+		std::string password;
+	};
+
+	struct RegisterResponse {
+		Type type = Type::registration;
+		OneByteInt version = 0;
+		std::string errMsg;
+	};
+
 	struct ConnectCreateDoc {
 		Type type = Type::create;
 		OneByteInt version = 0;
@@ -145,24 +183,11 @@ namespace msg {
 		std::string acCode;
 	};
 
-	struct ForwardConnect {
-		Type type = Type::masterForwardConnect;
-		OneByteInt version = 0;
-		unsigned int socket = 0;
-		std::string docCode;
-	};
-
-	struct Connect {
-		Type type = Type::connect;
-		OneByteInt version = 0;
-	};
-
 	struct ConnectResponse {
 		Type type = Type::connect;
 		OneByteInt version = 0;
 		OneByteInt user = 0; // Which user idx you are in doc
 		std::string error; // If not empty -> error happened
-		std::string token; // Authorization token needed for communication
 		std::string acCode; //Access code to document
 		std::string text; // Whole current state of the document
 		std::vector<unsigned int> cursorPositions;

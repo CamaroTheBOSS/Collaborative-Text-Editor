@@ -17,7 +17,7 @@ Application::Application(const std::string& ip, const int port) :
     windowsManager(terminal.getScreenSize()),
     repo() {
     windowsManager.showWindow<TextEditorWindow>(makeTextEditorWindowBuilder(terminal.getScreenSize()));
-    windowsManager.showWindow<MenuWindow>(makeMenuWindowBuilder(terminal.getScreenSize(), "Main Menu"), makeMainMenuOptions());
+    windowsManager.showWindow<MenuWindow>(makeMenuWindowBuilder(terminal.getScreenSize(), windows::mainmenu::name), getMainMenuOptions());
 }
 
 bool Application::connect(const std::string& ip, const int port) {
@@ -25,11 +25,20 @@ bool Application::connect(const std::string& ip, const int port) {
 }
 
 bool Application::disconnect() {
-    return tcpClient.disconnect();
+    bool disconnected = tcpClient.disconnect();
+    if (disconnected) {
+        repo.cleanAcCode();
+        repo.cleanAuthToken();
+    }
+    return disconnected;
 }
 
 bool Application::isConnected() const {
     return tcpClient.isConnected();
+}
+
+bool Application::isConnectedToDoc() const {
+    return isConnected() && !repo.getAcCode().empty();
 }
 
 bool Application::isLogged() const {
@@ -78,8 +87,9 @@ bool Application::processChar(const KeyPack& key) {
         }
         return true;
     case CTRL_Q:
-        windowsManager.showWindow<MenuWindow>(makeMenuWindowBuilder(terminal.getScreenSize(), "Main Menu"),
-            isConnected() ? makeLoggedMainMenuOptions() : makeMainMenuOptions());
+        windowsManager.showWindow<MenuWindow>(
+            makeMenuWindowBuilder(terminal.getScreenSize(), windows::mainmenu::name), getMainMenuOptions()
+        );
         return true;
     case ESC:
         windowsManager.destroyLastWindow(tcpClient);
@@ -122,27 +132,36 @@ bool Application::checkIncomingMessages() {
     return needRender;
 }
 
-bool Application::waitForDocument(const std::chrono::milliseconds& timeout, const int tries) {
+bool Application::waitForResponse(const msg::Type desiredType, const std::chrono::milliseconds& timeout, const int tries) {
     int currTry = 0;
     while (currTry < tries) {
         msg::Buffer msgBuffer = tcpClient.getNextMsg();
         if (msgBuffer.empty()) {
             currTry++;
-            logger.logDebug(currTry, " try to request document failed");
             std::this_thread::sleep_for(timeout);
             continue;
         }
         msg::Type msgType;
         msg::parse(msgBuffer, 0, msgType);
         repo.processMsg(windowsManager.getTextEditor()->getDocMutable(), msgBuffer);
-        if (msgType == msg::Type::create || msgType == msg::Type::join) {
+        if (msgType == desiredType) {
             return true;
         }
     }
-    logger.logDebug(currTry, "Requesting document from the server failed!\n");
+    logger.logDebug(currTry, "Waiting for response from the server timed out!\n");
     return false;
 }
 
 void Application::render() {
     terminal.render(windowsManager.getWindows());
+}
+
+std::vector<Option> Application::getMainMenuOptions() const {
+    if (isLogged() && isConnectedToDoc()) {
+        return makeConnectedToDocMainMenuOptions();
+    }
+    if (isLogged()) {
+        return makeLoggedMainMenuOptions();
+    }
+    return makeUnloggedMainMenuOptions();
 }

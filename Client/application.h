@@ -3,6 +3,7 @@
 #include "terminal.h"
 #include "repository.h"
 #include "application_event_handlers.h"
+#include "window_menu.h"
 
 using Windows = std::vector<std::unique_ptr<BaseWindow>>;
 using WindowsRegistry = std::unordered_map<std::string, bool>;
@@ -15,13 +16,15 @@ public:
 	bool connect(const std::string& ip, const int port);
 	bool disconnect();
 	bool isConnected() const;
+	bool isConnectedToDoc() const;
 	bool isLogged() const;
 	KeyPack readChar() const;
 	bool processChar(const KeyPack& key);
 	bool checkIncomingMessages();
 	bool checkBufferWasResized();
-	bool waitForDocument(const std::chrono::milliseconds& timeout, const int tries);
+	bool waitForResponse(const msg::Type type, const std::chrono::milliseconds& timeout, const int tries);
 	void render();
+	std::vector<Option> getMainMenuOptions() const;
 private:
 	TCPClient tcpClient;
 	Terminal terminal;

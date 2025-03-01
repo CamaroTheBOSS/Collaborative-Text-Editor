@@ -1,5 +1,6 @@
 #pragma once
 #include "window_base.h"
+#include "windows_manager.h"
 
 
 class Application;
@@ -24,6 +25,10 @@ private:
 	void eventCreateDoc(Application& app, const Event& pEvent);
 	void eventJoinDoc(Application& app, const Event& pEvent);
 	bool joinCreateDocImpl(const msg::Type type, msg::OneByteInt version, Application& app, const Event& pEvent);
+	bool waitForResponseAndProccessIt(Application& app, const msg::Type type);
+
+	bool validateTextInputWindow(Application& app, const WindowsIt& window) const;
+	bool validateConnection(Application& app);
 
 	HandlersMap handlers;
 };

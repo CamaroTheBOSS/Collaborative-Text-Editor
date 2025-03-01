@@ -10,9 +10,8 @@ public:
 	Event onDelete() override;
 	Event processChar(TCPClient& client, const KeyPack& key, const std::string& clipboardData) override;
 	std::string name() const override;
-private:
+protected:
 	static TextInputWindow::TextInputHandler funcNoop();
-
 	const std::string winName = "TextInputWindow";
 	TextInputHandler onSubmitHandler;
 	TextInputHandler onModifyHandler;

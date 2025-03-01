@@ -7,14 +7,9 @@
 
 #include "messages.h"
 #include "server_document.h"
+#include "response.h"
 
 namespace server {
-	struct Response {
-		msg::Buffer buffer;
-		std::vector<SOCKET> destinations;
-		msg::Type msgType;
-	};
-
 	class Repository {
 		friend class TestServer;
 		friend class SyncTester;

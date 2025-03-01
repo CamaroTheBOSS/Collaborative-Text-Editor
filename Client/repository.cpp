@@ -26,6 +26,12 @@ namespace client {
 			return disconnectUser(doc, buffer);
 		case msg::Type::replace:
 			return replace(doc, buffer);
+		case msg::Type::login:
+			return login(doc, buffer);
+		case msg::Type::logout:
+			return logout(doc, buffer);
+		case msg::Type::registration:
+			return registered(doc, buffer);
 		}
 		assert(false && "Unrecognized msg type. Aborting...");
 		return false;
@@ -33,7 +39,7 @@ namespace client {
 
 	bool Repository::sync(ClientSiteDocument& doc, msg::Buffer& buffer) {
 		msg::ConnectResponse msg;
-		parse(buffer, 1, msg.version, msg.user, lastError, authToken, acCode, msg.text, msg.cursorPositions);
+		parse(buffer, 0, msg.type, msg.version, msg.user, lastError, acCode, msg.text, msg.cursorPositions);
 		if (!lastError.empty()) {
 			logger.logDebug(lastError);
 			return false;
@@ -107,11 +113,46 @@ namespace client {
 		return true;
 	}
 
+	bool Repository::login(ClientSiteDocument& doc, msg::Buffer& buffer) {
+		msg::LoginResponse msg;
+		parse(buffer, 1, msg.version, msg.errMsg, msg.authToken);
+		if (!msg.errMsg.empty()) {
+			logger.logInfo("Error during login:", msg.errMsg);
+			lastError = msg.errMsg;
+			return false;
+		}
+		authToken = msg.authToken;
+		return true;
+	}
+
+	bool Repository::logout(ClientSiteDocument& doc, msg::Buffer& buffer) {
+		msg::AckResponse msg;
+		parse(buffer, 1, msg.version);
+		return true;
+	}
+
+	bool Repository::registered(ClientSiteDocument& doc, msg::Buffer& buffer) {
+		msg::RegisterResponse msg;
+		parse(buffer, 1, msg.version, msg.errMsg);
+		if (!msg.errMsg.empty()) {
+			logger.logInfo("Error during login:", msg.errMsg);
+			lastError = msg.errMsg;
+			return false;
+		}
+		return true;
+	}
+
 	std::string Repository::getAcCode() const {
 		return acCode;
 	}
 	std::string Repository::getAuthToken() const {
 		return authToken;
+	}
+	void Repository::cleanAcCode() {
+		acCode.clear();
+	}
+	void Repository::cleanAuthToken() {
+		return authToken.clear();
 	}
 	std::string Repository::getLastError() {
 		std::string err = lastError;
