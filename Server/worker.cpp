@@ -153,8 +153,8 @@ server::Response Worker::shutdownConnection(const SOCKET client, msg::Buffer& bu
     shutdown(client, SD_SEND);
     logger.logDebug("Closing connection with", client);
     buffer.clear();
-    msg::serializeTo(buffer, 0, msg::Type::disconnect, static_cast<msg::OneByteInt>(1));
+    msg::serializeTo(buffer, 0, msg::Type::disconnect, static_cast<msg::OneByteInt>(1), "");
     std::scoped_lock lock{connSetLock};
     FD_CLR(client, &connections);
-    return repo.process(client, buffer);
+    return repo.process(client, buffer, false);
 }

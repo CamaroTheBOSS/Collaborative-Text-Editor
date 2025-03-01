@@ -7,6 +7,7 @@ public:
 	TextEditorWindow(const ScrollableScreenBufferBuilder& ssbBuilder);
 	Event processChar(TCPClient& client, const KeyPack& key, const std::string& clipboardData) override;
 	void processEvent(const TCPClient& client, const Event& pEvent) override;
+	void setAuthToken(const std::string& newAuthToken);
 	std::string name() const override {
 		return className;
 	}
@@ -19,5 +20,6 @@ private:
 	void replace(const TCPClient& client, const std::vector<std::string>& args);
 
 	EventHandlersMap<TextEditorWindow> eventHandlers;
+	std::string authToken;
 };
 

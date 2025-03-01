@@ -87,6 +87,14 @@ void ApplicationEventHandlers::eventLoginPasswordAccepted(Application& app, cons
     app.windowsManager.showWindow<InfoWindow>(
         makeGenericBuilder(screenSize, "Success", left, 0.4, width, 1), pEvent.params[0] + " successful"
     );
+
+    std::string authToken = app.repo.getAuthToken();
+    if (authToken.empty()) {
+        return;
+    }
+    auto textEditor = dynamic_cast<TextEditorWindow*>(app.windowsManager.getTextEditor().get());
+    assert(textEditor != nullptr);
+    textEditor->setAuthToken(authToken);
 }
 
 void ApplicationEventHandlers::eventLogout(Application& app, const Event& pEvent) {

@@ -196,6 +196,7 @@ namespace msg {
 	struct Disconnect {
 		Type type = Type::disconnect;
 		OneByteInt version = 0;
+		std::string authToken;
 	};
 
 	struct DisconnectResponse {
@@ -207,7 +208,7 @@ namespace msg {
 	struct Write {
 		Type type = Type::write;
 		OneByteInt version = 0;
-		std::string token;
+		std::string authToken;;
 		std::string text;
 	};
 
@@ -223,7 +224,7 @@ namespace msg {
 	struct Erase {
 		Type type = Type::erase;
 		OneByteInt version = 0;
-		std::string token;
+		std::string authToken;
 		unsigned int eraseSize = 0;
 	};
 
@@ -239,7 +240,7 @@ namespace msg {
 	struct Replace {
 		Type type = Type::replace;
 		OneByteInt version = 0;
-		std::string token;
+		std::string authToken;
 		std::string text; // new text
 		std::vector<std::pair<COORD, COORD>> segments;
 	};
@@ -255,7 +256,7 @@ namespace msg {
 	struct MoveHorizontal {
 		Type type = Type::moveHorizontal;
 		OneByteInt version = 0;
-		std::string token;
+		std::string authToken;
 		MoveSide side = MoveSide::left;
 		OneByteInt withSelect = 0;
 	};
@@ -263,7 +264,7 @@ namespace msg {
 	struct MoveVertical {
 		Type type = Type::moveVertical;
 		OneByteInt version = 0;
-		std::string token;
+		std::string authToken;
 		MoveSide side = MoveSide::up;
 		unsigned int clientWidth = 0;
 		OneByteInt withSelect = 0;
@@ -272,13 +273,13 @@ namespace msg {
 	struct MoveSelectAll {
 		Type type = Type::selectAll;
 		OneByteInt version = 0;
-		std::string token;
+		std::string authToken;
 	};
 
 	struct MoveTo {
 		Type type = Type::moveTo;
 		OneByteInt version = 0;
-		std::string token;
+		std::string authToken;
 		unsigned int X = 0;
 		unsigned int Y = 0;
 	};
@@ -297,7 +298,7 @@ namespace msg {
 	struct ControlMessage {
 		Type type;
 		OneByteInt version;
-		std::string token;
+		std::string authToken;
 	};
 
 	struct ControlMessageResponse {

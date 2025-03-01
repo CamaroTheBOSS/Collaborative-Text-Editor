@@ -16,7 +16,7 @@ namespace server {
 		friend class SyncTester;
 	public:
 		Repository(server::Authenticator* auth);
-		Response process(SOCKET client, msg::Buffer& buffer);
+		Response process(SOCKET client, msg::Buffer& buffer, bool authenticateUser = true);
 		std::string getLastAddedAcCode();
 		std::string getLastDeletedAcCode();
 	private:
@@ -29,9 +29,7 @@ namespace server {
 		Response createDoc(msg::Buffer& buffer);
 		Response loadDoc( msg::Buffer& buffer);
 		Response masterClose(msg::Buffer& buffer) const;
-		//Response connectUserToDoc(const ArgPack& argPack);
 		Response disconnectUserFromDoc(const ArgPack& argPack);
-		//Response masterForwardConnect(const ArgPack& argPack);
 		Response write(const ArgPack& argPack);
 		Response erase(const ArgPack& argPack);
 		Response moveHorizontal(const ArgPack& argPack);

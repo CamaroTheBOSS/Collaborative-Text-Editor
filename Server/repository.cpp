@@ -11,10 +11,11 @@ namespace server {
 	Repository::Repository(server::Authenticator* auth) :
 		auth(auth) {}
 
-	Response Repository::process(SOCKET client, msg::Buffer& buffer) {
+	Response Repository::process(SOCKET client, msg::Buffer& buffer, bool authenticateUser) {
 		msg::Type type;
 		msg::OneByteInt version;
-		msg::parse(buffer, 0, type, version);
+		int pos = msg::parse(buffer, 0, type, version);
+		// Messages from master, doesn't require authentication
 		switch (type) {
 		case msg::Type::create:
 			return createDoc(buffer);
@@ -23,6 +24,17 @@ namespace server {
 		case msg::Type::masterClose:
 			return masterClose(buffer);
 		}
+
+		std::string authToken;
+		msg::parse(buffer, pos, authToken);
+		if (authenticateUser) {
+			auto it = clientToAuthToken.find(client);
+			if (it == clientToAuthToken.cend() || it->second != authToken) {
+				logger.logError("Cannot authenticate user", client);
+				return Response{ std::move(buffer), {}, msg::Type::error };
+			}
+		}
+
 		auto doc = findDoc(client);
 		if (doc == nullptr) {
 			logger.logError("Document for client", client, "not found");

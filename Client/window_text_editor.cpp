@@ -12,47 +12,47 @@ TextEditorWindow::TextEditorWindow(const ScrollableScreenBufferBuilder& ssbBuild
 
 Event TextEditorWindow::processChar(TCPClient& client, const KeyPack& key, const std::string& clipboardData) {
     if (key.keyCode >= 32 && key.keyCode <= 127) {
-        client.sendMsg(msg::Type::write, version, std::string{""}, std::string(1, key.keyCode));
+        client.sendMsg(msg::Type::write, version, authToken, std::string(1, key.keyCode));
         return Event{};
     }
     bool actionDone = false;
     switch (key.keyCode) {
     case ENTER:
-        actionDone = client.sendMsg(msg::Type::write, version, std::string{""}, std::string{'\n'});
+        actionDone = client.sendMsg(msg::Type::write, version, authToken, std::string{'\n'});
         break;
     case TABULAR:
-        actionDone = client.sendMsg(msg::Type::write, version, std::string{""}, std::string{"    "});
+        actionDone = client.sendMsg(msg::Type::write, version, authToken, std::string{"    "});
         break;
     case BACKSPACE:
-        actionDone = client.sendMsg(msg::Type::erase, version, std::string{""}, static_cast<unsigned int>(1));
+        actionDone = client.sendMsg(msg::Type::erase, version, authToken, static_cast<unsigned int>(1));
         break;
     case ARROW_LEFT:
-        actionDone = client.sendMsg(msg::Type::moveHorizontal, version, std::string{""}, msg::MoveSide::left, key.shiftPressed);
+        actionDone = client.sendMsg(msg::Type::moveHorizontal, version, authToken, msg::MoveSide::left, key.shiftPressed);
         break;
     case ARROW_RIGHT:
-        actionDone = client.sendMsg(msg::Type::moveHorizontal, version, std::string{""}, msg::MoveSide::right, key.shiftPressed);
+        actionDone = client.sendMsg(msg::Type::moveHorizontal, version, authToken, msg::MoveSide::right, key.shiftPressed);
         break;
     case ARROW_UP:
-        actionDone = client.sendMsg(msg::Type::moveVertical, version, std::string{""}, msg::MoveSide::up, getDocBufferWidth(), key.shiftPressed);
+        actionDone = client.sendMsg(msg::Type::moveVertical, version, authToken, msg::MoveSide::up, getDocBufferWidth(), key.shiftPressed);
         break;
     case ARROW_DOWN:
-        actionDone = client.sendMsg(msg::Type::moveVertical, version, std::string{""}, msg::MoveSide::down, getDocBufferWidth(), key.shiftPressed);
+        actionDone = client.sendMsg(msg::Type::moveVertical, version, authToken, msg::MoveSide::down, getDocBufferWidth(), key.shiftPressed);
         break;
     case CTRL_A:
-        actionDone = client.sendMsg(msg::Type::selectAll, version, std::string{""});
+        actionDone = client.sendMsg(msg::Type::selectAll, version, authToken);
         break;
     case CTRL_V:
-        actionDone = client.sendMsg(msg::Type::write, version, std::string{""}, clipboardData);
+        actionDone = client.sendMsg(msg::Type::write, version, authToken, clipboardData);
         break;
     case CTRL_X:
-        actionDone = client.sendMsg(msg::Type::erase, version, std::string{""}, static_cast<unsigned int>(1));
+        actionDone = client.sendMsg(msg::Type::erase, version, authToken, static_cast<unsigned int>(1));
         break;
     case CTRL_Z:
         if (key.shiftPressed) {
-            actionDone = client.sendMsg(msg::Type::redo, version, std::string{""});
+            actionDone = client.sendMsg(msg::Type::redo, version, authToken);
         }
         else {
-            actionDone = client.sendMsg(msg::Type::undo, version, std::string{""});
+            actionDone = client.sendMsg(msg::Type::undo, version, authToken);
         }
         break;
     }
@@ -65,6 +65,10 @@ void TextEditorWindow::processEvent(const TCPClient& client, const Event& pEvent
         return;
     }
     return (this->*it->second)(client, pEvent.params);
+}
+
+void TextEditorWindow::setAuthToken(const std::string& newAuthToken) {
+    authToken = newAuthToken;
 }
 
 void TextEditorWindow::find(const TCPClient& client, const std::vector<std::string>& args) {
