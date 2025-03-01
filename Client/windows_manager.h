@@ -11,6 +11,7 @@ enum class FocusDirection { up, down, left, right };
 class WindowsManager {
 public:
 	WindowsManager(const COORD& consoleSize);
+
 	void changeFocusUp();
 	void changeFocusDown();
 	void changeFocusLeft();
@@ -39,6 +40,9 @@ public:
 	WindowsIt findWindow(const std::string& name) const;
 	bool processEvent(const TCPClient& client, const Event& pEvent);
 private:
+	enum class ChangeFocusDirection {left, right, up, down};
+	void changeFocus(const ChangeFocusDirection direction);
+
 	int focus = 0;
 	Windows windows;
 	WindowsRegistry windowsRegistry;

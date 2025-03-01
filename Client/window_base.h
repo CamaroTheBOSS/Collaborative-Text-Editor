@@ -39,6 +39,7 @@ public:
 	void updateScroll();
 	void updateConsoleSize(const COORD& newSize);
 	void clearContent();
+	COORD getFocusAnchor() const;
 protected:
 	ClientSiteDocument doc;
 	ScrollableScreenBuffer buffer;

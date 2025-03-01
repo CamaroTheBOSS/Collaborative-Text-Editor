@@ -59,3 +59,9 @@ void BaseWindow::updateConsoleSize(const COORD& newSize) {
 void BaseWindow::clearContent() {
     doc.clearContent();
 }
+
+COORD BaseWindow::getFocusAnchor() const {
+    auto cursor = buffer.getTerminalCursor(doc, doc.getMyCursor());
+    return cursor.pos;
+    //return buffer.getCenter();
+}

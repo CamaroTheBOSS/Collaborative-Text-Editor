@@ -22,6 +22,10 @@ COORD operator+(const COORD& pos1, const COORD& pos2) {
 	return COORD{ static_cast<SHORT>(pos1.X + pos2.X), static_cast<SHORT>(pos1.Y + pos2.Y) };
 }
 
+COORD operator*(const COORD& pos1, const int multiplier) {
+	return COORD{ static_cast<SHORT>(pos1.X * multiplier), static_cast<SHORT>(pos1.Y * multiplier) };
+}
+
 bool operator<(const COORD& pos1, const COORD& pos2) {
 	if ((pos1.Y < pos2.Y) || (pos1.Y == pos2.Y && pos1.X < pos2.X)) {
 		return true;

@@ -1,4 +1,5 @@
 #include "windows_manager.h"
+#include "pos_helpers.h"
 
 
 WindowsManager::WindowsManager(const COORD& consoleSize) {
@@ -6,63 +7,19 @@ WindowsManager::WindowsManager(const COORD& consoleSize) {
 }
 
 void WindowsManager::changeFocusUp() {
-    int newFocus = focus;
-    float curr = windows[focus]->getBuffer().getCenter().Y;
-    float diff = INT_MAX;
-    for (int i = 0; i < windows.size(); i++) {
-        float other = windows[i]->getBuffer().getCenter().Y;
-        float newDiff = curr - other;
-        if (newDiff > 0 && newDiff < diff) {
-            diff = newDiff;
-            newFocus = i;
-        }
-    }
-    setFocus(newFocus);
+    return changeFocus(ChangeFocusDirection::up);
 }
 
 void WindowsManager::changeFocusDown() {
-    int newFocus = focus;
-    float curr = windows[focus]->getBuffer().getCenter().Y;
-    float diff = INT_MAX;
-    for (int i = 0; i < windows.size(); i++) {
-        float other = windows[i]->getBuffer().getCenter().Y;
-        float newDiff = other - curr;
-        if (newDiff > 0 && newDiff < diff) {
-            diff = newDiff;
-            newFocus = i;
-        }
-    }
-    setFocus(newFocus);
+    return changeFocus(ChangeFocusDirection::down);
 }
 
 void WindowsManager::changeFocusLeft() {
-    int newFocus = focus;
-    float curr = windows[focus]->getBuffer().getCenter().X;
-    float diff = INT_MAX;
-    for (int i = 0; i < windows.size(); i++) {
-        float other = windows[i]->getBuffer().getCenter().X;
-        float newDiff = curr - other;
-        if (newDiff > 0 && newDiff < diff) {
-            diff = newDiff;
-            newFocus = i;
-        }
-    }
-    setFocus(newFocus);
+    return changeFocus(ChangeFocusDirection::left);
 }
 
 void WindowsManager::changeFocusRight() {
-    int newFocus = focus;
-    float curr = windows[focus]->getBuffer().getCenter().X;
-    float diff = INT_MAX;
-    for (int i = 0; i < windows.size(); i++) {
-        float other = windows[i]->getBuffer().getCenter().X;
-        float newDiff = other - curr;
-        if (newDiff > 0 && newDiff < diff) {
-            diff = newDiff;
-            newFocus = i;
-        }
-    }
-    setFocus(newFocus);
+    return changeFocus(ChangeFocusDirection::right);
 }
 
 void WindowsManager::setFocus(const std::string& winName) {
@@ -147,4 +104,36 @@ WindowsIt WindowsManager::findWindow(const std::string& name) const {
         }
     }
     windows.cend();
+}
+
+void WindowsManager::changeFocus(const ChangeFocusDirection direction) {
+    int diffMultiplier = 2 * (direction == ChangeFocusDirection::left || direction == ChangeFocusDirection::up) - 1;
+    bool isVertical = (direction == ChangeFocusDirection::down || direction == ChangeFocusDirection::up);
+
+    int newFocus = focus;
+    auto currentPos = windows[focus]->getFocusAnchor();
+    auto diffPosRelevant = SHRT_MAX;
+    int distanceBetween = SHRT_MAX;
+    for (int i = 0; i < windows.size(); i++) {
+        auto otherPos = windows[i]->getFocusAnchor();
+        auto newDiffPos = (currentPos - otherPos) * diffMultiplier;
+        auto newDiffPosRelevant = isVertical ? newDiffPos.Y : newDiffPos.X;
+        if (newDiffPosRelevant <= 0) {
+            continue;
+        }
+        if (newDiffPosRelevant < diffPosRelevant) {
+            newFocus = i;
+            diffPosRelevant = newDiffPosRelevant;
+            distanceBetween = abs(newDiffPos.X) + abs(newDiffPos.Y);
+        }
+        else if (newDiffPosRelevant == diffPosRelevant) {
+            int distanceBetween2 = abs(newDiffPos.X) + abs(newDiffPos.Y);
+            if (distanceBetween2 < distanceBetween) {
+                newFocus = i;
+                diffPosRelevant = newDiffPosRelevant;
+                distanceBetween = distanceBetween2;
+            }
+        }
+    }
+    setFocus(newFocus);
 }
