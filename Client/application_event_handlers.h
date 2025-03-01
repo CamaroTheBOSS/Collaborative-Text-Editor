@@ -8,23 +8,22 @@ public:
 	ApplicationEventHandlers();
 	bool processEvent(Application& app, const Event& pEvent);
 private:
-	struct Args {
-		Application& app;
-		const std::vector<std::string>& args;
-	};
-	using HandlersMap = std::unordered_map<std::string, void(ApplicationEventHandlers::*)(const Args&)>;
+	using HandlersMap = std::unordered_map<std::string, void(ApplicationEventHandlers::*)(Application& app, const Event& pEvent)>;
 
+	void eventMainMenuLoginRegisterChosen(Application& app, const Event& pEvent);
+	void eventLoginPasswordAccepted(Application& app, const Event& pEvent);
+	void eventLogout(Application& app, const Event& pEvent);
 
-	void eventMainMenuDisconnectChosen(const Args& input);
-	void eventMainMenuCreateChosen(const Args& input);
-	void eventMainMenuJoinChosen(const Args& input);
-	void eventMainMenuExitChosen(const Args& input);
-	void eventMainMenuHelpChosen(const Args& input);
-	void eventMainMenuShowAcCodeChosen(const Args& input);
+	void eventMainMenuDisconnectChosen(Application& app, const Event& pEvent);
+	void eventMainMenuCreateChosen(Application& app, const Event& pEvent);
+	void eventMainMenuJoinChosen(Application& app, const Event& pEvent);
+	void eventMainMenuExitChosen(Application& app, const Event& pEvent);
+	void eventMainMenuHelpChosen(Application& app, const Event& pEvent);
+	void eventMainMenuShowAcCodeChosen(Application& app, const Event& pEvent);
 
-	void eventCreateDoc(const Args& input);
-	void eventJoinDoc(const Args& input);
-	bool joinCreateDocImpl(const msg::Type type, msg::OneByteInt version, const Args& input);
+	void eventCreateDoc(Application& app, const Event& pEvent);
+	void eventJoinDoc(Application& app, const Event& pEvent);
+	bool joinCreateDocImpl(const msg::Type type, msg::OneByteInt version, Application& app, const Event& pEvent);
 
 	HandlersMap handlers;
 };

@@ -17,7 +17,7 @@ Application::Application(const std::string& ip, const int port) :
     windowsManager(terminal.getScreenSize()),
     repo() {
     windowsManager.showWindow<TextEditorWindow>(makeTextEditorWindowBuilder(terminal.getScreenSize()));
-    windowsManager.showWindow<MenuWindow>(makeMenuWindowBuilder(terminal.getScreenSize(), "Main Menu"), makeMainMenuOptions());
+    windowsManager.showWindow<MenuWindow>(makeMenuWindowBuilder(terminal.getScreenSize(), "Main Menu"), makeUnloggedMainMenuOptions());
 }
 
 bool Application::connect(const std::string& ip, const int port) {
@@ -30,6 +30,10 @@ bool Application::disconnect() {
 
 bool Application::isConnected() const {
     return tcpClient.isConnected();
+}
+
+bool Application::isLogged() const {
+    return !repo.getAuthToken().empty();
 }
 
 KeyPack Application::readChar() const {

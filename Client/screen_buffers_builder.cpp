@@ -48,6 +48,14 @@ ScrollableScreenBufferBuilder& ScrollableScreenBufferBuilder::setAbsoluteRight(c
 	rightBottomAbs.X = val;
 	return *this;
 }
+ScrollableScreenBufferBuilder& ScrollableScreenBufferBuilder::setAbsoluteWidth(const int val) {
+	sizeAbs.X = val;
+	return *this;
+}
+ScrollableScreenBufferBuilder& ScrollableScreenBufferBuilder::setAbsoluteHeight(const int val) {
+	sizeAbs.Y = val;
+	return *this;
+}
 ScrollableScreenBufferBuilder& ScrollableScreenBufferBuilder::setRelativeTop(const double val) {
 	leftTop.Y = val;
 	return *this;
@@ -62,6 +70,14 @@ ScrollableScreenBufferBuilder& ScrollableScreenBufferBuilder::setRelativeLeft(co
 }
 ScrollableScreenBufferBuilder& ScrollableScreenBufferBuilder::setRelativeRight(const double val) {
 	rightBottom.X = val;
+	return *this;
+}
+ScrollableScreenBufferBuilder& ScrollableScreenBufferBuilder::setRelativeWidth(const double val) {
+	size.X = val;
+	return *this;
+}
+ScrollableScreenBufferBuilder& ScrollableScreenBufferBuilder::setRelativeHeight(const double val) {
+	size.Y = val;
 	return *this;
 }
 ScrollableScreenBufferBuilder& ScrollableScreenBufferBuilder::setConsoleSize(const Pos<int>& newConsoleSize) {
@@ -79,11 +95,37 @@ ScrollableScreenBuffer ScrollableScreenBufferBuilder::getResult() const {
 	buffer.leftFramePattern = leftFramePattern;
 	buffer.rightFramePattern = rightFramePattern;
 	buffer.consoleSize = consoleSize;
-	if (leftTopAbs.X != 0 || leftTopAbs.Y != 0 || rightBottomAbs.X != 0 || rightBottomAbs.Y != 0) {
-		buffer.setBufferAbsoluteSize(leftTopAbs.X, leftTopAbs.Y, rightBottomAbs.X, rightBottomAbs.Y);
+
+	bool absPosSet = leftTopAbs.X != 0 || leftTopAbs.Y != 0 || rightBottomAbs.X != 0 || rightBottomAbs.Y != 0;
+	bool absSizeSet = sizeAbs.X && sizeAbs.Y;
+	bool relPosSet = leftTop.X != 0 || leftTop.Y != 0 || rightBottom.X != 0 || rightBottom.Y != 0;
+	bool relSizeSet = size.X && size.Y;
+	if (absPosSet) {
+		if (absSizeSet) {
+			buffer.setBufferAbsoluteSize(leftTopAbs.X, leftTopAbs.Y, leftTopAbs.X + sizeAbs.X, leftTopAbs.Y + sizeAbs.Y);
+		}
+		else if (relSizeSet) {
+			buffer.setBufferAbsoluteSize(leftTopAbs.X, leftTopAbs.Y, rightBottomAbs.X, rightBottomAbs.Y);
+			buffer.setBufferSize(
+				Pos<double>{buffer.getRelativeLeft(), buffer.getRelativeTop()}, 
+				Pos<double>{buffer.getRelativeLeft() + size.X, buffer.getRelativeTop() + size.Y}
+			);
+		}
+		else {
+			buffer.setBufferAbsoluteSize(leftTopAbs.X, leftTopAbs.Y, rightBottomAbs.X, rightBottomAbs.Y);
+		}
 	}
-	else {
-		buffer.setBufferSize(leftTop, rightBottom);
+	else if (relPosSet) {
+		if (absSizeSet) {
+			buffer.setBufferSize(leftTop, rightBottom);
+			buffer.setBufferAbsoluteSize(buffer.getLeft(), buffer.getTop(), buffer.getLeft() + sizeAbs.X, buffer.getTop() + sizeAbs.Y);
+		}
+		else if (relSizeSet) {
+			buffer.setBufferSize(leftTop, Pos<double>{leftTop.X + size.X, leftTop.Y + size.Y});
+		}
+		else {
+			buffer.setBufferSize(leftTop, rightBottom);
+		}
 	}
 	return buffer;
 }

@@ -84,6 +84,9 @@
     <ClCompile Include="application_event_handlers.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
+    <ClCompile Include="validator.cpp">
+      <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="terminal.h">
@@ -138,6 +141,9 @@
       <Filter>Pliki nagłówkowe\Windows</Filter>
     </ClInclude>
     <ClInclude Include="application_event_handlers.h">
+      <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
+    <ClInclude Include="validator.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
   </ItemGroup>

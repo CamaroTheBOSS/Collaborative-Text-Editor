@@ -15,6 +15,7 @@ public:
 	bool connect(const std::string& ip, const int port);
 	bool disconnect();
 	bool isConnected() const;
+	bool isLogged() const;
 	KeyPack readChar() const;
 	bool processChar(const KeyPack& key);
 	bool checkIncomingMessages();

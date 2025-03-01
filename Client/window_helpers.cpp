@@ -108,8 +108,32 @@ ScrollableScreenBufferBuilder makeMenuWindowBuilder(const COORD& consoleSize, co
     return builder;
 }
 
+ScrollableScreenBufferBuilder makeTextInputBuilder(const COORD& consoleSize, const std::string& title, const double left, const double top, const int width, const int height) {
+    ScrollableScreenBufferBuilder builder;
+    builder.setScrollHisteresis(0)
+        .setTitle(title)
+        .setRelativeLeft(left)
+        .setRelativeTop(top)
+        .setAbsoluteWidth(width)
+        .setAbsoluteHeight(height)
+        .setConsoleSize({ consoleSize.X, consoleSize.Y })
+        .showLeftFramePattern("|")
+        .showRightFramePattern("|")
+        .showTopFramePattern("-")
+        .showBottomFramePattern("-");
+    return builder;
+}
+
+std::vector<Option> makeUnloggedMainMenuOptions() {
+    return std::vector<Option>{
+        Option{ "Login", [](MenuWindow& obj) { return Event{ windows::app::events::showLoginWindow, obj.name(), windows::app::name, { windows::login::name }}; } },
+        Option{ "Register", [](MenuWindow& obj) { return Event{ windows::app::events::showLoginWindow, obj.name(), windows::app::name, { windows::registration::name }}; }},
+        Option{ "Quit", [](MenuWindow& obj) { return Event{ windows::app::events::exit, obj.name(), windows::app::name, {} }; } }
+    };
+}
 std::vector<Option> makeMainMenuOptions() {
     return std::vector<Option>{
+        Option{ "Logout", [](MenuWindow& obj) { return Event{ windows::app::events::logout, obj.name(), windows::app::name, {} }; } },
         Option{ "Create document", [](MenuWindow& obj) { return Event{ windows::app::events::createDocWindow, obj.name(), windows::app::name, {} }; } },
         Option{ "Load document", [](MenuWindow& obj) { return Event{ windows::app::events::joinDocWindow, obj.name(), windows::app::name, {} }; } },
         Option{ "Help", [](MenuWindow& obj) { return Event{ windows::app::events::help, obj.name(), windows::app::name, {} }; } },
@@ -118,6 +142,7 @@ std::vector<Option> makeMainMenuOptions() {
 }
 std::vector<Option> makeLoggedMainMenuOptions() {
     return std::vector<Option>{
+        Option{ "Logout", [](MenuWindow& obj) { return Event{ windows::app::events::logout, obj.name(), windows::app::name, {} }; } },
         Option{ "Disconnect", [](MenuWindow& obj) { return Event{ windows::app::events::disconnect, obj.name(), windows::app::name, {} }; } },
         Option{ "Show access code", [](MenuWindow& obj) { return Event{ windows::app::events::showAcCode, obj.name(), windows::app::name, {} }; } },
         Option{ "Create document", [](MenuWindow& obj) { return Event{ windows::app::events::createDocWindow, obj.name(), windows::app::name, {} }; } },
@@ -155,6 +180,11 @@ TextInputWindow::TextInputHandler funcLoadDocSubmitEvent() {
 TextInputWindow::TextInputHandler funcCreateDocSubmitEvent() {
     return [](const TextInputWindow& win, const ClientSiteDocument& doc) {
         return Event{ windows::app::events::createDoc, win.name(), windows::app::name, { doc.getText() } };
+    };
+}
+TextInputWindow::TextInputHandler funcSubmitLoginPasswordEvent(bool isRegistration) {
+    return [isRegistration](const TextInputWindow& win, const ClientSiteDocument& doc) {
+        return Event{ windows::app::events::acceptLoginPassword, win.name(), windows::app::name, { doc.getText(), (isRegistration ? windows::registration::name : windows::login::name) }};
     };
 }
 

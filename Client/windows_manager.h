@@ -15,6 +15,7 @@ public:
 	void changeFocusDown();
 	void changeFocusLeft();
 	void changeFocusRight();
+	void setFocus(const std::string& winName);
 	void setFocus(const int newFocus);
 
 	template <typename WindowClass, typename... Args>
@@ -35,10 +36,9 @@ public:
 	const Window& getFocusedWindow() const;
 	const Window& getTextEditor() const;
 	const Windows& getWindows() const;
+	WindowsIt findWindow(const std::string& name) const;
 	bool processEvent(const TCPClient& client, const Event& pEvent);
 private:
-	WindowsIt findWindow(const std::string& name) const;
-
 	int focus = 0;
 	Windows windows;
 	WindowsRegistry windowsRegistry;

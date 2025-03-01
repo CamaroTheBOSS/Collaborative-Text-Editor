@@ -139,6 +139,7 @@
     <ClCompile Include="canvas.cpp" />
     <ClCompile Include="client_document.cpp" />
     <ClCompile Include="screen_buffers_builder.cpp" />
+    <ClCompile Include="validator.cpp" />
     <ClCompile Include="window_helpers.cpp" />
     <ClCompile Include="windows_manager.cpp" />
     <ClCompile Include="window_base.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="events.h" />
     <ClInclude Include="keypack.h" />
     <ClInclude Include="screen_buffers_builder.h" />
+    <ClInclude Include="validator.h" />
     <ClInclude Include="window_helpers.h" />
     <ClInclude Include="windows_manager.h" />
     <ClInclude Include="window_base.h" />

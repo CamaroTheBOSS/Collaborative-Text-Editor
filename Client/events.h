@@ -22,5 +22,22 @@ namespace windows::app {
 		static constexpr const char* joinDoc = "join doc";
 		static constexpr const char* help = "help";
 		static constexpr const char* exit = "exit";
+
+		// Login and register main menu options events
+		static constexpr const char* showLoginWindow = "show login";
+		static constexpr const char* acceptLoginPassword = "accept login/password";
+		static constexpr const char* logout = "logout";
 	}
+}
+
+namespace windows::login {
+	static constexpr const char* name = "Login";
+}
+
+namespace windows::registration {
+	static constexpr const char* name = "Register";
+}
+
+namespace windows::password {
+	static constexpr const char* name = "Password";
 }

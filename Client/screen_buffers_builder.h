@@ -17,18 +17,24 @@ public:
     ScrollableScreenBufferBuilder& setAbsoluteBot(const int val);
     ScrollableScreenBufferBuilder& setAbsoluteLeft(const int val);
     ScrollableScreenBufferBuilder& setAbsoluteRight(const int val);
+    ScrollableScreenBufferBuilder& setAbsoluteWidth(const int val);
+    ScrollableScreenBufferBuilder& setAbsoluteHeight(const int val);
     ScrollableScreenBufferBuilder& setRelativeTop(const double val);
     ScrollableScreenBufferBuilder& setRelativeBot(const double val);
     ScrollableScreenBufferBuilder& setRelativeLeft(const double val);
     ScrollableScreenBufferBuilder& setRelativeRight(const double val);
+    ScrollableScreenBufferBuilder& setRelativeWidth(const double val);
+    ScrollableScreenBufferBuilder& setRelativeHeight(const double val);
     ScrollableScreenBufferBuilder& setConsoleSize(const Pos<int>& newConsoleSize);
     ScrollableScreenBuffer getResult() const;
 private:
     // Absolute positions
+    Pos<int> sizeAbs;
     Pos<int> leftTopAbs;
     Pos<int> rightBottomAbs;
 
     // Relative positions to console size with values between <0, 1> 
+    Pos<double> size;
     Pos<double> leftTop;
     Pos<double> rightBottom;
 

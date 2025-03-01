@@ -65,6 +65,15 @@ void WindowsManager::changeFocusRight() {
     setFocus(newFocus);
 }
 
+void WindowsManager::setFocus(const std::string& winName) {
+    auto window = findWindow(winName);
+    if (window == windows.cend()) {
+        return;
+    }
+    const int newFocus = std::distance(windows.cbegin(), window);
+    return setFocus(newFocus);
+}
+
 void WindowsManager::setFocus(const int newFocus) {
     if (newFocus >= windows.size()) {
         return;

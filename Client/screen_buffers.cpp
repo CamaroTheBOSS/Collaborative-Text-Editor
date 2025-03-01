@@ -240,6 +240,22 @@ int ScrollableScreenBuffer::getBottom() const {
 	return bottom;
 }
 
+double ScrollableScreenBuffer::getRelativeLeft() const {
+	return leftTop.X;
+}
+
+double ScrollableScreenBuffer::getRelativeRight() const {
+	return rightBottom.X;
+}
+
+double ScrollableScreenBuffer::getRelativeTop() const {
+	return leftTop.Y;
+}
+
+double ScrollableScreenBuffer::getRelativeBottom() const {
+	return rightBottom.Y;
+}
+
 Pos<double> ScrollableScreenBuffer::getCenter() const {
 	return center;
 }

@@ -50,6 +50,10 @@ public:
     int getRight() const;
     int getTop() const;
     int getBottom() const;
+    double getRelativeLeft() const;
+    double getRelativeRight() const;
+    double getRelativeTop() const;
+    double getRelativeBottom() const;
     Pos<double> getCenter() const;
     std::vector<Frame> getFrames() const;
 
