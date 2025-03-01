@@ -8,15 +8,18 @@
 
 namespace server {
 
+	Repository::Repository(server::Authenticator* auth) :
+		auth(auth) {}
+
 	Response Repository::process(SOCKET client, msg::Buffer& buffer) {
 		msg::Type type;
 		msg::OneByteInt version;
 		msg::parse(buffer, 0, type, version);
 		switch (type) {
 		case msg::Type::create:
-			return createDoc(client, buffer);
+			return createDoc(buffer);
 		case msg::Type::join:
-			return loadDoc(client, buffer);
+			return loadDoc(buffer);
 		case msg::Type::masterClose:
 			return masterClose(buffer);
 		}
@@ -79,19 +82,20 @@ namespace server {
 		return Response{ std::move(buffer), {}, msg::Type::masterClose };
 	}
 
-	Response Repository::createDoc(const SOCKET client, msg::Buffer& buffer) {
+	Response Repository::createDoc(msg::Buffer& buffer) {
 		auto msg = Deserializer::parseConnectCreateDoc(buffer);
 		auto acCode = random::Engine::get().getRandomString(6);
+		auto token = addToAuthMap(msg.socket);
 		clientToAcCodeMap.emplace(msg.socket, acCode);
 		auto docIt = acCodeToDocMap.emplace(acCode, ServerSiteDocument("", 1, 0, msg.filename));
 		docIt.first->second.addClient(msg.socket);
-		logger.logDebug("User", client, "created new document!");
+		logger.logDebug("User", msg.socket, "created new document!");
 		auto newBuffer = Serializer::makeConnectResponse(msg.type, docIt.first->second, msg.version, 0, acCode);
 		lastAddedAcCode = acCode;
 		return Response{ std::move(newBuffer), docIt.first->second.getConnectedClients(), msg::Type::create };
 	}
 
-	Response Repository::loadDoc(const SOCKET client, msg::Buffer& buffer) {
+	Response Repository::loadDoc(msg::Buffer& buffer) {
 		auto msg = Deserializer::parseConnectJoinDoc(buffer);
 		auto docIt = acCodeToDocMap.find(msg.acCode);
 		if (docIt == acCodeToDocMap.cend()) {
@@ -99,12 +103,13 @@ namespace server {
 			auto newBuffer = Serializer::makeConnectResponseWithError(msg.type, errMsg, 1);
 			return Response{ std::move(newBuffer), { msg.socket }, msg::Type::join };
 		}
+		auto token = addToAuthMap(msg.socket);
 		clientToAcCodeMap.emplace(msg.socket, msg.acCode);
 		docIt->second.addUser();
 		docIt->second.addClient(msg.socket);
 		int userIdx = docIt->second.getCursorNum() - 1;
 		auto newBuffer = Serializer::makeConnectResponse(msg.type, docIt->second, msg.version, userIdx, msg.acCode);
-		logger.logDebug("User", client, "connected to document");
+		logger.logDebug("User", msg.socket, "connected to document");
 		return Response{ std::move(newBuffer), docIt->second.getConnectedClients(), msg::Type::join };
 	}
 
@@ -137,6 +142,15 @@ namespace server {
 				acCodeToDocMap.erase(acCodeToDocIt);
 			}
 		}
+		auth->clearUser(client);
+		clientToAuthToken.erase(client);
+	}
+
+	std::string Repository::addToAuthMap(const SOCKET client) {
+		std::string token = auth->getAuthToken(client);
+		assert(!token.empty());
+		clientToAuthToken.emplace(client, token);
+		return token;
 	}
 
 	Response Repository::write(const ArgPack& argPack) {

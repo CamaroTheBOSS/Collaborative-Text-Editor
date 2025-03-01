@@ -1,6 +1,7 @@
 #include "authenticator.h"
 #include "deserializer.h"
 #include "serializer.h"
+#include "engine.h"
 
 namespace server {
 	Response Authenticator::process(SOCKET client, msg::Buffer& buffer) {
@@ -16,7 +17,6 @@ namespace server {
 		case msg::Type::registration:
 			return registerUser(args);
 		}
-		assert(false && "Unrecognized msg type. Aborting...");
 		return Response{ buffer, {}, msg::Type::error };
 	}
 
@@ -25,21 +25,25 @@ namespace server {
 		DBUser dbUser;
 		dbUser.username = std::move(msg.login);
 		auto errMsg = db.getUser(dbUser);
+		std::string authToken;
 		if (errMsg.empty()) {
 			if (dbUser.password == msg.password) {
-				// GENERATE TOKEN
+				authToken = random::Engine::get().getRandomString(16);
+				std::lock_guard lock{authMutex};
+				clientToAuthToken.emplace(args.client, authToken);
 			}
 			else {
 				errMsg = "Incorrect password!";
 			}
 		}
-		auto buffer = Serializer::makeLoginResponse(msg.version, "authtoken", errMsg);
+		auto buffer = Serializer::makeLoginResponse(msg.version, authToken, errMsg);
 		return Response{ buffer, {args.client}, msg.type };
 	}
 
 	Response Authenticator::logoutUser(const ArgPack& args) {
 		auto msg = Deserializer::parseAck(args.buffer);
 		auto buffer = Serializer::makeAckResponse(msg.type, msg.version);
+		clearUser(args.client);
 		return Response{ buffer, {}, msg.type };
 	}
 
@@ -51,5 +55,19 @@ namespace server {
 		auto errMsg = db.putUser(dbUser);
 		auto buffer = Serializer::makeRegisterResponse(msg.version, errMsg);
 		return Response{ buffer, {args.client}, msg.type };
+	}
+
+	void Authenticator::clearUser(SOCKET client) {
+		std::lock_guard lock{authMutex};
+		clientToAuthToken.erase(client);
+	}
+
+	std::string Authenticator::getAuthToken(SOCKET client) {
+		std::lock_guard lock{authMutex};
+		auto it = clientToAuthToken.find(client);
+		if (it == clientToAuthToken.cend()) {
+			return "";
+		}
+		return it->second;
 	}
 }

@@ -7,11 +7,12 @@
 #include "messages.h"
 #include "repository.h"
 #include "message_extractor.h"
+#include "authenticator.h"
 
 class Worker {
 public:
 	friend class Server;
-	Worker(const std::string& ip, const int port);
+	Worker(const std::string& ip, const int port, server::Authenticator* auth);
 	Worker(Worker&& worker) noexcept;
 	Worker& operator=(Worker&& worker) noexcept;
 	Worker(const Worker&) = delete;

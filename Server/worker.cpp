@@ -8,7 +8,8 @@ using namespace server;
 
 constexpr int defaultBuffSize = 128;
 
-Worker::Worker(const std::string& ip, const int port) {
+Worker::Worker(const std::string& ip, const int port, server::Authenticator* auth):
+    repo(auth) {
     std::scoped_lock lock{connSetLock};
     FD_ZERO(&connections);
 	thread = std::thread{ &Worker::connectToMaster, this, ip, port };
@@ -18,7 +19,8 @@ Worker::Worker(Worker&& worker) noexcept :
     connSetLock(),
     masterListener(std::move(worker.masterListener)),
     connections(std::move(worker.connections)),
-    masterAddress(std::move(worker.masterAddress)) {
+    masterAddress(std::move(worker.masterAddress)),
+    repo(std::move(worker.repo)) {
     thread = std::thread{ &Worker::handleConnections, this };
 }
 
@@ -27,6 +29,7 @@ Worker& Worker::operator=(Worker&& worker) noexcept {
     connections = std::move(worker.connections);
     masterAddress = std::move(worker.masterAddress);
     thread = std::move(worker.thread);
+    repo = std::move(worker.repo);
     return *this;
 }
 

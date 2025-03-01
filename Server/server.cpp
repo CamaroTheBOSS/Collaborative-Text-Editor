@@ -191,7 +191,7 @@ void Server::initWorkers(const int nWorkers) {
 	FD_ZERO(&set);
 	FD_SET(listenSocket, &set);
 	for (int i = 0; i < nWorkers; i++) {
-		Worker worker{ip, port};
+		Worker worker{ip, port, &auth};
 		int socketCount = select(0, &set, nullptr, nullptr, nullptr);
 		auto notifySocket = accept(listenSocket, nullptr, nullptr);
 		if (notifySocket == INVALID_SOCKET) {
