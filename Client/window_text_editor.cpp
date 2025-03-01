@@ -89,14 +89,14 @@ void TextEditorWindow::findNext(const TCPClient& client, const std::vector<std::
     }
     unsigned int X = pos.X;
     unsigned int Y = pos.Y;
-    client.sendMsg(msg::Type::moveTo, version, std::string{""}, X, Y);
+    client.sendMsg(msg::Type::moveTo, version, authToken, X, Y);
 }
 
 void TextEditorWindow::replace(const TCPClient& client, const std::vector<std::string>& args) {
     if (doc.getSegments().empty() || args.empty()) {
         return;
     }
-    client.sendMsg(msg::Type::replace, version, std::string{""}, args[0], doc.getSegments());
+    client.sendMsg(msg::Type::replace, version, authToken, args[0], doc.getSegments());
 }
 
 
