@@ -108,7 +108,7 @@ ScrollableScreenBufferBuilder makeMenuWindowBuilder(const COORD& consoleSize, co
     return builder;
 }
 
-ScrollableScreenBufferBuilder makeTextInputBuilder(const COORD& consoleSize, const std::string& title, const double left, const double top, const int width, const int height) {
+ScrollableScreenBufferBuilder makeGenericBuilder(const COORD& consoleSize, const std::string& title, const double left, const double top, const int width, const int height) {
     ScrollableScreenBufferBuilder builder;
     builder.setScrollHisteresis(0)
         .setTitle(title)
@@ -203,4 +203,8 @@ std::string getHelpWindowText() {
         "Main designer: Kacper Plesiak\n"
         "LICENSE: MIT\n"
         "C++ is cool\n";
+}
+
+double getCenteredLeft(const COORD consoleSize, const int width) {
+    return ((double)consoleSize.X / 2 - width / 2) / consoleSize.X;
 }

@@ -13,7 +13,7 @@ ScrollableScreenBufferBuilder makeReplaceWindowBuilder(const COORD& consoleSize)
 ScrollableScreenBufferBuilder makeTextEditorWindowBuilder(const COORD& consoleSize);
 ScrollableScreenBufferBuilder makeInfoWindowBuilder(const COORD& consoleSize, const std::string& title);
 ScrollableScreenBufferBuilder makeMenuWindowBuilder(const COORD& consoleSize, const std::string& title);
-ScrollableScreenBufferBuilder makeTextInputBuilder(const COORD& consoleSize, const std::string& title, const double left, const double top, const int width, const int height);
+ScrollableScreenBufferBuilder makeGenericBuilder(const COORD& consoleSize, const std::string& title, const double left, const double top, const int width, const int height);
 
 // Menu options
 std::vector<Option> makeUnloggedMainMenuOptions();
@@ -30,6 +30,7 @@ TextInputWindow::TextInputHandler funcCreateDocSubmitEvent();
 TextInputWindow::TextInputHandler funcSubmitLoginPasswordEvent(bool isRegistration);
 
 std::string getHelpWindowText();
+double getCenteredLeft(const COORD consoleSize, const int width);
 
 
 

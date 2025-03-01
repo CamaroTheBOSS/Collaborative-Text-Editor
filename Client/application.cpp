@@ -17,7 +17,7 @@ Application::Application(const std::string& ip, const int port) :
     windowsManager(terminal.getScreenSize()),
     repo() {
     windowsManager.showWindow<TextEditorWindow>(makeTextEditorWindowBuilder(terminal.getScreenSize()));
-    windowsManager.showWindow<MenuWindow>(makeMenuWindowBuilder(terminal.getScreenSize(), "Main Menu"), makeUnloggedMainMenuOptions());
+    windowsManager.showWindow<MenuWindow>(makeMenuWindowBuilder(terminal.getScreenSize(), "Main Menu"), makeMainMenuOptions());
 }
 
 bool Application::connect(const std::string& ip, const int port) {
