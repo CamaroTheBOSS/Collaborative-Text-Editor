@@ -139,6 +139,7 @@
     <ClCompile Include="action_erase.cpp" />
     <ClCompile Include="action_history.cpp" />
     <ClCompile Include="action_write.cpp" />
+    <ClCompile Include="database.cpp" />
     <ClCompile Include="deserializer.cpp" />
     <ClCompile Include="history_manager.cpp" />
     <ClCompile Include="message_extractor.cpp" />
@@ -157,6 +158,7 @@
     <ClInclude Include="action_erase.h" />
     <ClInclude Include="action_history.h" />
     <ClInclude Include="action_write.h" />
+    <ClInclude Include="database.h" />
     <ClInclude Include="deserializer.h" />
     <ClInclude Include="history_manager.h" />
     <ClInclude Include="message_extractor.h" />

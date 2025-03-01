@@ -6,7 +6,7 @@
 
 #include "messages.h"
 #include "response.h"
-
+#include "database.h"
 
 namespace server {
 	class Authenticator {
@@ -17,6 +17,8 @@ namespace server {
 			SOCKET client;
 			msg::Buffer& buffer;
 		};
+
+		Database db{ dbRootDefault };
 
 		Response loginUser(const ArgPack& args);
 		Response logoutUser(const ArgPack& args);

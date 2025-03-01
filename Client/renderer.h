@@ -5,6 +5,7 @@
 class Renderer {
 public:
 	static void addToCanvas(Canvas& canvas, const BaseWindow& window);
+	static void addToCanvas(Canvas& canvas, const ScrollableScreenBuffer& buffer, const ClientSiteDocument& doc, const bool isActive);
 private:
 	static void addTextToCanvas(Canvas& canvas, const ScrollableScreenBuffer& buffer, const std::vector<std::string>& linesToRender, const COORD& startPos, const COORD& endPos, const int color = Canvas::defaultColor);
 	static void addCursorToCanvas(Canvas& canvas, const ScrollableScreenBuffer& buffer, const RenderCursor& cursor, const int color);

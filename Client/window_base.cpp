@@ -4,8 +4,7 @@
 BaseWindow::BaseWindow(const ScrollableScreenBufferBuilder& ssbBuilder) :
     doc(),
     buffer(ssbBuilder.getResult()),
-    active(false),
-    activeChildrenIndex(-1) {}
+    active(false) {}
 
 bool BaseWindow::saveDoc() const {
     std::ofstream file(doc.getFilename(), std::ios::out);
@@ -47,9 +46,6 @@ void BaseWindow::deactivate() {
 void BaseWindow::render(Canvas& canvas) {
     updateScroll();
     Renderer::addToCanvas(canvas, *this);
-    for (const auto& child : children) {
-        child->render(canvas);
-    }
 }
 
 void BaseWindow::updateScroll() {

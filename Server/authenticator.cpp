@@ -22,22 +22,34 @@ namespace server {
 
 	Response Authenticator::loginUser(const ArgPack& args) {
 		auto msg = Deserializer::parseLogin(args.buffer);
-		// DB
-		auto buffer = Serializer::makeLoginResponse(msg.version, "authtoken", "");
+		DBUser dbUser;
+		dbUser.username = std::move(msg.login);
+		auto errMsg = db.getUser(dbUser);
+		if (errMsg.empty()) {
+			if (dbUser.password == msg.password) {
+				// GENERATE TOKEN
+			}
+			else {
+				errMsg = "Incorrect password!";
+			}
+		}
+		auto buffer = Serializer::makeLoginResponse(msg.version, "authtoken", errMsg);
 		return Response{ buffer, {args.client}, msg.type };
 	}
 
 	Response Authenticator::logoutUser(const ArgPack& args) {
 		auto msg = Deserializer::parseAck(args.buffer);
-		// WORK
 		auto buffer = Serializer::makeAckResponse(msg.type, msg.version);
 		return Response{ buffer, {}, msg.type };
 	}
 
 	Response Authenticator::registerUser(const ArgPack& args) {
 		auto msg = Deserializer::parseRegister(args.buffer);
-		// DB
-		auto buffer = Serializer::makeRegisterResponse(msg.version, "");
+		DBUser dbUser;
+		dbUser.username = std::move(msg.login);
+		dbUser.password = std::move(msg.password);
+		auto errMsg = db.putUser(dbUser);
+		auto buffer = Serializer::makeRegisterResponse(msg.version, errMsg);
 		return Response{ buffer, {args.client}, msg.type };
 	}
 }

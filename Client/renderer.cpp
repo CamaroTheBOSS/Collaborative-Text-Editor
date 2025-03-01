@@ -10,6 +10,11 @@ constexpr int foundSegmentsColor = 31;
 void Renderer::addToCanvas(Canvas& canvas, const BaseWindow& window) {
     auto& buffer = window.getBuffer();
     auto& doc = window.getDoc();
+    auto isActive = window.isActive();
+    return addToCanvas(canvas, buffer, doc, isActive);
+}
+
+void Renderer::addToCanvas(Canvas& canvas, const ScrollableScreenBuffer& buffer, const ClientSiteDocument& doc, const bool isActive) {
     auto visibleLines = buffer.getTextInBuffer(doc);
     auto frames = buffer.getFrames();
     // Render basic text + frame if applicable
@@ -29,18 +34,18 @@ void Renderer::addToCanvas(Canvas& canvas, const BaseWindow& window) {
 
     // Render selection if applicable
     auto cursors = buffer.getTerminalCursors(doc);
-    if (window.isActive()) {
+    if (isActive) {
         auto myCursorSelectionAnchor = doc.getCursorSelectionAnchor(doc.getMyCursor());
         if (myCursorSelectionAnchor.has_value()) {
             auto terminalSelectionAnchor = buffer.getTerminalCursorPos(doc, myCursorSelectionAnchor.value());
             addSelectionToCanvas(canvas, visibleLines, buffer, cursors[doc.getMyCursor()].pos, terminalSelectionAnchor, colors[doc.getMyCursor()]);
         }
     }
-        
+
     // Render cursors if applicable
     auto nCursors = (std::min)(cursors.size(), colors.size());
     for (int i = 0; i < nCursors; i++) {
-        if (i == myCursorIdx && !window.isActive()) {
+        if (i == myCursorIdx && !isActive) {
             continue;
         }
         addCursorToCanvas(canvas, buffer, cursors[i], colors[i]);

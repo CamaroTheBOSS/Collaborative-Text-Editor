@@ -9,6 +9,7 @@ public:
 		TextInputHandler onModifyHandler = funcNoop(), TextInputHandler onDeleteHandler = funcNoop());
 	Event onDelete() override;
 	Event processChar(TCPClient& client, const KeyPack& key, const std::string& clipboardData) override;
+	void render(Canvas& canvas);
 private:
-	ClientSiteDocument nonObsfucatedDoc;
+	ClientSiteDocument obsfucated;
 };

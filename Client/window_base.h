@@ -41,8 +41,5 @@ public:
 protected:
 	ClientSiteDocument doc;
 	ScrollableScreenBuffer buffer;
-
-	std::vector<std::unique_ptr<BaseWindow>> children;
-	int activeChildrenIndex;
 	bool active;
 };
