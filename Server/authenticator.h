@@ -20,14 +20,23 @@ namespace server {
 			SOCKET client;
 			msg::Buffer& buffer;
 		};
+		struct UserData {
+			std::string authToken;
+			std::string username;
+		};
 
 		Database db{ dbRootDefault };
 
 		Response loginUser(const ArgPack& args);
 		Response logoutUser(const ArgPack& args);
 		Response registerUser(const ArgPack& args);
+		void addUser(const SOCKET client, const std::string& authToken, const std::string& username);
+		bool checkIfUserIsActive(const std::string& username);
 
 		std::mutex authMutex;
-		std::unordered_map<SOCKET, std::string> clientToAuthToken;
+		std::unordered_map<SOCKET, UserData> clientToAuthToken;
+
+		std::mutex activeUsersMutex;
+		std::unordered_map<std::string, bool> activeUsers;
 	};
 }

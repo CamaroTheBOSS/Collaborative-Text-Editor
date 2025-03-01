@@ -25,12 +25,14 @@ namespace server {
 		DBUser dbUser;
 		dbUser.username = std::move(msg.login);
 		auto errMsg = db.getUser(dbUser);
-		std::string authToken;
-		if (errMsg.empty()) {
+		std::string authToken = getAuthToken(args.client);
+		if (checkIfUserIsActive(dbUser.username) || !authToken.empty()) {
+			errMsg = "Session for this user already exists!";
+		}
+		else if (errMsg.empty()) {
 			if (dbUser.password == msg.password) {
 				authToken = random::Engine::get().getRandomString(16);
-				std::lock_guard lock{authMutex};
-				clientToAuthToken.emplace(args.client, authToken);
+				addUser(args.client, authToken, dbUser.username);
 			}
 			else {
 				errMsg = "Incorrect password!";
@@ -58,8 +60,20 @@ namespace server {
 	}
 
 	void Authenticator::clearUser(SOCKET client) {
-		std::lock_guard lock{authMutex};
+		std::scoped_lock lock{authMutex, activeUsersMutex};
 		clientToAuthToken.erase(client);
+	}
+
+	void Authenticator::addUser(const SOCKET client, const std::string& authToken, const std::string& username) {
+		std::scoped_lock lock{authMutex, activeUsersMutex};
+		clientToAuthToken.emplace(client, UserData{ authToken, username });
+		activeUsers.emplace(username, true);
+	}
+
+	bool Authenticator::checkIfUserIsActive(const std::string& username) {
+		std::lock_guard lock{activeUsersMutex};
+		auto it = activeUsers.find(username);
+		return it != activeUsers.cend();
 	}
 
 	std::string Authenticator::getAuthToken(SOCKET client) {
@@ -68,6 +82,6 @@ namespace server {
 		if (it == clientToAuthToken.cend()) {
 			return "";
 		}
-		return it->second;
+		return it->second.authToken;
 	}
 }
