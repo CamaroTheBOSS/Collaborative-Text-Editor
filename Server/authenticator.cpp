@@ -61,7 +61,10 @@ namespace server {
 
 	void Authenticator::clearUser(SOCKET client) {
 		std::scoped_lock lock{authMutex, activeUsersMutex};
-		clientToAuthToken.erase(client);
+		auto it = clientToAuthToken.find(client);
+		assert(it != clientToAuthToken.cend());
+		activeUsers.erase(it->second.username);
+		clientToAuthToken.erase(it);
 	}
 
 	void Authenticator::addUser(const SOCKET client, const std::string& authToken, const std::string& username) {

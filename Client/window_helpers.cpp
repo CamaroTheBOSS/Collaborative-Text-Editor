@@ -145,8 +145,6 @@ std::vector<Option> makeConnectedToDocMainMenuOptions() {
     return std::vector<Option>{
         Option{ "Logout", [](MenuWindow& obj) { return Event{ windows::app::events::disconnect, obj.name(), windows::app::name, {} }; } },
         Option{ "Show access code", [](MenuWindow& obj) { return Event{ windows::app::events::showAcCode, obj.name(), windows::app::name, {} }; } },
-        Option{ "Create document", [](MenuWindow& obj) { return Event{ windows::app::events::createDocWindow, obj.name(), windows::app::name, {} }; } },
-        Option{ "Load document", [](MenuWindow& obj) { return Event{ windows::app::events::joinDocWindow, obj.name(), windows::app::name, {} }; } },
         Option{ "Help", [](MenuWindow& obj) { return Event{ windows::app::events::help, obj.name(), windows::app::name, {} }; } },
         Option{ "Quit", [](MenuWindow& obj) { return Event{ windows::app::events::exit, obj.name(), windows::app::name, {} }; } }
     };
