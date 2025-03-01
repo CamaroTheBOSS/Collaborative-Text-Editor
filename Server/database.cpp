@@ -32,6 +32,9 @@ namespace server {
 		for (std::string line; std::getline(file, line);) {
 			auto row = parseRow(line);
 			if (row[0] == user.username) {
+				if (row[1][row[1].size() - 1] == '\n') {
+					row[1].erase(row[1].size() - 1);
+				}
 				user.password = row[1];
 				return "";
 			}
@@ -53,7 +56,7 @@ namespace server {
 			server::logger.logError("Error! Cannot open users database!");
 			return "Error! Cannot open users database!";
 		}
-		std::string row = user.username + "," + user.password;
+		std::string row = user.username + "," + user.password + "\n";
 		file << row;
 		return "";
 	}

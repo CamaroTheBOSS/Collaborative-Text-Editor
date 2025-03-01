@@ -97,10 +97,6 @@ void ApplicationEventHandlers::eventLoginPasswordAccepted(Application& app, cons
     textEditor->setAuthToken(authToken);
 }
 
-void ApplicationEventHandlers::eventLogout(Application& app, const Event& pEvent) {
-
-}
-
 void ApplicationEventHandlers::eventMainMenuDisconnectChosen(Application& app, const Event& pEvent) {
     int width = 25;
     auto screenSize = app.terminal.getScreenSize();
