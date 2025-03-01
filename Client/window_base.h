@@ -38,6 +38,7 @@ public:
 	virtual void processEvent(const TCPClient& client, const Event& pEvent) {};
 	void updateScroll();
 	void updateConsoleSize(const COORD& newSize);
+	void clearContent();
 protected:
 	ClientSiteDocument doc;
 	ScrollableScreenBuffer buffer;

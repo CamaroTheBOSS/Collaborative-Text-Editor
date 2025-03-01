@@ -55,3 +55,7 @@ void BaseWindow::updateScroll() {
 void BaseWindow::updateConsoleSize(const COORD& newSize) {
     buffer.setNewConsoleSize({ newSize.X, newSize.Y });
 }
+
+void BaseWindow::clearContent() {
+    doc.clearContent();
+}

@@ -72,6 +72,10 @@ std::vector<std::string> TextContainer::eraseLines(const int start, const int en
 	return erasedLines;
 }
 
+void TextContainer::clear() {
+	data.clear();
+}
+
 COORD TextContainer::eraseBetween(const COORD& start, const COORD& end, std::vector<std::string>& erasedText) {
 	auto [smaller, bigger] = getAscendingOrder(start, end);
 	erasedText.reserve(bigger->Y - smaller->Y + 5);

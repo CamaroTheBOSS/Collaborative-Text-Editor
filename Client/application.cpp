@@ -29,6 +29,7 @@ bool Application::disconnect() {
     if (disconnected) {
         repo.cleanAcCode();
         repo.cleanAuthToken();
+        windowsManager.getTextEditor()->clearContent();
     }
     return disconnected;
 }

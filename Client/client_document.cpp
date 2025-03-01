@@ -64,6 +64,14 @@ int ClientSiteDocument::getChosenSegmentIndex() const {
 	return chosenSegment;
 }
 
+void ClientSiteDocument::clearContent() {
+	container.clear();
+	for (auto& user : users) {
+		user.cursor.setPosition(COORD{ 0, 0 });
+		user.cursor.setOffset(0);
+	}
+}
+
 void ClientSiteDocument::setSegments(TextContainer::Segments& newSegments) {
 	segments = std::move(newSegments);
 }
