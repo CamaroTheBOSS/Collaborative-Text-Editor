@@ -5,6 +5,7 @@
 
 class ServerSiteDocument : public BaseDocument {
 public:
+	using Timestamp = std::chrono::time_point<std::chrono::system_clock>;
 	ServerSiteDocument();
 	ServerSiteDocument(const std::string& text);
 	ServerSiteDocument(const std::string& text, const int cursors, const int myUserIdx, const std::string& docName = "filename.txt");
@@ -19,10 +20,13 @@ public:
 	bool eraseClient(SOCKET client);
 	int findUser(SOCKET client) const;
 	std::vector<SOCKET>& getConnectedClients();
+	Timestamp getLastSaveTimestamp() const;
+	void setNowAsLastSaveTimestamp();
 private:
 	void afterWriteAction(const int index, const COORD& startPos, const COORD& endPos, std::vector<std::string>& writtenText) override;
 	void afterEraseAction(const int index, const COORD& startPos, const COORD& endPos, std::vector<std::string>& erasedText) override;
 
 	history::HistoryManager historyManager;
 	std::vector<SOCKET> connectedClients;
+	Timestamp lastSaveTimestamp;
 };

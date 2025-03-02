@@ -80,11 +80,16 @@ namespace server {
 	}
 
 	std::string Authenticator::getAuthToken(SOCKET client) {
+		auto userData = getUserData(client);
+		return userData.authToken;
+	}
+
+	Authenticator::UserData Authenticator::getUserData(SOCKET client) {
 		std::lock_guard lock{authMutex};
 		auto it = clientToAuthToken.find(client);
 		if (it == clientToAuthToken.cend()) {
-			return "";
+			return UserData();
 		}
-		return it->second.authToken;
+		return it->second;
 	}
 }

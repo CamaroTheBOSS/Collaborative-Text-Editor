@@ -12,18 +12,21 @@
 namespace server {
 	class Authenticator {
 	public:
+		struct UserData {
+			std::string authToken;
+			std::string username;
+		};
+
 		Response process(SOCKET client, msg::Buffer& buffer);
 		void clearUser(SOCKET client);
 		std::string getAuthToken(SOCKET client);
+		UserData getUserData(SOCKET client);
 	private:
 		struct ArgPack {
 			SOCKET client;
 			msg::Buffer& buffer;
 		};
-		struct UserData {
-			std::string authToken;
-			std::string username;
-		};
+		
 
 		Database db{ dbRootDefault };
 

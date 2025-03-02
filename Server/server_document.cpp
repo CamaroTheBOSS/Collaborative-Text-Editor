@@ -50,6 +50,7 @@ bool ServerSiteDocument::addUser() {
 
 bool ServerSiteDocument::addClient(SOCKET client) {
 	connectedClients.push_back(client);
+	lastSavedTimestamps.emplace_back(std::chrono::system_clock::now());
 	return true;
 }
 
@@ -71,6 +72,7 @@ bool ServerSiteDocument::eraseClient(SOCKET client) {
 		return false;
 	}
 	connectedClients.erase(connectedClients.cbegin() + index);
+	lastSavedTimestamps.erase(lastSavedTimestamps.cbegin() + index);
 	return true;
 }
 
@@ -106,4 +108,13 @@ void ServerSiteDocument::afterWriteAction(const int index, const COORD& startPos
 void ServerSiteDocument::afterEraseAction(const int index, const COORD& startPos, const COORD& endPos, std::vector<std::string>& erasedText) {
 	historyManager.pushEraseAction(index, startPos, endPos, erasedText, &container);
 }
+
+ServerSiteDocument::Timestamp ServerSiteDocument::getLastSaveTimestamp() const {
+	return lastSaveTimestamp;
+}
+
+void ServerSiteDocument::setNowAsLastSaveTimestamp() {
+	lastSaveTimestamp = std::chrono::system_clock::now();
+}
+
 

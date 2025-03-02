@@ -28,8 +28,8 @@ namespace server {
 		std::string authToken;
 		msg::parse(buffer, pos, authToken);
 		if (authenticateUser) {
-			auto it = clientToAuthToken.find(client);
-			if (it == clientToAuthToken.cend() || it->second != authToken) {
+			auto it = clientToUser.find(client);
+			if (it == clientToUser.cend() || it->second.authToken != authToken) {
 				logger.logError("Cannot authenticate user", client);
 				return Response{ std::move(buffer), {}, msg::Type::error };
 			}
@@ -41,6 +41,14 @@ namespace server {
 			return Response{ std::move(buffer), {}, msg::Type::error };
 		}
 		ArgPack argPack{ client, buffer, doc };
+		auto response = processImpl(type, argPack);
+		if (std::chrono::system_clock::now() > doc->getLastSaveTimestamp() + savingDocInterval) {	
+			saveDocInDb(*doc);
+		}
+		return response;
+	}
+
+	Response Repository::processImpl(const msg::Type type, const ArgPack& argPack) {
 		switch (type) {
 		case msg::Type::disconnect:
 			return disconnectUserFromDoc(argPack);
@@ -63,7 +71,7 @@ namespace server {
 			return replace(argPack);
 		}
 		assert(false && "Unrecognized msg type. Aborting...");
-		return Response{ std::move(buffer), {}, msg::Type::error };
+		return Response{ std::move(argPack.buffer), {}, msg::Type::error };
 	}
 
 	std::string Repository::getLastAddedAcCode() {
@@ -155,14 +163,25 @@ namespace server {
 			}
 		}
 		auth->clearUser(client);
-		clientToAuthToken.erase(client);
+		clientToUser.erase(client);
 	}
 
 	std::string Repository::addToAuthMap(const SOCKET client) {
-		std::string token = auth->getAuthToken(client);
-		assert(!token.empty());
-		clientToAuthToken.emplace(client, token);
-		return token;
+		auto data = auth->getUserData(client);
+		assert(!data.authToken.empty());
+		clientToUser.emplace(client, data);
+		return data.authToken;
+	}
+
+	std::string Repository::saveDocInDb(const ServerSiteDocument& doc) {
+		/*DBDocument dbdoc;
+		dbdoc.filename = doc.getFilename();
+		dbdoc.text = doc.getText();
+		auto userData = clientToUser.find(client);
+		assert(userData != clientToUser.cend());
+		dbdoc.username = userData->second.username;
+		return db.putDoc(dbdoc);*/
+		return "";
 	}
 
 	Response Repository::write(const ArgPack& argPack) {

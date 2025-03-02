@@ -9,6 +9,7 @@
 #include "server_document.h"
 #include "response.h"
 #include "authenticator.h"
+#include "database.h"
 
 namespace server {
 	class Repository {
@@ -26,6 +27,7 @@ namespace server {
 			ServerSiteDocument* doc;
 		};
 		ServerSiteDocument* findDoc(SOCKET client);
+		Response processImpl(const msg::Type type, const ArgPack& argPack);
 		Response createDoc(msg::Buffer& buffer);
 		Response loadDoc( msg::Buffer& buffer);
 		Response masterClose(msg::Buffer& buffer) const;
@@ -40,6 +42,7 @@ namespace server {
 		Response replace(const ArgPack& argPack);
 		void eraseFromMap(const ServerSiteDocument& doc, const SOCKET client);
 		std::string addToAuthMap(const SOCKET client);
+		std::string saveDocInDb(const ServerSiteDocument& doc, const SOCKET client);
 
 		std::unordered_map<std::string, ServerSiteDocument> acCodeToDocMap;
 		std::unordered_map<SOCKET, std::string> clientToAcCodeMap;
@@ -47,7 +50,9 @@ namespace server {
 		std::string lastDeletedAcCode;
 
 		// Authentication
-		server::Authenticator* auth;
-		std::unordered_map<SOCKET, std::string> clientToAuthToken;
+		Authenticator* auth;
+		std::unordered_map<SOCKET, Authenticator::UserData> clientToUser;
+		std::chrono::seconds savingDocInterval{ 1 }; //5min 
+		Database db{ dbRootDefault };
 	};
 }
