@@ -50,7 +50,6 @@ bool ServerSiteDocument::addUser() {
 
 bool ServerSiteDocument::addClient(SOCKET client) {
 	connectedClients.push_back(client);
-	lastSavedTimestamps.emplace_back(std::chrono::system_clock::now());
 	return true;
 }
 
@@ -72,7 +71,6 @@ bool ServerSiteDocument::eraseClient(SOCKET client) {
 		return false;
 	}
 	connectedClients.erase(connectedClients.cbegin() + index);
-	lastSavedTimestamps.erase(lastSavedTimestamps.cbegin() + index);
 	return true;
 }
 

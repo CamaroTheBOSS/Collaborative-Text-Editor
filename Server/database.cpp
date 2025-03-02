@@ -1,114 +1,195 @@
 #include "database.h"
 #include "logging.h"
+#include "parser.h"
 
 #include <fstream>
 #include <sstream>
 
 namespace server {
+	const std::string DBUser::dbName{ "usersDb" };
+	const std::string DBUser::objName{ "user" };
+	const std::string DBDocument::dbName{ "docDb" };
+	const std::string DBDocument::objName{ "document" };
+
+	void DBUser::parseRow(std::vector<std::string>& row) {
+		username = std::move(row[0]);
+		password = std::move(row[1]);
+		documentIds = Parser::parseLineToVector(row[2], ';');
+	}
+
+	std::vector<std::string> DBUser::serialize() const {
+		return { username, password, Parser::parseVectorToText(documentIds, ';') };
+	}
+
+	void DBDocument::parseRow(std::vector<std::string>& row) {
+		id = std::move(row[0]);
+		filename = std::move(row[1]);
+		usernames = Parser::parseLineToVector(row[2], ';');
+	}
+
+	std::vector<std::string> DBDocument::serialize() const {
+		return { id, filename, Parser::parseVectorToText(usernames, ';')};
+	}
+
 
 	Database::Database(const std::string& dbRoot):
-		dbRoot(dbRoot),
-		pathToUsers(dbRoot + "\\" + usersFilename) {
+		dbRoot(dbRoot) {
 		std::error_code errCode;
 		std::filesystem::create_directories(dbRoot, errCode);
 		if (errCode.value()) {
-			server::logger.logError("Creating users database failed.", errCode);
+			logger.logError("Creating users database failed.", errCode);
 			return;
 		}
-		std::ofstream file{ pathToUsers, std::ios::app };
-		if (!file) {
-			server::logger.logError("Cannot create user database file.");
-			return;
-		}
-	}
 
-	std::string Database::getUser(DBUser& user) const {
-		std::ifstream file{ pathToUsers, std::ios::in };
-		if (!file) {
-			server::logger.logError("Error! Cannot find users database!");
-			return "Error! Cannot open users database!";
-		}
-		
-		for (std::string line; std::getline(file, line);) {
-			auto row = parseRow(line);
-			if (row[0] == user.username) {
-				if (row[1][row[1].size() - 1] == '\n') {
-					row[1].erase(row[1].size() - 1);
-				}
-				user.password = row[1];
-				return "";
+		for (const auto& name : { DBUser::dbName, DBDocument::dbName }) {
+			std::ofstream db{ dbRoot + "\\" + std::string{ name }, std::ios::app };
+			if (!db) {
+				logger.logError("Cannot create user database file.");
 			}
 		}
-		server::logger.logDebug("User " + user.username + " has not been found");
-		return "User " + user.username + " has not been found";
 	}
 
-	std::string Database::putUser(const DBUser& user) {
-		DBUser query;
-		query.username = user.username;
-		auto err = getUser(query);
-		if (err.empty()) {
-			server::logger.logDebug("User " + query.username + " already exists!");
-			return "User " + query.username + " already exists!";
-		}
-		std::ofstream file{ pathToUsers, std::ios::app };
-		if (!file) {
-			server::logger.logError("Error! Cannot open users database!");
-			return "Error! Cannot open users database!";
-		}
-		std::string row = user.username + "," + user.password + "\n";
-		file << row;
-		return "";
+	std::optional<DBUser> Database::getUserWithUsername(const std::string& username) {
+		return getObjFromDb<DBUser>([&](const std::string& line, DBUser& user) {
+				auto row = parseRow(line);
+				if (row[0] == username) {
+					user.parseRow(row);
+					return true;
+				}
+				return false;
+		});
 	}
 
-	std::string Database::getDoc(DBDocument& doc) const {
-		std::filesystem::path path = std::string(dbRoot + "\\" + doc.username + "\\" + doc.filename);
-		if (!std::filesystem::is_regular_file(path)) {
-			return "Cannot find document " + doc.filename;
-		}
-		std::ifstream file{ path, std::ios::in };
-		if (!file) {
-			server::logger.logError("Error! Cannot open document database!");
-			return "Error! Cannot open document database!";
+	std::optional<DBUser> Database::extractUserWithUsername(const std::string& username) {
+		auto db = getDbForRead(DBUser::dbName);
+		if (!db) {
+			return {};
 		}
 		std::stringstream ss;
-		ss << file.rdbuf();
-		doc.text = ss.str();
-		return "";
-	}
-
-	std::string Database::putDoc(const DBDocument& doc) {
-		std::filesystem::path path = std::string(dbRoot + "\\" + doc.username + "\\" + doc.filename);
-		if (!std::filesystem::is_directory(path.parent_path())) {
-			std::error_code errCode;
-			std::filesystem::create_directories(path.parent_path(), errCode);
-			if (errCode.value()) {
-				server::logger.logError("Creating user's document database failed.", errCode);
-				return "Creating user's document database failed.";
+		ss << db.rdbuf();
+		auto lines = Parser::parseTextToVector(ss.str());
+		std::optional<DBUser> opt;
+		for (int i = 0; i < lines.size(); i++) {
+			if (lines[i].substr(0, lines[i].find(',')) == username) {
+				auto parsed = parseRow(lines[i]);
+				DBUser user;
+				user.parseRow(parsed);
+				opt = std::move(user);
+				lines.erase(lines.cbegin() + i);
+				break;
 			}
 		}
-
-		std::ofstream file{ path, std::ios::out };
-		if (!file) {
-			server::logger.logError("Error! Cannot save document!");
-			return "Error! Cannot save document!";
+		if (!opt) {
+			lastError = "Specified " + DBUser::objName + " does not exists";
+			return {};
 		}
-		file << doc.text;
-		return "";
+		auto dbForReplace = getDbForReplace(DBUser::dbName);
+		if (!dbForReplace) {
+			return {};
+		}
+		std::string newDbContent = Parser::parseVectorToText(lines);
+		dbForReplace << newDbContent;
+		return opt;
 	}
 
-	std::string Database::deleteDoc(const DBDocument& doc) {
-		std::filesystem::path path = std::string(dbRoot + "\\" + doc.username + "\\" + doc.filename);
-		std::error_code errCode;
-		if (!std::filesystem::is_directory(path.parent_path(), errCode) || !std::filesystem::is_regular_file(path)) {
-			return "Specified doc '" + doc.filename + "' does not exists in the database";
+	bool Database::addUser(const DBUser& user) {
+		if (getUserWithUsername(user.username).has_value()) {
+			lastError = "User " + user.username + " already exists!";
+			return false;
 		}
-		std::filesystem::remove(path, errCode);
-		if (errCode.value()) {
-			server::logger.logError("Error during doc deletion!", errCode);
-			return "Something went wrong during document deletion";
+		return _addUserWithoutCheckingIfExists(user);
+	}
+
+	bool Database::_addUserWithoutCheckingIfExists(const DBUser& user) {
+		auto db = getDbForAdd(DBUser::dbName);
+		if (!db) {
+			return false;
 		}
-		return "";
+		db << Parser::parseVectorToText(user.serialize(), ',');
+		return true;
+	}
+
+	bool Database::addDocToUser(const DBDocument& doc, const DBUser& user) {
+		auto userFromDbOpt = extractUserWithUsername(user.username);
+		if (!userFromDbOpt) {
+			return false;
+		}
+		auto it = std::find(userFromDbOpt.value().documentIds.cbegin(), userFromDbOpt.value().documentIds.cend(), doc.id);
+		if (it != userFromDbOpt.value().documentIds.cend()) {
+			logger.logDebug("Specified document", doc.id, "is present in user's (", user.username, ") database");
+			return true;
+		}
+		userFromDbOpt.value().documentIds.emplace_back(doc.id);
+		return _addUserWithoutCheckingIfExists(userFromDbOpt.value());
+	}
+
+	bool Database::delDocFromUser(const DBDocument& doc, const DBUser& user) {
+		auto userFromDbOpt = extractUserWithUsername(user.username);
+		if (!userFromDbOpt) {
+			return false;
+		}
+		auto it = std::find(userFromDbOpt.value().documentIds.cbegin(), userFromDbOpt.value().documentIds.cend(), doc.id);
+		if (it == userFromDbOpt.value().documentIds.cend()) {
+			logger.logDebug("Specified document", doc.id, "does not exists in user's (", user.username, ") database");
+			return true;
+		}
+		userFromDbOpt.value().documentIds.erase(it);
+		return _addUserWithoutCheckingIfExists(userFromDbOpt.value());
+	}
+
+	std::optional<DBDocument> Database::getDocWithId(const std::string& id) {
+		return getObjFromDb<DBDocument>([&](const std::string& line, DBDocument& doc) {
+			auto row = parseRow(line);
+			doc.parseRow(row);
+			if (doc.filename == id) {
+				return true;
+			}
+			return false;
+		});
+	}
+
+	std::optional<DBDocument> Database::getDocWithUsernameAndFilename(const std::string& username, const std::string& filename) {
+		return getObjFromDb<DBDocument>([&](const std::string& line, DBDocument& doc) {
+			auto row = parseRow(line);
+			doc.parseRow(row);
+			if (doc.filename == filename && std::find(doc.usernames.cbegin(), doc.usernames.cend(), username) != doc.usernames.cend()) {
+				return true;
+			}
+			return false;
+		});
+	}
+
+	std::string Database::getLastError() {
+		std::string error = lastError;
+		lastError.clear();
+		return error;
+	}
+
+	std::ifstream Database::getDbForRead(const std::string& dbName) {
+		std::ifstream file{ dbRoot + "\\" + dbName, std::ios::in };
+		if (!file) {
+			lastError = "Error! Cannot find " + DBUser::dbName + " database!";
+			logger.logError(lastError);
+		}
+		return file;
+	}
+
+	std::ofstream Database::getDbForAdd(const std::string& dbName) {
+		std::ofstream file{ dbRoot + "\\" + dbName, std::ios::app };
+		if (!file) {
+			lastError = "Error! Cannot find " + DBUser::dbName + " database!";
+			logger.logError(lastError);
+		}
+		return file;
+	}
+
+	std::ofstream Database::getDbForReplace(const std::string& dbName) {
+		std::ofstream file{ dbRoot + "\\" + dbName, std::ios::out };
+		if (!file) {
+			lastError = "Error! Cannot find " + DBUser::dbName + " database!";
+			logger.logError(lastError);
+		}
+		return file;
 	}
 
 	std::vector<std::string> Database::parseRow(const std::string& line) const {

@@ -407,4 +407,6 @@ RandomClient/client.log
 RandomClient/document.txt
 Server/server.log
 Server/db/*
+Test/database_tests.cpp
+Test/db_test/*
 TestRandomClientServerSync/actions.txt

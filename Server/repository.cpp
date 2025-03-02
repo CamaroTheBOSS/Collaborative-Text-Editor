@@ -37,7 +37,10 @@ namespace server {
 
 		auto doc = findDoc(client);
 		if (doc == nullptr) {
-			logger.logError("Document for client", client, "not found");
+			if (type == msg::Type::disconnect) {
+				auth->clearUser(client);
+			}
+			logger.logDebug("Document for client", client, "not found");
 			return Response{ std::move(buffer), {}, msg::Type::error };
 		}
 		ArgPack argPack{ client, buffer, doc };

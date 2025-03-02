@@ -172,7 +172,9 @@ bool ApplicationEventHandlers::joinCreateDocImpl(const msg::Type type, msg::OneB
     int width = 25;
     auto screenSize = app.terminal.getScreenSize();
     double left = getCenteredLeft(screenSize, width);
-    assert(app.isLogged());
+    if (!app.isLogged()) {
+        return false;
+    }
     if (app.isConnectedToDoc()) {
         app.windowsManager.showWindow<InfoWindow>(
             makeGenericBuilder(app.terminal.getScreenSize(), "Failure", left, 0.4, width, 2), "You are already connected to the document. Please disconnect first."
@@ -185,6 +187,7 @@ bool ApplicationEventHandlers::joinCreateDocImpl(const msg::Type type, msg::OneB
     unsigned int socket = 0;
     app.tcpClient.sendMsg(type, version, socket, params[0]);
     if (!waitForResponseAndProccessIt(app, type)) {
+        app.windowsManager.destroyWindow(pEvent.src, app.tcpClient);
         return false;
     }
     app.windowsManager.destroyLastWindow(app.tcpClient);

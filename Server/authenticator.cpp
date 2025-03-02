@@ -22,9 +22,13 @@ namespace server {
 
 	Response Authenticator::loginUser(const ArgPack& args) {
 		auto msg = Deserializer::parseLogin(args.buffer);
-		DBUser dbUser;
-		dbUser.username = std::move(msg.login);
-		auto errMsg = db.getUser(dbUser);
+		auto userFromDbOpt = db.getUserWithUsername(msg.login);
+		std::string errMsg;
+		if (!userFromDbOpt) {
+			auto buffer = Serializer::makeLoginResponse(msg.version, "", db.getLastError());
+			return Response{ buffer, {args.client}, msg.type };
+		}
+		auto& dbUser = userFromDbOpt.value();
 		std::string authToken = getAuthToken(args.client);
 		if (checkIfUserIsActive(dbUser.username) || !authToken.empty()) {
 			errMsg = "Session for this user already exists!";
@@ -54,15 +58,17 @@ namespace server {
 		DBUser dbUser;
 		dbUser.username = std::move(msg.login);
 		dbUser.password = std::move(msg.password);
-		auto errMsg = db.putUser(dbUser);
-		auto buffer = Serializer::makeRegisterResponse(msg.version, errMsg);
+		auto success = db.addUser(dbUser);
+		auto buffer = Serializer::makeRegisterResponse(msg.version, success ? "" : db.getLastError());
 		return Response{ buffer, {args.client}, msg.type };
 	}
 
 	void Authenticator::clearUser(SOCKET client) {
 		std::scoped_lock lock{authMutex, activeUsersMutex};
 		auto it = clientToAuthToken.find(client);
-		assert(it != clientToAuthToken.cend());
+		if (it == clientToAuthToken.cend()) {
+			return;
+		}
 		activeUsers.erase(it->second.username);
 		clientToAuthToken.erase(it);
 	}

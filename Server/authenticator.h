@@ -28,7 +28,7 @@ namespace server {
 		};
 		
 
-		Database db{ dbRootDefault };
+		Database db{};
 
 		Response loginUser(const ArgPack& args);
 		Response logoutUser(const ArgPack& args);

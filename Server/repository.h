@@ -42,7 +42,7 @@ namespace server {
 		Response replace(const ArgPack& argPack);
 		void eraseFromMap(const ServerSiteDocument& doc, const SOCKET client);
 		std::string addToAuthMap(const SOCKET client);
-		std::string saveDocInDb(const ServerSiteDocument& doc, const SOCKET client);
+		std::string saveDocInDb(const ServerSiteDocument& doc);
 
 		std::unordered_map<std::string, ServerSiteDocument> acCodeToDocMap;
 		std::unordered_map<SOCKET, std::string> clientToAcCodeMap;
@@ -53,6 +53,6 @@ namespace server {
 		Authenticator* auth;
 		std::unordered_map<SOCKET, Authenticator::UserData> clientToUser;
 		std::chrono::seconds savingDocInterval{ 1 }; //5min 
-		Database db{ dbRootDefault };
+		Database db{};
 	};
 }

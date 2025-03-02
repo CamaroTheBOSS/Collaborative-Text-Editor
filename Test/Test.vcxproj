@@ -38,6 +38,7 @@
   <ItemGroup>
     <ClCompile Include="action_history_tests.cpp" />
     <ClCompile Include="action_tests.cpp" />
+    <ClCompile Include="database_tests.cpp" />
     <ClCompile Include="document_test.cpp" />
     <ClCompile Include="framer_test.cpp" />
     <ClCompile Include="logger_test.cpp" />

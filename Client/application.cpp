@@ -30,6 +30,7 @@ bool Application::disconnect() {
         repo.cleanAcCode();
         repo.cleanAuthToken();
         windowsManager.getTextEditor()->clearContent();
+        windowsManager.destroyWindow(windows::mainmenu::name, tcpClient);
     }
     return disconnected;
 }

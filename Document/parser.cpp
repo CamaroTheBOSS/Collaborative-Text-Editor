@@ -1,8 +1,22 @@
 #include "parser.h"
 
-std::vector<std::string> Parser::parseTextToVector(const std::string& text) {
+std::vector<std::string> Parser::parseLineToVector(const std::string& line, const char delimiter) {
+	int prev = 0, curr = 0;
+	std::vector<std::string> parsedLines;
+	while (curr = line.find(delimiter, prev), curr != std::string::npos) {
+		parsedLines.emplace_back(line.substr(prev, curr - prev));
+		prev = curr + 1;
+	}
+	auto subline = line.substr(prev);
+	if (subline.size() > 0) {
+		parsedLines.emplace_back(std::move(subline));
+	}
+	return parsedLines;
+}
+
+std::vector<std::string> Parser::parseTextToVector(const std::string& text, const char delimiter) {
 	size_t offset = 0;
-	size_t end = text.find('\n');
+	size_t end = text.find(delimiter);
 	std::vector<std::string> parsedLines;
 	if (end == std::string::npos) {
 		parsedLines.emplace_back(text);
@@ -13,7 +27,7 @@ std::vector<std::string> Parser::parseTextToVector(const std::string& text) {
 		std::string lineText{text.cbegin() + offset, text.cbegin() + end - windowsStyleEndl};
 		parsedLines.emplace_back(lineText);
 		offset = end + 1;
-		end = text.find('\n', offset);
+		end = text.find(delimiter, offset);
 	} while (end != std::string::npos);
 	std::string lineText{text.cbegin() + offset, text.cend()};
 	parsedLines.emplace_back(lineText);
@@ -21,10 +35,10 @@ std::vector<std::string> Parser::parseTextToVector(const std::string& text) {
 	return parsedLines;
 }
 
-std::string Parser::parseVectorToText(const std::vector<std::string>& vec) {
+std::string Parser::parseVectorToText(const std::vector<std::string>& vec, const char delimiter) {
 	std::string ret;
 	for (const auto& line : vec) {
-		ret += line + "\n";
+		ret += line + delimiter;
 	}
 	if (!ret.empty()) {
 		ret.erase(ret.size() - 1);
