@@ -107,6 +107,11 @@ namespace server {
 
 	Response Repository::createDoc(msg::Buffer& buffer) {
 		auto msg = Deserializer::parseConnectCreateDoc(buffer);
+		DBDocument dbDoc;
+		dbDoc.id = random::Engine::get().getRandomString(12);
+		dbDoc.filename = msg.filename;
+		dbDoc.usernames.emplace_back(auth->getUserData(msg.socket).username);
+
 		auto acCode = random::Engine::get().getRandomString(6);
 		auto token = addToAuthMap(msg.socket);
 		clientToAcCodeMap.emplace(msg.socket, acCode);
