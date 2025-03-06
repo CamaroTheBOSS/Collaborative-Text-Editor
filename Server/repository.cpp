@@ -20,7 +20,7 @@ namespace server {
 		case msg::Type::create:
 			return createDoc(buffer);
 		case msg::Type::join:
-			return loadDoc(buffer);
+			return joinDoc(buffer);
 		case msg::Type::masterClose:
 			return masterClose(buffer);
 		}
@@ -127,7 +127,7 @@ namespace server {
 		return Response{ std::move(newBuffer), docIt.first->second.getConnectedClients(), msg::Type::create };
 	}
 
-	Response Repository::loadDoc(msg::Buffer& buffer) {
+	Response Repository::joinDoc(msg::Buffer& buffer) {
 		auto msg = Deserializer::parseConnectJoinDoc(buffer);
 		auto docIt = acCodeToDocMap.find(msg.acCode);
 		if (docIt == acCodeToDocMap.cend()) {

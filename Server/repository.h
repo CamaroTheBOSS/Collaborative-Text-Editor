@@ -29,7 +29,7 @@ namespace server {
 		ServerSiteDocument* findDoc(SOCKET client);
 		Response processImpl(const msg::Type type, const ArgPack& argPack);
 		Response createDoc(msg::Buffer& buffer);
-		Response loadDoc( msg::Buffer& buffer);
+		Response joinDoc(msg::Buffer& buffer);
 		Response masterClose(msg::Buffer& buffer) const;
 		Response disconnectUserFromDoc(const ArgPack& argPack);
 		Response write(const ArgPack& argPack);
