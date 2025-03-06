@@ -107,19 +107,23 @@ namespace server {
 
 	Response Repository::createDoc(msg::Buffer& buffer) {
 		auto msg = Deserializer::parseConnectCreateDoc(buffer);
-		DBDocument dbDoc;
-		dbDoc.id = random::Engine::get().getRandomString(12);
-		dbDoc.filename = msg.filename;
-		dbDoc.usernames.emplace_back(auth->getUserData(msg.socket).username);
-
 		auto acCode = random::Engine::get().getRandomString(6);
-		auto token = addToAuthMap(msg.socket);
+		auto id = random::Engine::get().getRandomString(12);
+		auto userAuthData = auth->getUserData(msg.socket);
+		assert(!userAuthData.authToken.empty());
+		auto docIt = acCodeToDocMap.emplace(acCode, ServerSiteDocument("", 1, 0, id, msg.filename));
+		DBDocument dbDoc(id, msg.filename, { auth->getUserData(msg.socket).username });
+		if (!db.addDocAndLink(dbDoc)) {
+			auto newBuffer = Serializer::makeConnectResponseWithError(msg.type, db.getLastError(), 1);
+			return Response{ std::move(newBuffer), { msg.socket }, msg::Type::create };
+		}
+		lastAddedAcCode = acCode;
+		clientToUser.emplace(msg.socket, std::move(userAuthData));
 		clientToAcCodeMap.emplace(msg.socket, acCode);
-		auto docIt = acCodeToDocMap.emplace(acCode, ServerSiteDocument("", 1, 0, msg.filename));
 		docIt.first->second.addClient(msg.socket);
+
 		logger.logDebug("User", msg.socket, "created new document!");
 		auto newBuffer = Serializer::makeConnectResponse(msg.type, docIt.first->second, msg.version, 0, acCode);
-		lastAddedAcCode = acCode;
 		return Response{ std::move(newBuffer), docIt.first->second.getConnectedClients(), msg::Type::create };
 	}
 
@@ -131,13 +135,22 @@ namespace server {
 			auto newBuffer = Serializer::makeConnectResponseWithError(msg.type, errMsg, 1);
 			return Response{ std::move(newBuffer), { msg.socket }, msg::Type::join };
 		}
-		auto token = addToAuthMap(msg.socket);
+		auto userAuthData = auth->getUserData(msg.socket);
+		assert(!userAuthData.authToken.empty());
+		DBUser userdb(userAuthData.username, "", {});
+		DBDocument docdb(docIt->second.getId(), "", {});
+		if (!db.linkUserAndDoc(userdb, docdb)) {
+			auto newBuffer = Serializer::makeConnectResponseWithError(msg.type, db.getLastError(), 1);
+			return Response{ std::move(newBuffer), { msg.socket }, msg::Type::join };
+		}
+		clientToUser.emplace(msg.socket, std::move(userAuthData));
 		clientToAcCodeMap.emplace(msg.socket, msg.acCode);
 		docIt->second.addUser();
 		docIt->second.addClient(msg.socket);
+
+		logger.logDebug("User", msg.socket, "connected to document");
 		int userIdx = docIt->second.getCursorNum() - 1;
 		auto newBuffer = Serializer::makeConnectResponse(msg.type, docIt->second, msg.version, userIdx, msg.acCode);
-		logger.logDebug("User", msg.socket, "connected to document");
 		return Response{ std::move(newBuffer), docIt->second.getConnectedClients(), msg::Type::join };
 	}
 
@@ -174,22 +187,8 @@ namespace server {
 		clientToUser.erase(client);
 	}
 
-	std::string Repository::addToAuthMap(const SOCKET client) {
-		auto data = auth->getUserData(client);
-		assert(!data.authToken.empty());
-		clientToUser.emplace(client, data);
-		return data.authToken;
-	}
-
-	std::string Repository::saveDocInDb(const ServerSiteDocument& doc) {
-		/*DBDocument dbdoc;
-		dbdoc.filename = doc.getFilename();
-		dbdoc.text = doc.getText();
-		auto userData = clientToUser.find(client);
-		assert(userData != clientToUser.cend());
-		dbdoc.username = userData->second.username;
-		return db.putDoc(dbdoc);*/
-		return "";
+	bool Repository::saveDocInDb(const ServerSiteDocument& doc) {
+		return db.saveDoc(doc.getId(), doc.getText());
 	}
 
 	Response Repository::write(const ArgPack& argPack) {

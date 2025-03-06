@@ -236,7 +236,7 @@ namespace server {
 
 	std::optional<ServerSiteDocument> Database::loadDoc(const std::string& username, const std::string& filename) {
 		auto docFromDbOpt = getDocWithUsernameAndFilename(username, filename);
-		if (docFromDbOpt) {
+		if (!docFromDbOpt) {
 			setError("Document " + filename + " does not exists in " + username + "'s database");
 			return {};
 		}
@@ -247,7 +247,7 @@ namespace server {
 		}
 		std::stringstream ss;
 		ss << file.rdbuf();
-		ServerSiteDocument doc{ ss.str(), 1, 0 };
+		ServerSiteDocument doc{ ss.str(), 1, 0, docFromDbOpt.value().id, docFromDbOpt.value().filename };
 		return std::make_optional(std::move(doc));
 	}
 

@@ -64,7 +64,7 @@ TEST(DocumentTests, SimpleEraseTest) {
 
 TEST(DocumentTests, EraseUndoTest) {
 	// ...[...(...]...)... //
-	ServerSiteDocument doc{ "abcd", 1, 0 };
+	ServerSiteDocument doc{ "abcd", 1, 0, ""};
 	doc.setCursorPos(0, doc.getEndPos());
 	for (int i = 0; i < 4; i++) {
 		doc.erase(0, 1);
@@ -77,7 +77,7 @@ TEST(DocumentTests, EraseUndoTest) {
 
 TEST(DocumentTests, WriteAndEraseUndoTest) {
 	// ...[...(...]...)... //
-	ServerSiteDocument doc{ "", 1, 0 };
+	ServerSiteDocument doc{ "", 1, 0, "" };
 	doc.write(0, "test");
 	doc.erase(0, 1);
 	doc.undo(0);
@@ -87,7 +87,7 @@ TEST(DocumentTests, WriteAndEraseUndoTest) {
 
 TEST(DocumentTests, WriteAndMoveEndlUndoRedoTest) {
 	// ...[...(...]...)... //
-	ServerSiteDocument doc{ "", 1, 0 };
+	ServerSiteDocument doc{ "", 1, 0, "" };
 	doc.write(0, "lower");
 	doc.setCursorPos(0, COORD{ 0, 0 });
 	doc.write(0, "\n");
@@ -104,7 +104,7 @@ TEST(DocumentTests, WriteAndMoveEndlUndoRedoTest) {
 
 TEST(DocumentTests, TwoUserHistoryUndoTest) {
 	// ...[...(...]...)... //
-	ServerSiteDocument doc{ "", 2, 0 };
+	ServerSiteDocument doc{ "", 2, 0, "" };
 	doc.write(0, "first user text");
 	doc.setCursorPos(1, COORD{6, 0});
 	doc.write(1, "BREAK");
@@ -119,7 +119,7 @@ TEST(DocumentTests, TwoUserHistoryUndoTest) {
 
 TEST(DocumentTests, TwoUserHistoryUndoWithEndlTest) {
 	// ...[...(...]...)... //
-	ServerSiteDocument doc{ "", 2, 0 };
+	ServerSiteDocument doc{ "", 2, 0, "" };
 	doc.write(0, "first user text");
 	doc.setCursorPos(0, COORD{ 0, 0 });
 	doc.write(0, "\n");
@@ -138,7 +138,7 @@ TEST(DocumentTests, TwoUserHistoryUndoWithEndlTest) {
 
 TEST(DocumentTests, TwoUserHistoryUndoWithErasesTest) {
 	// ...[...(...]...)... //
-	ServerSiteDocument doc{ "", 2, 0 };
+	ServerSiteDocument doc{ "", 2, 0, "" };
 	doc.write(0, "first line\n");
 	doc.write(0, "second line");
 	doc.setCursorPos(0, COORD{ 0, 0 });
@@ -163,7 +163,7 @@ TEST(DocumentTests, TwoUserHistoryUndoWithErasesTest) {
 
 TEST(DocumentTests, TwoUserWriteWithEraseBeforeInterruptionUndoTest) {
 	// ...[...(...]...)... //
-	ServerSiteDocument doc{ "", 2, 0 };
+	ServerSiteDocument doc{ "", 2, 0, "" };
 	doc.write(0, "first");
 	doc.erase(0, 2);
 	doc.write(0, "st user");
@@ -181,7 +181,7 @@ TEST(DocumentTests, TwoUserWriteWithEraseBeforeInterruptionUndoTest) {
 
 TEST(DocumentTests, TwoUserWriteWithEraseAfterInterruptionUndoTest) {
 	// ...[...(...]...)... //
-	ServerSiteDocument doc{ "", 2, 0 };
+	ServerSiteDocument doc{ "", 2, 0, "" };
 	doc.write(0, "firxd");
 	doc.erase(0, 2);
 	doc.write(0, "st user");
@@ -199,7 +199,7 @@ TEST(DocumentTests, TwoUserWriteWithEraseAfterInterruptionUndoTest) {
 
 TEST(DocumentTests, StdMovedWriteWithRelationshipEraseUndoTest) {
 	// ...[...(...]...)... //
-	ServerSiteDocument doc{ "", 2, 0 };
+	ServerSiteDocument doc{ "", 2, 0, "" };
 	doc.write(0, "verylongline");
 	doc.setCursorPos(1, COORD{ 4, 0 });
 	doc.erase(1, 2);

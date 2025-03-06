@@ -8,7 +8,7 @@ public:
 	using Timestamp = std::chrono::time_point<std::chrono::system_clock>;
 	ServerSiteDocument();
 	ServerSiteDocument(const std::string& text);
-	ServerSiteDocument(const std::string& text, const int cursors, const int myUserIdx, const std::string& docName = "filename.txt");
+	ServerSiteDocument(const std::string& text, const int cursors, const int myUserIdx, const std::string& id, const std::string& docName = "filename.txt");
 	ServerSiteDocument(const std::string& text, const int cursors, const int myUserIdx, const history::HistoryManagerOptions& historyManagerOptions);
 
 	UndoReturn undo(const int index);
@@ -22,6 +22,7 @@ public:
 	std::vector<SOCKET>& getConnectedClients();
 	Timestamp getLastSaveTimestamp() const;
 	void setNowAsLastSaveTimestamp();
+	std::string getId() const;
 private:
 	void afterWriteAction(const int index, const COORD& startPos, const COORD& endPos, std::vector<std::string>& writtenText) override;
 	void afterEraseAction(const int index, const COORD& startPos, const COORD& endPos, std::vector<std::string>& erasedText) override;
@@ -29,4 +30,5 @@ private:
 	history::HistoryManager historyManager;
 	std::vector<SOCKET> connectedClients;
 	Timestamp lastSaveTimestamp;
+	const std::string id;
 };

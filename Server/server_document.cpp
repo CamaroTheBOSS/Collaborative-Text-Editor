@@ -2,17 +2,20 @@
 #include "pos_helpers.h"
 
 ServerSiteDocument::ServerSiteDocument() :
-	BaseDocument() {
+	BaseDocument(),
+	id("") {
 	addUser();
 }
 
 ServerSiteDocument::ServerSiteDocument(const std::string& text) :
-	BaseDocument(text) {
+	BaseDocument(text),
+	id("") {
 	addUser();
 }
 
-ServerSiteDocument::ServerSiteDocument(const std::string& text, const int nCursors, const int myUserIdx, const std::string& docName) :
-	BaseDocument(text, nCursors, myUserIdx) {
+ServerSiteDocument::ServerSiteDocument(const std::string& text, const int nCursors, const int myUserIdx, const std::string& id, const std::string& docName) :
+	BaseDocument(text, nCursors, myUserIdx),
+	id(id) {
 	filename = docName;
 	for (int i = 0; i < nCursors; i++) {
 		addUser();
@@ -21,7 +24,8 @@ ServerSiteDocument::ServerSiteDocument(const std::string& text, const int nCurso
 
 ServerSiteDocument::ServerSiteDocument(const std::string& text, const int nCursors, const int myUserIdx, const history::HistoryManagerOptions& historyManagerOptions) :
 	BaseDocument(text, nCursors, myUserIdx),
-	historyManager(historyManagerOptions) {
+	historyManager(historyManagerOptions),
+	id("") {
 	for (int i = 0; i < nCursors; i++) {
 		addUser();
 	}
@@ -115,4 +119,6 @@ void ServerSiteDocument::setNowAsLastSaveTimestamp() {
 	lastSaveTimestamp = std::chrono::system_clock::now();
 }
 
-
+std::string ServerSiteDocument::getId() const {
+	return id;
+}
