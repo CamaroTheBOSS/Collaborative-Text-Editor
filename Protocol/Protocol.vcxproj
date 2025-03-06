@@ -22,11 +22,13 @@
     <ClCompile Include="framer.cpp" />
     <ClCompile Include="logger.cpp" />
     <ClCompile Include="messages.cpp" />
+    <ClCompile Include="validator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framer.h" />
     <ClInclude Include="logger.h" />
     <ClInclude Include="messages.h" />
+    <ClInclude Include="validator.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

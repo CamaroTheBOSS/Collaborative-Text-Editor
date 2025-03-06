@@ -184,6 +184,9 @@ bool ApplicationEventHandlers::joinCreateDocImpl(const msg::Type type, msg::OneB
     if (!validateConnection(app)) {
         return false;
     }
+    if (!validateTextInputWindow(app, app.windowsManager.findWindow(pEvent.src))) {
+        return false;
+    }
     unsigned int socket = 0;
     app.tcpClient.sendMsg(type, version, socket, params[0]);
     if (!waitForResponseAndProccessIt(app, type)) {
