@@ -159,6 +159,7 @@
     <ClCompile Include="window_text_input_obsfucated.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="action_scenarios.h" />
     <ClInclude Include="application_event_handlers.h" />
     <ClInclude Include="canvas.h" />
     <ClInclude Include="client_document.h" />

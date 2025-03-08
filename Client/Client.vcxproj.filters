@@ -146,5 +146,8 @@
     <ClInclude Include="window_text_input_obsfucated.h">
       <Filter>Pliki nagłówkowe\Windows</Filter>
     </ClInclude>
+    <ClInclude Include="action_scenarios.h">
+      <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

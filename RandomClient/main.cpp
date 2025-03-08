@@ -4,8 +4,7 @@
 #include <iostream>
 #include <chrono>
 #include <random>
-
-#include "application.h";
+#include "action_scenarios.h"
 
 auto getRandomEngine() {
 	std::random_device device;
@@ -44,8 +43,32 @@ int getRandomKey() {
 	return key;
 }
 
+int main(int argc, char* argv[]) {
+	Args::ArgsMap argsConfig{
+		{ ip, Args::Arg{ Args::Type::string, "IP of the server" } },
+		{ port, Args::Arg{ Args::Type::integer, 8081, "Port of the server"} },
+		{ login, Args::Arg{ Args::Type::string, "Login for the user"} },
+		{ password, Args::Arg{ Args::Type::string, "Password for the user"} },
+		{ acCode, Args::Arg{ Args::Type::string, "Access code to document"} },
+		{ filename, Args::Arg{ Args::Type::string, std::string{"X"}, "Reserved"} },
+	};
+	Args::Commands commands{
+		Args::Command{join, "Joins to the existing document session using provided access code", { ip, port, login, password, acCode }},
+		Args::Command{registration, "Registers user in the server and terminating", { login, password }},
+		Args::Command{help, "Prints all arguments and commands"},
+	};
+	Args args{ std::move(argsConfig), std::move(commands) };
+	auto errMsg = args.parse(argc, argv);
+	if (!args.isValid()) {
+		std::cout << errMsg << args.getDescription();
+		return 0;
+	}
+	auto command = args.getCommand();
+	if (command == commandHelp || command == commandRun) {
+		std::cout << args.getDescription();
+		return 0;
+	}
 
-int main() {
 	WSADATA wsaData;
 	WORD mVersionRequested = MAKEWORD(2, 2);
 	int wsaError = WSAStartup(mVersionRequested, &wsaData);
@@ -55,23 +78,34 @@ int main() {
 		return 0;
 	}
 
-	Application app;
-	if (!app.connect("192.168.1.10", 8081)) {
-		std::cout << "Connection to server failed!\n";
+	Application app{ args.get<std::string>(ip) , args.get<int>(port) };
+	if (command == registration) {
+		// Focus on REGISTER menu option and click it
+		goDownInMenuAndAccept(app, 1);
+		passCredentials(app, args);
 		return 0;
 	}
-	app.processChar(KeyPack{ENTER, false});
-	app.processChar(KeyPack{ 's', false});
-	app.processChar(KeyPack{ ENTER, false });
-	app.render();
-	while (app.isConnected()) {
-		KeyPack key = app.readChar();
-		if (key.keyCode == '\0') {
-			key.keyCode = getRandomKey();
-		}
-		app.processChar(key);
-		bool render = app.checkIncomingMessages();
-		if (render) {
+	// Login
+	doAndRender(app, ENTER);
+	passCredentials(app, args);
+
+	// Close information window, focus on Join option and click it
+	doAndRender(app, ESC);
+	goDownInMenuAndAccept(app, 3);
+
+	// Pass accode
+	auto& accessCode = args.get<std::string>(acCode);
+	passStringToWindow(app, accessCode);
+	doAndRender(app, ENTER);
+	doAndRender(app, ESC);
+	auto actionDone = false;
+	bool render = false;
+	while (true) {
+		KeyPack key{0, false};
+		key.keyCode = getRandomKey();
+		actionDone = app.processChar(key);
+		render = app.checkIncomingMessages();
+		if (render || actionDone) {
 			app.render();
 		}
 	}
