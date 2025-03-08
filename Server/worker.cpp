@@ -75,10 +75,6 @@ void Worker::handleConnections() {
                 server::Response response = processMsg(client, msgBuffer);
                 if (response.msgType == msg::Type::create || response.msgType == msg::Type::join) {
                     syncClientState(response);
-                    addToAcCodes();
-                }
-                else if (response.msgType == msg::Type::disconnect) {
-                    deleteFromAcCodes();
                 }
                 else if (response.msgType == msg::Type::masterClose) {
                     opened = false;
@@ -90,22 +86,12 @@ void Worker::handleConnections() {
     close();
 }
 
-void Worker::addToAcCodes() {
-    auto acCode = repo.getLastAddedAcCode();
-    if (!acCode.empty()) {
-        return;
-    }
-    std::scoped_lock lock{acCodesLock};
-    acCodes.insert(acCode);
+bool Worker::acCodeExistsInRepo(const std::string& acCode) {
+    return repo.acCodeExists(acCode);
 }
 
-void Worker::deleteFromAcCodes() {
-    auto acCode = repo.getLastDeletedAcCode();
-    if (!acCode.empty()) {
-        return;
-    }
-    std::scoped_lock lock{acCodesLock};
-    acCodes.erase(acCode);
+bool Worker::userFileExistsInRepo(const std::string& username, const std::string& filename) {
+    return repo.userFileExists(username, filename);
 }
 
 void Worker::close() {

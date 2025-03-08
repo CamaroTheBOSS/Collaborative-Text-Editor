@@ -136,7 +136,8 @@ std::vector<Option> makeLoggedMainMenuOptions() {
     return std::vector<Option>{
         Option{ "Logout", [](MenuWindow& obj) { return Event{ windows::app::events::disconnect, obj.name(), windows::app::name, {} }; } },
         Option{ "Create document", [](MenuWindow& obj) { return Event{ windows::app::events::createDocWindow, obj.name(), windows::app::name, {} }; } },
-        Option{ "Load document", [](MenuWindow& obj) { return Event{ windows::app::events::joinDocWindow, obj.name(), windows::app::name, {} }; } },
+        Option{ "Manage documents", [](MenuWindow& obj) { return Event{ windows::app::events::loadDocWindow, obj.name(), windows::app::name, {} }; } },
+        Option{ "Join document", [](MenuWindow& obj) { return Event{ windows::app::events::joinDocWindow, obj.name(), windows::app::name, {} }; } },
         Option{ "Help", [](MenuWindow& obj) { return Event{ windows::app::events::help, obj.name(), windows::app::name, {} }; } },
         Option{ "Quit", [](MenuWindow& obj) { return Event{ windows::app::events::exit, obj.name(), windows::app::name, {} }; } }
     };
@@ -170,7 +171,7 @@ TextInputWindow::TextInputHandler funcReplaceSubmitEvent() {
         return Event{ windows::text_editor::events::replace, win.name(), windows::text_editor::name, { doc.getText() } };
     };
 }
-TextInputWindow::TextInputHandler funcLoadDocSubmitEvent() {
+TextInputWindow::TextInputHandler funcJoinDocSubmitEvent() {
     return [](const TextInputWindow& win, const ClientSiteDocument& doc) {
         return Event{ windows::app::events::joinDoc, win.name(), windows::app::name, { doc.getText() } };
     };

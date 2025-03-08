@@ -53,6 +53,7 @@ namespace server {
 		bool addDocToUser(const DBDocument& doc, const DBUser& user);
 		bool delDocFromUser(const DBDocument& doc, const DBUser& user);
 
+		std::vector<std::string> getUserDocumentNames(const std::string& username);
 		std::optional<DBDocument> getDocWithId(const std::string& id);
 		std::optional<DBDocument> getDocWithUsernameAndFilename(const std::string& username, const std::string& filename);
 		std::optional<DBDocument> extractDocWithUsernameAndFilename(const std::string& username, const std::string& filename);

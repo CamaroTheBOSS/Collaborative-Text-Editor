@@ -10,6 +10,28 @@ namespace server {
 
 	Repository::Repository(server::Authenticator* auth) :
 		auth(auth) {}
+	
+	Repository::Repository(Repository&& other) :
+		clientToUserData(std::move(other.clientToUserData)),
+		acCodeToDocMap(std::move(other.acCodeToDocMap)),
+		auth(other.auth),
+		savingDocInterval(std::move(other.savingDocInterval)),
+		db(std::move(other.db)),
+		acCodesLock(),
+		acCodeSet(std::move(other.acCodeSet)),
+		userFileCombinedLock(),
+		userFileCombinedSet(std::move(other.userFileCombinedSet)) {}
+
+	Repository& Repository::operator=(Repository&& other) {
+		clientToUserData = std::move(other.clientToUserData);
+		acCodeToDocMap = std::move(other.acCodeToDocMap);
+		auth = auth;
+		savingDocInterval = std::move(other.savingDocInterval);
+		db = std::move(other.db);
+		acCodeSet = std::move(other.acCodeSet);
+		userFileCombinedSet = std::move(other.userFileCombinedSet);
+		return *this;
+	}
 
 	Response Repository::process(SOCKET client, msg::Buffer& buffer, bool authenticateUser) {
 		msg::Type type;
@@ -19,6 +41,8 @@ namespace server {
 		switch (type) {
 		case msg::Type::create:
 			return createDoc(buffer);
+		case msg::Type::load:
+			return loadDoc(buffer);
 		case msg::Type::join:
 			return joinDoc(buffer);
 		case msg::Type::masterClose:
@@ -28,8 +52,8 @@ namespace server {
 		std::string authToken;
 		msg::parse(buffer, pos, authToken);
 		if (authenticateUser) {
-			auto it = clientToUser.find(client);
-			if (it == clientToUser.cend() || it->second.authToken != authToken) {
+			auto it = clientToUserData.find(client);
+			if (it == clientToUserData.cend() || it->second.authToken != authToken) {
 				logger.logError("Cannot authenticate user", client);
 				return Response{ std::move(buffer), {}, msg::Type::error };
 			}
@@ -45,7 +69,7 @@ namespace server {
 		}
 		ArgPack argPack{ client, buffer, doc };
 		auto response = processImpl(type, argPack);
-		if (std::chrono::system_clock::now() > doc->getLastSaveTimestamp() + savingDocInterval) {	
+		if (type != msg::Type::disconnect && std::chrono::system_clock::now() > doc->getLastSaveTimestamp() + savingDocInterval) {
 			saveDocInDb(*doc);
 		}
 		return response;
@@ -77,27 +101,26 @@ namespace server {
 		return Response{ std::move(argPack.buffer), {}, msg::Type::error };
 	}
 
-	std::string Repository::getLastAddedAcCode() {
-		std::string acCode = lastAddedAcCode;
-		lastAddedAcCode.clear();
-		return acCode;
-	}
-	std::string Repository::getLastDeletedAcCode() {
-		std::string acCode = lastDeletedAcCode;
-		lastDeletedAcCode.clear();
-		return acCode;
-	}
-
 	ServerSiteDocument* Repository::findDoc(SOCKET client) {
-		auto acCodeIt = clientToAcCodeMap.find(client);
-		if (acCodeIt == clientToAcCodeMap.cend()) {
+		auto userData = clientToUserData.find(client);
+		if (userData == clientToUserData.cend()) {
 			return nullptr;
 		}
-		auto docIt = acCodeToDocMap.find(acCodeIt->second);
+		auto docIt = acCodeToDocMap.find(userData->second.acCode);
 		if (docIt == acCodeToDocMap.cend()) {
 			return {};
 		}
 		return &docIt->second;
+	}
+
+	bool Repository::acCodeExists(const std::string& acCode) {
+		std::lock_guard lock{acCodesLock};
+		return std::find(acCodeSet.cbegin(), acCodeSet.cend(), acCode) != acCodeSet.cend();
+	}
+	bool Repository::userFileExists(const std::string& username, const std::string& filename) {
+		std::lock_guard lock{userFileCombinedLock};
+		auto key = username + "-" + filename;
+		return std::find(userFileCombinedSet.cbegin(), userFileCombinedSet.cend(), key) != userFileCombinedSet.cend();
 	}
 
 	Response Repository::masterClose(msg::Buffer& buffer) const {
@@ -107,51 +130,62 @@ namespace server {
 
 	Response Repository::createDoc(msg::Buffer& buffer) {
 		auto msg = Deserializer::parseConnectCreateDoc(buffer);
-		auto acCode = random::Engine::get().getRandomString(6);
 		auto id = random::Engine::get().getRandomString(12);
 		auto userAuthData = auth->getUserData(msg.socket);
 		assert(!userAuthData.authToken.empty());
-		auto docIt = acCodeToDocMap.emplace(acCode, ServerSiteDocument("", 1, 0, id, msg.filename));
 		DBDocument dbDoc(id, msg.filename, { auth->getUserData(msg.socket).username });
 		if (!db.addDocAndLink(dbDoc)) {
 			auto newBuffer = Serializer::makeConnectResponseWithError(msg.type, db.getLastError(), 1);
 			return Response{ std::move(newBuffer), { msg.socket }, msg::Type::create };
 		}
-		lastAddedAcCode = acCode;
-		clientToUser.emplace(msg.socket, std::move(userAuthData));
-		clientToAcCodeMap.emplace(msg.socket, acCode);
-		docIt.first->second.addClient(msg.socket);
+		auto session = createNewSession(userAuthData.username, ServerSiteDocument("", 0, 0, id, msg.filename));
+		addClientToSession(msg.socket, userAuthData, session);
+		auto& [acCode, doc] = *session;
+		auto newBuffer = Serializer::makeConnectResponse(msg.type, doc, msg.version, 0, acCode);
+		return Response{ std::move(newBuffer), doc.getConnectedClients(), msg::Type::create };
+	}
 
-		logger.logDebug("User", msg.socket, "created new document!");
-		auto newBuffer = Serializer::makeConnectResponse(msg.type, docIt.first->second, msg.version, 0, acCode);
-		return Response{ std::move(newBuffer), docIt.first->second.getConnectedClients(), msg::Type::create };
+	Response Repository::loadDoc(msg::Buffer& buffer) {
+		auto msg = Deserializer::parseConnectCreateDoc(buffer);
+		auto userAuthData = auth->getUserData(msg.socket);
+		assert(!userAuthData.authToken.empty());
+		auto docIt = db.loadDoc(userAuthData.username, msg.filename);
+		if (!docIt) {
+			auto newBuffer = Serializer::makeConnectResponseWithError(msg.type, db.getLastError(), 1);
+			return Response{ std::move(newBuffer), { msg.socket }, msg::Type::load };
+		}
+		auto session = getSessionWithDocId(docIt.value().getId());
+		if (session == acCodeToDocMap.end()) {
+			session = createNewSession(userAuthData.username, docIt.value());
+		}
+		addClientToSession(msg.socket, userAuthData, session);
+		auto& [acCode, doc] = *session;
+		auto userIdx = doc.findUser(msg.socket);
+		auto newBuffer = Serializer::makeConnectResponse(msg.type, doc, msg.version, userIdx, acCode);
+		return Response{ std::move(newBuffer), doc.getConnectedClients(), msg::Type::load };
 	}
 
 	Response Repository::joinDoc(msg::Buffer& buffer) {
 		auto msg = Deserializer::parseConnectJoinDoc(buffer);
-		auto docIt = acCodeToDocMap.find(msg.acCode);
-		if (docIt == acCodeToDocMap.cend()) {
+		auto session = getSessionWithAcCode(msg.acCode);
+		if (session == acCodeToDocMap.end()) {
 			std::string errMsg = "Incorrect access code!";
 			auto newBuffer = Serializer::makeConnectResponseWithError(msg.type, errMsg, 1);
 			return Response{ std::move(newBuffer), { msg.socket }, msg::Type::join };
 		}
+		auto& [acCode, doc] = *session;
 		auto userAuthData = auth->getUserData(msg.socket);
 		assert(!userAuthData.authToken.empty());
 		DBUser userdb(userAuthData.username, "", {});
-		DBDocument docdb(docIt->second.getId(), "", {});
+		DBDocument docdb(doc.getId(), "", {});
 		if (!db.linkUserAndDoc(userdb, docdb)) {
 			auto newBuffer = Serializer::makeConnectResponseWithError(msg.type, db.getLastError(), 1);
 			return Response{ std::move(newBuffer), { msg.socket }, msg::Type::join };
 		}
-		clientToUser.emplace(msg.socket, std::move(userAuthData));
-		clientToAcCodeMap.emplace(msg.socket, msg.acCode);
-		docIt->second.addUser();
-		docIt->second.addClient(msg.socket);
-
-		logger.logDebug("User", msg.socket, "connected to document");
-		int userIdx = docIt->second.getCursorNum() - 1;
-		auto newBuffer = Serializer::makeConnectResponse(msg.type, docIt->second, msg.version, userIdx, msg.acCode);
-		return Response{ std::move(newBuffer), docIt->second.getConnectedClients(), msg::Type::join };
+		addClientToSession(msg.socket, userAuthData, session);
+		int userIdx = doc.getCursorNum() - 1;
+		auto newBuffer = Serializer::makeConnectResponse(msg.type, doc, msg.version, userIdx, acCode);
+		return Response{ std::move(newBuffer), doc.getConnectedClients(), msg::Type::join };
 	}
 
 	Response Repository::disconnectUserFromDoc(const ArgPack& argPack) {
@@ -162,33 +196,56 @@ namespace server {
 			logger.logDebug(msg.type, "command failed. User not found error");
 			return Response{ std::move(argPack.buffer), {}, msg::Type::error };
 		}
-		doc.eraseUser(userIdx);
-		doc.eraseClient(argPack.client);
-		eraseFromMap(doc, argPack.client);
+		saveDocInDb(doc);
+		eraseClientFromSession(doc, argPack.client);
 		auto newBuffer = Serializer::makeDisconnectResponse(userIdx, msg);
 		return Response{ std::move(newBuffer), doc.getConnectedClients(), msg::Type::disconnect };
 	}
 
-	void Repository::eraseFromMap(const ServerSiteDocument& doc, const SOCKET client) {
-		auto clientToAcCodeIt = clientToAcCodeMap.find(client);
-		std::string erasedAcCode;
-		if (clientToAcCodeIt != clientToAcCodeMap.cend()) {
-			erasedAcCode = clientToAcCodeIt->second;
-			clientToAcCodeMap.erase(clientToAcCodeIt);
-		}
-		if (doc.getCursorNum() == 0) {
-			auto acCodeToDocIt = acCodeToDocMap.find(erasedAcCode);
-			if (acCodeToDocIt != acCodeToDocMap.cend()) {
-				lastDeletedAcCode = erasedAcCode;
-				acCodeToDocMap.erase(acCodeToDocIt);
-			}
+	void Repository::eraseClientFromSession(ServerSiteDocument& doc, const SOCKET client) {
+		int userIdx = doc.findUser(client);
+		doc.eraseUser(userIdx);
+		doc.eraseClient(client);
+		auto userDataIt = clientToUserData.find(client);
+		std::string erasedAcCode, erasedUsername;
+		if (userDataIt != clientToUserData.cend()) {
+			erasedAcCode = std::move(userDataIt->second.acCode);
+			erasedUsername = std::move(userDataIt->second.username);
+			clientToUserData.erase(userDataIt);
+			std::lock_guard lock{userFileCombinedLock};
+			userFileCombinedSet.erase(erasedUsername + "-" + doc.getFilename());
 		}
 		auth->clearUser(client);
-		clientToUser.erase(client);
+		if (doc.getCursorNum() == 0) {
+			deleteSession(erasedUsername, erasedAcCode, doc);
+		}
+	}
+
+	void Repository::deleteSession(const std::string& username, const std::string& acCode, ServerSiteDocument& doc) {
+		std::scoped_lock lock{acCodesLock, userFileCombinedLock};
+		acCodeSet.erase(acCode);
+		userFileCombinedSet.erase(username + "-" + doc.getFilename());
+		auto acCodeToDocIt = acCodeToDocMap.find(acCode);
+		if (acCodeToDocIt != acCodeToDocMap.cend()) {
+			acCodeToDocMap.erase(acCodeToDocIt);
+		}
 	}
 
 	bool Repository::saveDocInDb(const ServerSiteDocument& doc) {
 		return db.saveDoc(doc.getId(), doc.getText());
+	}
+
+	SessionIt Repository::getSessionWithDocId(const std::string& id) {
+		for (auto it = acCodeToDocMap.begin(); it != acCodeToDocMap.end(); it++) {
+			if (it->second.getId() == id) {
+				return it;
+			}
+		}
+		return acCodeToDocMap.end();
+	}
+
+	SessionIt Repository::getSessionWithAcCode(const std::string& acCode) {
+		return acCodeToDocMap.find(acCode);
 	}
 
 	Response Repository::write(const ArgPack& argPack) {
@@ -340,4 +397,14 @@ namespace server {
 		return Response{ std::move(newBuffer), doc.getConnectedClients(), msg::Type::replace };
 	}
 
+	bool Repository::addClientToSession(const SOCKET client, Authenticator::UserData& userAuthData, SessionIt session) {
+		auto& [acCode, doc] = *session;
+		doc.addClient(client);
+		doc.addUser();
+		std::lock_guard lock{userFileCombinedLock};
+		userFileCombinedSet.insert(userAuthData.username + "-" + doc.getFilename());
+		clientToUserData.emplace(client, ClientUserData{ std::move(acCode), std::move(userAuthData.username), std::move(userAuthData.authToken) });
+		logger.logDebug("User", client, "added to session (docId", doc.getId() + ")");
+		return true;
+	}
 }

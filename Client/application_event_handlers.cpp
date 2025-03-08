@@ -12,6 +12,10 @@ ApplicationEventHandlers::ApplicationEventHandlers():
         {windows::app::events::exit, &ApplicationEventHandlers::eventMainMenuExitChosen},
         {windows::app::events::createDocWindow, &ApplicationEventHandlers::eventMainMenuCreateChosen},
         {windows::app::events::joinDocWindow, &ApplicationEventHandlers::eventMainMenuJoinChosen},
+        {windows::app::events::loadDocWindow, &ApplicationEventHandlers::eventMainMenuLoadChosen},
+        {windows::app::events::loadItemClicked, &ApplicationEventHandlers::eventLoadItemClicked},
+        {windows::app::events::loadItemAccepted, &ApplicationEventHandlers::eventLoadItemAccepted},
+        {windows::app::events::loadItemDeleted, &ApplicationEventHandlers::eventLoadItemDeleted},
         {windows::app::events::help, &ApplicationEventHandlers::eventMainMenuHelpChosen},
         {windows::app::events::disconnect, &ApplicationEventHandlers::eventMainMenuDisconnectChosen},
         {windows::app::events::showAcCode, &ApplicationEventHandlers::eventMainMenuShowAcCodeChosen},
@@ -116,8 +120,35 @@ void ApplicationEventHandlers::eventMainMenuCreateChosen(Application& app, const
 
 void ApplicationEventHandlers::eventMainMenuJoinChosen(Application& app, const Event& pEvent) {
     app.windowsManager.showWindow<TextInputWindow>(
-        makeLoadDocWindowBuilder(app.terminal.getScreenSize()), funcLoadDocSubmitEvent()
+        makeLoadDocWindowBuilder(app.terminal.getScreenSize()), funcJoinDocSubmitEvent()
     );
+}
+
+void ApplicationEventHandlers::eventMainMenuLoadChosen(Application& app, const Event& pEvent) {
+    msg::OneByteInt version = 1;
+    app.tcpClient.sendMsg(msg::Type::getDocNames, version, app.repo.getAuthToken());
+    if (!waitForResponseAndProccessIt(app, msg::Type::getDocNames)) {
+        app.windowsManager.destroyWindow(pEvent.src, app.tcpClient);
+        return;
+    }
+    std::vector<Option> options;
+    for (const auto& name : app.repo.getFetchedDocNames()) {
+        options.emplace_back(Option{ name, [&](MenuWindow& obj) { return Event{ windows::app::events::loadItemClicked, obj.name(), windows::app::name, { name }}; }});
+    }
+    if (options.size() > 0) {
+        app.windowsManager.showWindow<MenuWindow>(
+            makeMenuWindowBuilder(app.terminal.getScreenSize(), "Choose document"), std::move(options)
+        );
+    }
+    else {
+        int width = 25;
+        auto screenSize = app.terminal.getScreenSize();
+        double left = getCenteredLeft(screenSize, width);
+        app.windowsManager.showWindow<InfoWindow>(
+            makeGenericBuilder(app.terminal.getScreenSize(), "Choose document", left, 0.4, width, 1), "You don't have any documents"
+        );
+    }
+    
 }
 
 void ApplicationEventHandlers::eventMainMenuExitChosen(Application& app, const Event& pEvent) {
@@ -138,6 +169,47 @@ void ApplicationEventHandlers::eventMainMenuShowAcCodeChosen(Application& app, c
     app.windowsManager.showWindow<InfoWindow>(
         makeGenericBuilder(screenSize, "Access code", left, 0.4, width, 1), app.repo.getAcCode()
     );
+}
+
+void ApplicationEventHandlers::eventLoadItemClicked(Application& app, const Event& pEvent) {
+    assert(pEvent.params.size() > 0);
+    app.windowsManager.showWindow<MenuWindow>(
+        makeMenuWindowBuilder(app.terminal.getScreenSize(), "Manage document"), std::vector<Option>{
+        Option{"Load", [filename = pEvent.params[0]](MenuWindow& obj) { return Event{ windows::app::events::loadItemAccepted, obj.name(), windows::app::name, { filename }}; }},
+        Option{ "Delete", [filename = pEvent.params[0]](MenuWindow& obj) { return Event{ windows::app::events::loadItemDeleted, obj.name(), windows::app::name, { filename } }; }}
+    });
+}
+void ApplicationEventHandlers::eventLoadItemAccepted(Application& app, const Event& pEvent) {
+    bool success = joinCreateDocImpl(msg::Type::load, 1, app, pEvent);
+    if (success) {
+        int width = 26;
+        auto screenSize = app.terminal.getScreenSize();
+        double left = getCenteredLeft(screenSize, width);
+        app.windowsManager.showWindow<InfoWindow>(
+            makeGenericBuilder(screenSize, "Success", left, 0.4, width, 1),
+            "Access code for document: " + app.repo.getAcCode()
+        );
+        app.windowsManager.destroyWindow(pEvent.src, app.tcpClient);
+        app.windowsManager.destroyWindow("Choose document", app.tcpClient);
+    }
+}
+void ApplicationEventHandlers::eventLoadItemDeleted(Application& app, const Event& pEvent) {
+    assert(pEvent.params.size() > 0);
+    msg::OneByteInt version = 1;
+    app.tcpClient.sendMsg(msg::Type::delDoc, version, app.repo.getAuthToken(), pEvent.params[0]);
+    if (!waitForResponseAndProccessIt(app, msg::Type::delDoc)) {
+        app.windowsManager.destroyWindow(pEvent.src, app.tcpClient);
+        return;
+    }
+    int width = 25;
+    auto screenSize = app.terminal.getScreenSize();
+    double left = getCenteredLeft(screenSize, width);
+    app.windowsManager.showWindow<InfoWindow>(
+        makeGenericBuilder(screenSize, "Success", left, 0.4, width, 1),
+        "Document deleted successfuly"
+    );
+    app.windowsManager.destroyWindow(pEvent.src, app.tcpClient);
+    app.windowsManager.destroyWindow("Choose document", app.tcpClient);
 }
 
 void ApplicationEventHandlers::eventCreateDoc(Application& app, const Event& pEvent) {
@@ -184,7 +256,7 @@ bool ApplicationEventHandlers::joinCreateDocImpl(const msg::Type type, msg::OneB
     if (!validateConnection(app)) {
         return false;
     }
-    if (!validateTextInputWindow(app, app.windowsManager.findWindow(pEvent.src))) {
+    if (type != msg::Type::load && !validateTextInputWindow(app, app.windowsManager.findWindow(pEvent.src))) {
         return false;
     }
     unsigned int socket = 0;
@@ -199,7 +271,7 @@ bool ApplicationEventHandlers::joinCreateDocImpl(const msg::Type type, msg::OneB
 }
 
 bool ApplicationEventHandlers::waitForResponseAndProccessIt(Application& app, const msg::Type type) {
-    bool success = app.waitForResponse(type, std::chrono::milliseconds(500), 4);
+    bool success = app.waitForResponse(type, std::chrono::milliseconds(1), 1500);
     int width = 25;
     auto screenSize = app.terminal.getScreenSize();
     double left = getCenteredLeft(screenSize, width);

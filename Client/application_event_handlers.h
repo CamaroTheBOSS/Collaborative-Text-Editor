@@ -13,15 +13,18 @@ private:
 
 	void eventMainMenuLoginRegisterChosen(Application& app, const Event& pEvent);
 	void eventLoginPasswordAccepted(Application& app, const Event& pEvent);
-	void eventLogout(Application& app, const Event& pEvent);
 
 	void eventMainMenuDisconnectChosen(Application& app, const Event& pEvent);
 	void eventMainMenuCreateChosen(Application& app, const Event& pEvent);
 	void eventMainMenuJoinChosen(Application& app, const Event& pEvent);
+	void eventMainMenuLoadChosen(Application& app, const Event& pEvent);
 	void eventMainMenuExitChosen(Application& app, const Event& pEvent);
 	void eventMainMenuHelpChosen(Application& app, const Event& pEvent);
 	void eventMainMenuShowAcCodeChosen(Application& app, const Event& pEvent);
 
+	void eventLoadItemClicked(Application& app, const Event& pEvent);
+	void eventLoadItemAccepted(Application& app, const Event& pEvent);
+	void eventLoadItemDeleted(Application& app, const Event& pEvent);
 	void eventCreateDoc(Application& app, const Event& pEvent);
 	void eventJoinDoc(Application& app, const Event& pEvent);
 	bool joinCreateDocImpl(const msg::Type type, msg::OneByteInt version, Application& app, const Event& pEvent);

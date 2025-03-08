@@ -17,9 +17,9 @@ public:
 	Worker& operator=(Worker&& worker) noexcept;
 	Worker(const Worker&) = delete;
 	Worker& operator=(const Worker&) = delete;
+	bool acCodeExistsInRepo(const std::string& acCode);
+	bool userFileExistsInRepo(const std::string& username, const std::string& filename);
 private:
-	void addToAcCodes();
-	void deleteFromAcCodes();
 	void close();
 	bool connectToMaster(const std::string& ip, const int port);
 	void handleConnections();
@@ -36,8 +36,6 @@ private:
 	SOCKET masterListener = INVALID_SOCKET;
 	std::thread thread;
 
-	std::mutex acCodesLock;
-	std::set<std::string> acCodes;
 	server::Repository repo;
 	MessageExtractor extractor;
 };

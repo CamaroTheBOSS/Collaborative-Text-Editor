@@ -16,7 +16,7 @@ public:
 
 	bool open(const int nWorkers);
 	void start();
-	bool close();
+	bool close();	
 private:
 	friend class SyncTester;
 	enum class State {opened, closing, closed};
@@ -24,6 +24,7 @@ private:
 	bool acceptConnection(const SOCKET client);
 	int selectWorker();
 	int selectWorkerWithAcCode(const std::string& acCode);
+	int selectWorkerWithUsernameAndFilename(const std::string& username, const std::string& filename);
 	void initWorkers(const int nWorkers);
 	int closeWorkers();
 	void sendResponses(server::Response& response) const;

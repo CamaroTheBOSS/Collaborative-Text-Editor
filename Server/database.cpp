@@ -107,6 +107,34 @@ namespace server {
 		return addObjToDbEvenIfExists(userFromDbOpt.value());
 	}
 
+	std::vector<std::string> Database::getUserDocumentNames(const std::string& username) {
+		auto userDb = getUserWithUsername(username);
+		if (!userDb) {
+			return {};
+		}
+		auto db = getDbForRead(DBDocument::dbName);
+		if (!db) {
+			return {};
+		}
+		std::stringstream ss;
+		ss << db.rdbuf();
+		std::vector<std::string> names;
+		auto lines = Parser::parseTextToVector(ss.str());
+		for (const auto& line : lines) {
+			int pos = line.find(',');
+			if (pos == std::string::npos) {
+				continue;
+			}
+			auto id = std::string_view(line.cbegin(), line.cbegin() + pos);
+			auto it = std::find(userDb.value().documentIds.cbegin(), userDb.value().documentIds.cend(), id);
+			if (it != userDb.value().documentIds.cend()) {
+				auto row = parseRow(line);
+				names.emplace_back(std::move(row[1]));
+			}
+		}
+		return names;
+	}
+
 	std::optional<DBDocument> Database::getDocWithId(const std::string& id) {
 		return getObjFromDb<DBDocument>([&](const std::string& line, DBDocument& doc) {
 			auto row = parseRow(line);
@@ -168,6 +196,7 @@ namespace server {
 		}
 		docFromDbOpt.value().usernames.erase(it);
 		if (docFromDbOpt.value().usernames.size() == 0) {
+			std::filesystem::remove(std::filesystem::path(dbRoot) / docFromDbOpt.value().id);
 			return true;
 		}
 		return addObjToDbEvenIfExists(docFromDbOpt.value());
@@ -247,7 +276,7 @@ namespace server {
 		}
 		std::stringstream ss;
 		ss << file.rdbuf();
-		ServerSiteDocument doc{ ss.str(), 1, 0, docFromDbOpt.value().id, docFromDbOpt.value().filename };
+		ServerSiteDocument doc{ ss.str(), 0, 0, docFromDbOpt.value().id, docFromDbOpt.value().filename };
 		return std::make_optional(std::move(doc));
 	}
 

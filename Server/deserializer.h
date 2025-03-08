@@ -4,6 +4,7 @@
 class Deserializer {
 public:
 	static msg::AckMsg parseAck(const msg::Buffer& buffer);
+	static msg::DeleteDoc parseDelDoc(const msg::Buffer& buffer);
 	static msg::Login parseLogin(const msg::Buffer& buffer);
 	static msg::Register parseRegister(const msg::Buffer& buffer);
 	static msg::ConnectCreateDoc parseConnectCreateDoc(const msg::Buffer& buffer);

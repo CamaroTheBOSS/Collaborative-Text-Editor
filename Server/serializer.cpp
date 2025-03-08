@@ -1,8 +1,19 @@
 #include "serializer.h"
 
-msg::Buffer Serializer::makeAckResponse(const msg::Type& type, const msg::OneByteInt version) {
-	msg::Buffer buffer{5};
-	msg::serializeTo(buffer, 0, type, version);
+msg::Buffer Serializer::makeAckResponse(const msg::Type& type, const msg::OneByteInt version, const std::string& errMsg) {
+	int size = errMsg.size() + 6;
+	msg::Buffer buffer{size};
+	msg::serializeTo(buffer, 0, type, version, errMsg);
+	return buffer;
+}
+
+msg::Buffer Serializer::makeGetNamesResponse(const msg::OneByteInt version, const std::string& errMsg, const std::vector<std::string>& docNames) {
+	int size = errMsg.size();
+	for (const auto& name : docNames) {
+		size += name.size();
+	}
+	msg::Buffer buffer{size + 10};
+	msg::serializeTo(buffer, 0, msg::Type::getDocNames, version, errMsg, docNames);
 	return buffer;
 }
 

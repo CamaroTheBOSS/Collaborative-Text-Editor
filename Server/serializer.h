@@ -4,7 +4,8 @@
 
 class Serializer {
 public:
-	static msg::Buffer makeAckResponse(const msg::Type& type, const msg::OneByteInt version);
+	static msg::Buffer makeAckResponse(const msg::Type& type, const msg::OneByteInt version, const std::string& errMsg = "");
+	static msg::Buffer makeGetNamesResponse(const msg::OneByteInt version, const std::string& errMsg, const std::vector<std::string>& docNames);
 	static msg::Buffer makeLoginResponse(const msg::OneByteInt version, const std::string& authToken, const std::string& errMsg);
 	static msg::Buffer makeRegisterResponse(const msg::OneByteInt version, const std::string& errMsg);
 	static msg::Buffer makeConnectResponse(const msg::Type& type, const ServerSiteDocument& doc, const msg::OneByteInt version, const int userIdx, const std::string& acCode);

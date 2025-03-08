@@ -5,6 +5,11 @@ msg::AckMsg Deserializer::parseAck(const msg::Buffer& buffer) {
 	msg::parse(buffer, 0, msg.type, msg.version);
 	return msg;
 }
+msg::DeleteDoc Deserializer::parseDelDoc(const msg::Buffer& buffer) {
+	msg::DeleteDoc msg;
+	msg::parse(buffer, 0, msg.type, msg.version, msg.authToken, msg.docFilename);
+	return msg;
+}
 msg::Login Deserializer::parseLogin(const msg::Buffer& buffer) {
 	msg::Login msg;
 	msg::parse(buffer, 0, msg.type, msg.version, msg.login, msg.password);

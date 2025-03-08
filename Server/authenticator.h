@@ -33,6 +33,9 @@ namespace server {
 		Response loginUser(const ArgPack& args);
 		Response logoutUser(const ArgPack& args);
 		Response registerUser(const ArgPack& args);
+		Response getDocNames(const ArgPack& args);
+		Response delDoc(const ArgPack& args);
+
 		void addUser(const SOCKET client, const std::string& authToken, const std::string& username);
 		bool checkIfUserIsActive(const std::string& username);
 

@@ -2,6 +2,7 @@
 #include <WS2tcpip.h>
 #include "server.h"
 #include "logging.h"
+#include "deserializer.h"
 
 using namespace server;
 
@@ -65,6 +66,13 @@ void Server::start() {
 				if (type == msg::Type::create) {
 					buffer.replace(2, client);
 					int worker = selectWorker();
+					forwardConnection(client, buffer, worker);
+				}
+				else if (type == msg::Type::load) {
+					auto msg = Deserializer::parseConnectCreateDoc(buffer);
+					auto userData = auth.getUserData(client);
+					buffer.replace(2, client);
+					int worker = selectWorkerWithUsernameAndFilename(userData.username, msg.filename);
 					forwardConnection(client, buffer, worker);
 				}
 				else if (type == msg::Type::join) {
@@ -158,9 +166,16 @@ int Server::selectWorker() {
 
 int Server::selectWorkerWithAcCode(const std::string& acCode) {
 	for (int i = 0; i < workers.size(); i++) {
-		std::scoped_lock lock{workers[i].acCodesLock};
-		auto it = workers[i].acCodes.find(acCode);
-		if (it != workers[i].acCodes.cend()) {
+		if (workers[i].acCodeExistsInRepo(acCode)) {
+			return i;
+		}
+	}
+	return 0;
+}
+
+int Server::selectWorkerWithUsernameAndFilename(const std::string& username, const std::string& filename) {
+	for (int i = 0; i < workers.size(); i++) {
+		if (workers[i].userFileExistsInRepo(username, filename)) {
 			return i;
 		}
 	}

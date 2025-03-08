@@ -38,7 +38,10 @@ namespace msg {
 		disconnect,
 		selectAll,
 		undo,
-		redo
+		redo,
+		// CRUD
+		getDocNames,
+		delDoc
 	};
 
 	enum class MoveSide {
@@ -140,6 +143,21 @@ namespace msg {
 	struct AckResponse {
 		Type type = Type::logout;
 		OneByteInt version = 0;
+		std::string errMsg;
+	};
+
+	struct DeleteDoc {
+		Type type = Type::delDoc;
+		OneByteInt version = 0;
+		std::string authToken;
+		std::string docFilename;
+	};
+
+	struct GetDocNamesResponse {
+		Type type = Type::getDocNames;
+		OneByteInt version = 0;
+		std::string errMsg;
+		std::vector<std::string> docNames;
 	};
 
 	struct Login {
@@ -306,4 +324,5 @@ namespace msg {
 		OneByteInt version;
 		OneByteInt user;
 	};
+
 }

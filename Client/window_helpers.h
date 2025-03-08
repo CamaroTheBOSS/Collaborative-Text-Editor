@@ -25,7 +25,7 @@ TextInputWindow::TextInputHandler funcSearchModifyEvent();
 TextInputWindow::TextInputHandler funcSearchSubmitEvent();
 TextInputWindow::TextInputHandler funcSearchDeleteEvent();
 TextInputWindow::TextInputHandler funcReplaceSubmitEvent();
-TextInputWindow::TextInputHandler funcLoadDocSubmitEvent();
+TextInputWindow::TextInputHandler funcJoinDocSubmitEvent();
 TextInputWindow::TextInputHandler funcCreateDocSubmitEvent();
 TextInputWindow::TextInputHandler funcSubmitLoginPasswordEvent(bool isRegistration);
 

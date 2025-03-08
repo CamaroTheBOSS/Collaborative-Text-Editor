@@ -2,6 +2,7 @@
 #include "deserializer.h"
 #include "serializer.h"
 #include "engine.h"
+#include "logging.h"
 
 namespace server {
 	Response Authenticator::process(SOCKET client, msg::Buffer& buffer) {
@@ -16,10 +17,15 @@ namespace server {
 			return logoutUser(args);
 		case msg::Type::registration:
 			return registerUser(args);
+		case msg::Type::getDocNames:
+			return getDocNames(args);
+		case msg::Type::delDoc:
+			return delDoc(args);
 		}
+		assert(false && "Unrecognized msg type. Aborting...");
 		return Response{ buffer, {}, msg::Type::error };
 	}
-
+	
 	Response Authenticator::loginUser(const ArgPack& args) {
 		auto msg = Deserializer::parseLogin(args.buffer);
 		auto userFromDbOpt = db.getUserWithUsername(msg.login);
@@ -61,6 +67,41 @@ namespace server {
 		auto success = db.addUser(dbUser);
 		auto buffer = Serializer::makeRegisterResponse(msg.version, success ? "" : db.getLastError());
 		return Response{ buffer, {args.client}, msg.type };
+	}
+
+	Response Authenticator::getDocNames(const ArgPack& args) {
+		auto msg = Deserializer::parseControlMessage(args.buffer);
+		auto userData = getUserData(args.client);
+		if (userData.authToken != msg.authToken) {
+			logger.logError("Cannot authenticate user", args.client);
+			auto newBuffer = Serializer::makeGetNamesResponse(1, "Cannot authenticate user", {});
+			return Response{ std::move(newBuffer), { args.client }, msg::Type::error };
+		}
+		auto names = db.getUserDocumentNames(userData.username);
+		auto newBuffer = Serializer::makeGetNamesResponse(1, "", names);
+		return Response{ std::move(newBuffer), { args.client }, msg::Type::getDocNames };
+	}
+
+	Response Authenticator::delDoc(const ArgPack& args) {
+		auto msg = Deserializer::parseDelDoc(args.buffer);
+		auto userData = getUserData(args.client);
+		if (userData.authToken != msg.authToken) {
+			logger.logError("Cannot authenticate user", args.client);
+			auto newBuffer = Serializer::makeAckResponse(msg::Type::delDoc, 1, "Cannot authenticate user");
+			return Response{ std::move(newBuffer), { args.client }, msg::Type::error };
+		}
+		auto doc = db.getDocWithUsernameAndFilename(userData.username, msg.docFilename);
+		if (!doc) {
+			auto newBuffer = Serializer::makeAckResponse(msg::Type::delDoc, 1, db.getLastError());
+			return Response{ std::move(newBuffer), { args.client }, msg::Type::error };
+		}
+		DBUser user(userData.username, "", {});
+		if (!db.unlinkUserAndDoc(user, doc.value())) {
+			auto newBuffer = Serializer::makeAckResponse(msg::Type::delDoc, 1, db.getLastError());
+			return Response{ std::move(newBuffer), { args.client }, msg::Type::error };
+		}
+		auto newBuffer = Serializer::makeAckResponse(msg::Type::delDoc, 1, db.getLastError());
+		return Response{ std::move(newBuffer), { args.client }, msg::Type::delDoc };
 	}
 
 	void Authenticator::clearUser(SOCKET client) {

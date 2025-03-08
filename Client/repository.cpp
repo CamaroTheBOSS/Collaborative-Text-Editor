@@ -17,6 +17,7 @@ namespace client {
 		case msg::Type::moveVertical:
 		case msg::Type::moveTo:
 			return move(doc, buffer);
+		case msg::Type::load:
 		case msg::Type::create:
 		case msg::Type::join:
 			return sync(doc, buffer);
@@ -32,6 +33,10 @@ namespace client {
 			return logout(doc, buffer);
 		case msg::Type::registration:
 			return registered(doc, buffer);
+		case msg::Type::getDocNames:
+			return getDocNames(buffer);
+		case msg::Type::delDoc:
+			return deleteDoc(buffer);
 		}
 		assert(false && "Unrecognized msg type. Aborting...");
 		return false;
@@ -142,6 +147,29 @@ namespace client {
 		return true;
 	}
 
+	bool Repository::getDocNames(msg::Buffer& buffer) {
+		msg::GetDocNamesResponse msg;
+		fetchedDocNames.clear();
+		parse(buffer, 1, msg.version, msg.errMsg, fetchedDocNames);
+		if (!msg.errMsg.empty()) {
+			logger.logInfo("Error when getting doc names:", msg.errMsg);
+			lastError = msg.errMsg;
+			return false;
+		}
+		return true;
+	}
+
+	bool Repository::deleteDoc(msg::Buffer& buffer) {
+		msg::AckResponse msg;
+		parse(buffer, 1, msg.version, msg.errMsg);
+		if (!msg.errMsg.empty()) {
+			logger.logInfo("Error when deleting doc:", msg.errMsg);
+			lastError = msg.errMsg;
+			return false;
+		}
+		return true;
+	}
+
 	std::string Repository::getAcCode() const {
 		return acCode;
 	}
@@ -153,6 +181,9 @@ namespace client {
 	}
 	void Repository::cleanAuthToken() {
 		return authToken.clear();
+	}
+	std::vector<std::string>& Repository::getFetchedDocNames() {
+		return fetchedDocNames;
 	}
 	std::string Repository::getLastError() {
 		std::string err = lastError;
