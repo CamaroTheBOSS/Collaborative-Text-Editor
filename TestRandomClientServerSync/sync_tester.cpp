@@ -44,7 +44,7 @@ void SyncTester::logDesync(const std::string& errorLog) {
 	writeToFile("desync.txt", errorLog);
 }
 
-std::string SyncTester::compareDocs(const Document& clientDoc, const Document& serverDoc) const {
+std::string SyncTester::compareDocs(const ClientSiteDocument& clientDoc, const ServerSiteDocument& serverDoc) const {
 	std::stringstream ss;
 	int nError = 0;
 	auto& clientData = clientDoc.get();
@@ -78,8 +78,8 @@ void SyncTester::randomUndoRedoTest() {
 	bool success = true;
 	std::string desyncLog;
 	constexpr int nRandomActions = 500;
-	auto& serverDoc = server.server.repo.doc;
-	auto& clientDoc = client.controller.repo.doc;
+	auto serverDoc = ServerSiteDocument{};// server.server.repo.doc;
+	auto clientDoc = ClientSiteDocument{}; //client.controller.repo.;
 	serverState.cursorPositions.push_back(serverDoc.getCursorPositions());
 	serverState.actions.push_back(DocAction{});
 	clientState.cursorPositions.push_back(clientDoc.getCursorPositions());

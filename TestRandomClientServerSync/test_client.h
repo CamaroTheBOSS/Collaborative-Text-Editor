@@ -1,5 +1,5 @@
 #pragma once
-#include "controller.h"
+#include "application.h"
 #include "state.h"
 
 #include <thread>
@@ -17,7 +17,7 @@ public:
 	DocAction getUndoAction() const;
 	std::string getRandomString();
 private:
-	Controller controller;
+	Application controller;
 	std::string serverIp;
 	int serverPort;
 };

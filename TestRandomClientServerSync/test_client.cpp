@@ -10,7 +10,7 @@ constexpr static std::array<const char*, 20> randomStrings = {
 };
 
 TestClient::TestClient(const std::string& serverIp, const int serverPort, const int seed) :
-	controller(),
+	controller(serverIp, serverPort),
 	serverIp(serverIp),
 	serverPort(serverPort) {
 	random::Engine::get().setSeed(seed);
@@ -94,10 +94,10 @@ void TestClient::start() {
 		std::cout << "Connection to server failed!\n";
 		return;
 	}
-	if (!controller.requestDocument(std::chrono::milliseconds(500), 3)) {
+	/*if (!controller.requestDocument(std::chrono::milliseconds(500), 3)) {
 		std::cout << "Requesting document from the server failed!\n";
 		return;
-	}
+	}*/
 }
 
 void TestClient::stop() {

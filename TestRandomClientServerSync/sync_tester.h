@@ -14,7 +14,7 @@ private:
 	void randomTest();
 	void randomUndoRedoTest();
 	std::string getActionLog(const State& state) const;
-	std::string compareDocs(const Document& clientDoc, const Document& serverDoc) const;
+	std::string compareDocs(const ClientSiteDocument& clientDoc, const ServerSiteDocument& serverDoc) const;
 	TestServer server;
 	TestClient client;
 	std::string filename{"actions.txt"};

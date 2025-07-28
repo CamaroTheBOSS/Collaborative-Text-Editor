@@ -14,6 +14,24 @@ constexpr char closeMsgBuffer[msgBufferSize] = { 0, 0, 0, 2, closeType, version 
 Server::Server(std::string ip, const int port) :
 	ip(ip),
 	port(port) {
+	SOCKET s = INVALID_SOCKET;
+
+	struct addrinfo hint = { 0 };
+	hint.ai_flags = AI_NUMERICHOST;
+	hint.ai_family = AF_UNSPEC;
+	hint.ai_socktype = SOCK_STREAM;
+	hint.ai_protocol = IPPROTO_TCP;
+
+	struct addrinfo* addrs = NULL;
+	int ret = getaddrinfo("camarotheboss.mooo.com", NULL, &hint, &addrs);
+	if (ret == EAI_NONAME)
+	{
+		hint.ai_flags = 0;
+		ret = getaddrinfo("camarotheboss.mooo.com", NULL, &hint, &addrs);
+	}
+
+
+
 	listenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (listenSocket == INVALID_SOCKET) {
 		logger.logError(WSAGetLastError(), ": Error when creating listening socket");
