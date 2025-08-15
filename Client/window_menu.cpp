@@ -30,7 +30,7 @@ Event MenuWindow::processChar(TCPClient& client, const KeyPack& key, const std::
 Event MenuWindow::goUp() {
     selectedOption--;
     if (selectedOption < 0) {
-        selectedOption = options.size() - 1;
+        selectedOption = static_cast<int>(options.size() - 1);
     }
     selectOption();
     return Event{};
