@@ -2,9 +2,11 @@ module;
 
 #include <winsock2.h>
 #include "Windows.h"
-#include "client_document.h"
+#include <vector>
+#include <string>
 
 export module screen.buffers;
+import client.document;
 
 export using TextLines = std::vector<std::string>;
 export struct RenderCursor {

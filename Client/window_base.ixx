@@ -1,12 +1,15 @@
 module;
 
-#include "client_document.h"
 #include <unordered_map>
+#include <string>
+#include <vector>
+#include "document_base.h"
 
 export module window.base;
 export import screen.buffers.builder;
 export import keypack;
 export import tcp_client;
+import client.document;
 import canvas;
 
 export struct Event {

@@ -1,10 +1,14 @@
 module;
+
+#include "Windows.h"
 #include <memory>
-#include "client_document.h"
+#include <vector>
+#include <string>
 
 export module renderer;
 import window.base;
 import canvas;
+import client.document;
 
 export class Renderer {
 public:

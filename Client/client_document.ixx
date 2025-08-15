@@ -1,7 +1,9 @@
-#pragma once
+module;
 #include "document_base.h"
 
-class ClientSiteDocument : public BaseDocument {
+export module client.document;
+
+export class ClientSiteDocument : public BaseDocument {
 public:
 	ClientSiteDocument();
 	ClientSiteDocument(const std::string& text);

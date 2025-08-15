@@ -1,10 +1,12 @@
 module;
 
-#include "client_document.h"
+#include <string>
+#include <vector>
 
 export module repository;
 import messages;
 import screen.buffers;
+import client.document;
 
 namespace client {
 	export class Repository {

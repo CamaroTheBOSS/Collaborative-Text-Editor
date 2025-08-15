@@ -140,6 +140,7 @@
     <ClCompile Include="canvas.cpp" />
     <ClCompile Include="canvas.ixx" />
     <ClCompile Include="client_document.cpp" />
+    <ClCompile Include="client_document.ixx" />
     <ClCompile Include="events.ixx" />
     <ClCompile Include="keypack.ixx" />
     <ClCompile Include="renderer.ixx" />
@@ -176,7 +177,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="action_scenarios.h" />
-    <ClInclude Include="client_document.h" />
     <ClInclude Include="keypack_defs.h" />
     <ClInclude Include="application.h" />
     <ClInclude Include="logging.h" />
