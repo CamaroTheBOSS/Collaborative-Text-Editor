@@ -1,14 +1,16 @@
 #pragma once
-#include "terminal.h"
 #include "repository.h"
 #include "tcp_client.h"
 
 #include <chrono>
 #include <unordered_map>
+#include <memory>
 
+import window.base;
 import window.manager;
 import window.menu;
 import messages;
+import terminal;
 
 using Windows = std::vector<std::unique_ptr<BaseWindow>>;
 using WindowsRegistry = std::unordered_map<std::string, bool>;

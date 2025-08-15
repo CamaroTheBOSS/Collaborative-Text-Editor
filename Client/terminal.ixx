@@ -1,15 +1,17 @@
-#pragma once
+module;
 #define _WINSOCKAPI_ 
 #include <Winsock2.h>
 #include <Windows.h>
 #include <memory>
 #include <vector>
+#include <string>
 
+export module terminal;
 import window.base;
 import keypack;
 import canvas;
 
-class Terminal {
+export class Terminal {
 public:
 	Terminal();
 	~Terminal();

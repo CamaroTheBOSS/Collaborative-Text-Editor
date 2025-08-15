@@ -145,6 +145,7 @@
     <ClCompile Include="screen_buffers.ixx" />
     <ClCompile Include="screen_buffers_builder.cpp" />
     <ClCompile Include="screen_buffers_builder.ixx" />
+    <ClCompile Include="terminal.ixx" />
     <ClCompile Include="windows_manager.ixx" />
     <ClCompile Include="window_base.ixx" />
     <ClCompile Include="window_helpers.cpp" />
@@ -179,7 +180,6 @@
     <ClInclude Include="logging.h" />
     <ClInclude Include="renderer.h" />
     <ClInclude Include="repository.h" />
-    <ClInclude Include="terminal.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Document\Document.vcxproj">

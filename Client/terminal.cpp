@@ -1,8 +1,12 @@
+module;
+
+#include <Windows.h>
 #include <conio.h>
 #include <iostream>
 
-#include "terminal.h"
 #include "logging.h"
+
+module terminal;
 
 using namespace client;
 

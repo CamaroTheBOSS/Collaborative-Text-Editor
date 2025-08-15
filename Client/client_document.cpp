@@ -1,14 +1,14 @@
 #include "client_document.h"
 #include "pos_helpers.h"
 
-std::pair<int, bool> binarySearchSegments(const TextContainer::Segments& segments, const int left, const int right, const COORD& pos) {
+std::pair<size_t, bool> binarySearchSegments(const TextContainer::Segments& segments, const size_t left, const size_t right, const COORD& pos) {
 	if (segments.empty()) {
 		return { -1, false };
 	}
 	if (left == right) {
 		return { left, false };
 	}
-	int center = left + (right - left) / 2;
+	size_t center = left + (right - left) / 2;
 	if (segments[center].first >= pos) {
 		return binarySearchSegments(segments, left, center, pos);
 	}
@@ -97,8 +97,8 @@ void ClientSiteDocument::afterWriteAction(const int index, const COORD& startPos
 	}
 	COORD diff = endPos - startPos;
 	auto [closestSegment, toDelete] = binarySearchSegments(segments, 0, segments.size(), startPos);
-	int start = (std::max)(closestSegment, 0);
-	for (int i = start; i < segments.size(); i++) {
+	size_t start = (std::max)(closestSegment, static_cast<size_t>(0));
+	for (size_t i = start; i < segments.size(); i++) {
 		moveSegment(segments[i], startPos, diff);
 	}
 	if (toDelete) {
@@ -115,11 +115,11 @@ void ClientSiteDocument::afterEraseAction(const int index, const COORD& startPos
 	}
 	COORD diff = endPos - startPos;
 	auto [closestSegmnetToEnd, toDeleteEnd] = binarySearchSegments(segments, 0, segments.size(), endPos);
-	int start = (std::max)(closestSegmnetToEnd, 0);
+	size_t start = (std::max)(closestSegmnetToEnd, static_cast<size_t>(0));
 	std::vector<int> indexesToDelete;
-	for (int i = start; i < segments.size(); i++) {
+	for (size_t i = start; i < segments.size(); i++) {
 		if (segmentsIntersect(segments[i].first, segments[i].second, endPos, startPos)) {
-			indexesToDelete.push_back(i);
+			indexesToDelete.push_back(static_cast<int>(i));
 			continue;
 		}
 		moveSegment(segments[i], startPos, diff);

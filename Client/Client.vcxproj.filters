@@ -120,11 +120,11 @@
     <ClCompile Include="canvas.ixx">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
+    <ClCompile Include="terminal.ixx">
+      <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="terminal.h">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
     <ClInclude Include="repository.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
