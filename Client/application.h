@@ -58,7 +58,7 @@ private:
 	client::Repository repo;
 
 	WindowsManager windowsManager;
-	std::unordered_map<std::string, void(*)(const Event&)> eventHandlers;
+	std::unordered_map<std::string, void(Application::*)(const Event&)> eventHandlers;
 	std::string srvIp;
 	int srvPort;
 };

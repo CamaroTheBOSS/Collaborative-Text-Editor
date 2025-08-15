@@ -19,6 +19,8 @@ import validator;
 using namespace client;
 constexpr msg::OneByteInt version = 1;
 
+void xd(const Event& event) {};
+
 Application::Application(const std::string& ip, const int port) :
     srvIp(ip),
     srvPort(port),
@@ -28,22 +30,22 @@ Application::Application(const std::string& ip, const int port) :
     repo() {
     windowsManager.showWindow<TextEditorWindow>(makeTextEditorWindowBuilder(terminal.getScreenSize()));
     windowsManager.showWindow<MenuWindow>(makeMenuWindowBuilder(terminal.getScreenSize(), windows::mainmenu::name), getMainMenuOptions());
-    /*eventHandlers = {
-        {windows::app::events::createDoc, &eventCreateDoc},
-        {windows::app::events::joinDoc, &eventJoinDoc},
-        {windows::app::events::exit, &eventMainMenuExitChosen},
-        {windows::app::events::createDocWindow, &eventMainMenuCreateChosen},
-        {windows::app::events::joinDocWindow, &eventMainMenuJoinChosen},
-        {windows::app::events::loadDocWindow, &eventMainMenuLoadChosen},
-        {windows::app::events::loadItemClicked, &eventLoadItemClicked},
-        {windows::app::events::loadItemAccepted, &eventLoadItemAccepted},
-        {windows::app::events::loadItemDeleted, &eventLoadItemDeleted},
-        {windows::app::events::help, &eventMainMenuHelpChosen},
-        {windows::app::events::disconnect, &eventMainMenuDisconnectChosen},
-        {windows::app::events::showAcCode, &eventMainMenuShowAcCodeChosen},
-        {windows::app::events::showLoginWindow, &eventMainMenuLoginRegisterChosen},
-        {windows::app::events::acceptLoginPassword, &eventLoginPasswordAccepted},
-    };*/
+    eventHandlers = {
+        {windows::app::events::createDoc, &Application::eventCreateDoc},
+        {windows::app::events::joinDoc, &Application::eventJoinDoc},
+        {windows::app::events::exit, &Application::eventMainMenuExitChosen},
+        {windows::app::events::createDocWindow, &Application::eventMainMenuCreateChosen},
+        {windows::app::events::joinDocWindow, &Application::eventMainMenuJoinChosen},
+        {windows::app::events::loadDocWindow, &Application::eventMainMenuLoadChosen},
+        {windows::app::events::loadItemClicked, &Application::eventLoadItemClicked},
+        {windows::app::events::loadItemAccepted, &Application::eventLoadItemAccepted},
+        {windows::app::events::loadItemDeleted, &Application::eventLoadItemDeleted},
+        {windows::app::events::help, &Application::eventMainMenuHelpChosen},
+        {windows::app::events::disconnect, &Application::eventMainMenuDisconnectChosen},
+        {windows::app::events::showAcCode, &Application::eventMainMenuShowAcCodeChosen},
+        {windows::app::events::showLoginWindow, &Application::eventMainMenuLoginRegisterChosen},
+        {windows::app::events::acceptLoginPassword, &Application::eventLoginPasswordAccepted},
+    };
 }
 
 bool Application::connect(const std::string& ip, const int port) {
@@ -199,7 +201,7 @@ bool Application::processEvent(const Event& pEvent) {
     if (it == eventHandlers.cend()) {
         return false;
     }
-    (*it->second)(pEvent);
+    (this->*it->second)(pEvent);
     return true;
 }
 
