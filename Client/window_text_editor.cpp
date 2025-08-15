@@ -1,6 +1,14 @@
-#include "window_text_editor.h"
+module;
 
-constexpr msg::OneByteInt version = 1;
+#include <string>
+#include <typeinfo>
+#include "pos_helpers.h"
+#include "keypack_defs.h"
+
+module window.text_editor;
+import messages;
+
+static constexpr msg::OneByteInt version = 1;
 
 TextEditorWindow::TextEditorWindow(const ScrollableScreenBufferBuilder& ssbBuilder) :
     BaseWindow(ssbBuilder) {

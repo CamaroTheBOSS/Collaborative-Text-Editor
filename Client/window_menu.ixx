@@ -1,14 +1,18 @@
-#pragma once
-#include "window_base.h"
+module;
+
 #include <functional>
+#include <string>
+
+export module window.menu;
+import window.base;
 
 class MenuWindow;
-struct Option {
+export struct Option {
 	std::string name;
 	std::function<Event(MenuWindow&)> handler;
 };
 
-class MenuWindow : public BaseWindow {
+export class MenuWindow : public BaseWindow {
 public:
 	MenuWindow(const ScrollableScreenBufferBuilder& ssbBuilder, std::vector<Option>&& options);
 	Event processChar(TCPClient& client, const KeyPack& key, const std::string& clipboardData) override;

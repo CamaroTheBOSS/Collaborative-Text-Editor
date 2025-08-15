@@ -1,6 +1,12 @@
-#include "window_info.h"
+module;
 
-constexpr msg::OneByteInt version = 1;
+#include <string>
+#include "keypack_defs.h"
+
+module window.info;
+import messages;
+
+static constexpr msg::OneByteInt version = 1;
 
 InfoWindow::InfoWindow(const ScrollableScreenBufferBuilder& ssbBuilder, const std::string& msg) :
     BaseWindow(ssbBuilder),

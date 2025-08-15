@@ -1,5 +1,10 @@
-#include "windows_manager.h"
+module;
+
 #include "pos_helpers.h"
+#include <string>
+
+module window.manager;
+import window.text_editor;
 
 
 WindowsManager::WindowsManager(const COORD& consoleSize) {

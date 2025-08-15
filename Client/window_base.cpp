@@ -1,5 +1,9 @@
-#include "window_base.h"
+module;
+
 #include "renderer.h"
+#include <fstream>
+
+module window.base;
 
 BaseWindow::BaseWindow(const ScrollableScreenBufferBuilder& ssbBuilder) :
     doc(),

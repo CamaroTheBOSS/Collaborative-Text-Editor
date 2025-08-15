@@ -1,4 +1,8 @@
-#include "screen_buffers.h"
+module;
+
+#include <string>
+
+module screen.buffers;
 
 void ScrollableScreenBuffer::moveHorizontal(const int units) {
 	setBufferAbsoluteSize(left + units, top, right + units, bottom);

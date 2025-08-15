@@ -1,8 +1,9 @@
 #pragma once
 
 #include "client_document.h"
-#include "messages.h"
-#include "screen_buffers.h"
+
+import messages;
+import screen.buffers;
 
 namespace client {
 	class Repository {

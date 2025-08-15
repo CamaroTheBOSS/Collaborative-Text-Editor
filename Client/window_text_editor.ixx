@@ -1,7 +1,12 @@
-#pragma once
-#include "window_base.h"
+module;
 
-class TextEditorWindow : public BaseWindow {
+#include <string>
+
+export module window.text_editor;
+import window.base;
+import events;
+
+export class TextEditorWindow : public BaseWindow {
 	friend class SyncTester;
 public:
 	TextEditorWindow(const ScrollableScreenBufferBuilder& ssbBuilder);

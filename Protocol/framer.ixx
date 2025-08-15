@@ -1,22 +1,24 @@
-#pragma once
+module;
+
 #include <vector>
 
-#include "messages.h"
+export module framer;
+import messages;
 
-using Messages = std::vector<msg::Buffer>;
+export using Messages = std::vector<msg::Buffer>;
 
-class Framer {
+export class Framer {
 public:
 	Framer(const int capacity);
 	Messages extractMessages(msg::Buffer& recvBuff);
 private:
 	void extractLength(int head, msg::Buffer& recvBuff, Messages& messages);
 	void extractMsg(int head, msg::Buffer& recvBuff, Messages& messages);
-	enum class State {length, msg, drop};
+	enum class State { length, msg, drop };
 
 	State state = State::length;
 	msg::Buffer msgBuff;
-	msg::Buffer lenBuff{4};
+	msg::Buffer lenBuff{ 4 };
 	unsigned int neededSymbols = 0;
 
 	// debug buffers

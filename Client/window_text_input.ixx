@@ -1,8 +1,12 @@
-#pragma once
-#include "window_base.h"
-#include <functional>
+module;
 
-class TextInputWindow : public BaseWindow {
+#include <functional>
+#include <string>
+
+export module window.text_input;
+import window.base;
+
+export class TextInputWindow : public BaseWindow {
 public:
 	using TextInputHandler = std::function<Event(const TextInputWindow&, const ClientSiteDocument&)>;
 	TextInputWindow(const ScrollableScreenBufferBuilder& ssbBuilder, TextInputHandler onSubmitHandler = funcNoop(),

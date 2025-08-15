@@ -1,6 +1,4 @@
 #pragma once
-#include <string>
-
 #define ARROW_UP 1296
 #define ARROW_DOWN 1304
 #define ARROW_LEFT 1299
@@ -26,11 +24,3 @@
 #define ESC 27
 
 #define F3 1061
-
-struct KeyPack {
-	int keyCode;
-	bool shiftPressed;
-	std::string str() const {
-		return "(" + std::to_string(keyCode) + (shiftPressed ? ", shift)" : ")");
-	}
-};

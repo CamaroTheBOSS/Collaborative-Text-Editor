@@ -1,4 +1,9 @@
-#include "window_menu.h"
+module;
+
+#include "keypack_defs.h"
+#include <string>
+
+module window.menu;
 
 MenuWindow::MenuWindow(const ScrollableScreenBufferBuilder& ssbBuilder, std::vector<Option>&& menuOptions) :
     BaseWindow(ssbBuilder),

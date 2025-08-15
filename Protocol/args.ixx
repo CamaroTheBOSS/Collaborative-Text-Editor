@@ -1,17 +1,21 @@
+module;
+
 #include <string>
 #include <unordered_map>
 #include <vector>
 #include <variant>
 
-static constexpr const char* commandRun = "__run__";
-static constexpr const char* commandHelp = "help";
+export module args;
+
+export constexpr const char* commandRun = "__run__";
+export constexpr const char* commandHelp = "help";
 
 template <typename E>
 constexpr typename std::underlying_type<E>::type to_underlying(E e) noexcept {
 	return static_cast<typename std::underlying_type<E>::type>(e);
 }
 
-class Args {
+export class Args {
 public:
 	enum class Type { null = 0, integer = 1, string = 2 };
 private:
@@ -23,11 +27,12 @@ public:
 		Command(const std::string& key, const std::string& description = "", std::vector<std::string>&& requiredArgKeys = {}) :
 			key(key),
 			description(description),
-			requiredArgKeys(requiredArgKeys) {}
+			requiredArgKeys(requiredArgKeys) {
+		}
 		bool isArgRequiredForCommand(const std::string& commandKey) {
 			return std::find(requiredArgKeys.cbegin(), requiredArgKeys.cend(), commandKey) != requiredArgKeys.cend();
 		}
-		
+
 		std::string key;
 		std::string description;
 		std::vector<std::string> requiredArgKeys;
@@ -37,12 +42,14 @@ public:
 		Arg() = default;
 		Arg(const Type type, const std::string& description = "") :
 			type(type),
-			description(description) {}
+			description(description) {
+		}
 		template <typename T>
 		Arg(const Type type, const T&& value, const std::string& description = "") :
 			type(type),
-			value(Variant{value}),
-			description(description) {}
+			value(Variant{ value }),
+			description(description) {
+		}
 		Type type = Type::null;
 		Variant value = Variant{ NullArg{} };
 		std::string description;

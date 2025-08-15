@@ -1,5 +1,6 @@
 #pragma once
 #include <utility>
+#define _WINSOCKAPI_ 
 #include <Windows.h>
 
 COORD makeCoord(const int X, const int Y);

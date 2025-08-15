@@ -1,13 +1,15 @@
-#pragma once
-#include "tcp_client.h"
-#include "screen_buffers_builder.h"
-#include "keypack.h"
-#include "canvas.h"
-#include "events.h"
+module;
 
+#include "tcp_client.h"
+#include "canvas.h"
+#include "client_document.h"
 #include <unordered_map>
 
-struct Event {
+export module window.base;
+export import screen.buffers.builder;
+export import keypack;
+
+export struct Event {
 	std::string name;
 	std::string src;
 	std::string target;
@@ -17,10 +19,10 @@ struct Event {
 	}
 };
 
-template <typename T>
+export template <typename T>
 using EventHandlersMap = std::unordered_map<std::string, void(T::*)(const TCPClient&, const std::vector<std::string>&)>;
 
-class BaseWindow {
+export class BaseWindow {
 public:
 	BaseWindow(const ScrollableScreenBufferBuilder& ssbBuilder);
 	virtual Event onDelete() { return Event{}; };

@@ -3,9 +3,10 @@
 #include <Winsock2.h>
 #include <Windows.h>
 #include <memory>
-#include "window_base.h"
-#include "keypack.h"
 #include "canvas.h"
+
+import window.base;
+import keypack;
 
 class Terminal {
 public:

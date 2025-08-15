@@ -1,6 +1,8 @@
 #pragma once
-#include "args.h"
 #include "application.h"
+#include "keypack_defs.h"
+
+import args;
 
 static constexpr const char* port = "port";
 static constexpr const char* ip = "ip";

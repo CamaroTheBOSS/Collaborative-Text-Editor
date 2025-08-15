@@ -1,5 +1,6 @@
 #include "pch.h"
-#include "args.h"
+
+import args;
 
 static constexpr int invalidInt = -134320423;
 struct Arg {

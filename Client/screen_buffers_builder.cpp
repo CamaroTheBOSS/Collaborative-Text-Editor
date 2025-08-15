@@ -1,4 +1,8 @@
-#include "screen_buffers_builder.h"
+module;
+
+#include <string>
+
+module screen.buffers.builder;
 
 std::string ScrollableScreenBufferBuilder::getTitle() const {
 	return title;

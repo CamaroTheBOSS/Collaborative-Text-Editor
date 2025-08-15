@@ -1,6 +1,8 @@
 #include <memory>
-#include "window_base.h"
 #include "canvas.h"
+#include "client_document.h"
+
+import window.base;
 
 class Renderer {
 public:

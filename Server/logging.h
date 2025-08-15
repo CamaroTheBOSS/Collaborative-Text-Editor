@@ -1,5 +1,5 @@
 #pragma once
-#include "logger.h"
+import logger;
 
 namespace server {
 	extern logs::Logger logger;

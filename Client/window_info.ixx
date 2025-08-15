@@ -1,7 +1,11 @@
-#pragma once
-#include "window_base.h"
+module;
 
-class InfoWindow : public BaseWindow {
+#include <string>
+
+export module window.info;
+import window.base;
+
+export class InfoWindow : public BaseWindow {
 public:
 	InfoWindow(const ScrollableScreenBufferBuilder& ssbBuilder, const std::string& msg);
 	InfoWindow(const ScrollableScreenBufferBuilder& ssbBuilder, const std::string&& msg);

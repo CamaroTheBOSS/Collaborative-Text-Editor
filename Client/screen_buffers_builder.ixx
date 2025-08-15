@@ -1,8 +1,11 @@
-#pragma once
-#include <string>
-#include "screen_buffers.h"
+module;
 
-class ScrollableScreenBufferBuilder {
+#include <string>
+
+export module screen.buffers.builder;
+export import screen.buffers;
+
+export class ScrollableScreenBufferBuilder {
 public:
     std::string getTitle() const;
 

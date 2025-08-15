@@ -1,7 +1,12 @@
-#include "window_text_input_obsfucated.h"
-#include "renderer.h"
+module;
 
-constexpr msg::OneByteInt version = 1;
+#include "renderer.h"
+#include "keypack_defs.h"
+
+module window.text_input.obsfucated;
+import messages;
+
+static constexpr msg::OneByteInt version = 1;
 
 ObsfucatedTextInputWindow::ObsfucatedTextInputWindow(const ScrollableScreenBufferBuilder& ssbBuilder, TextInputHandler onSubmitHandler, TextInputHandler onModifyHandler, TextInputHandler onDeleteHandler) :
     TextInputWindow(ssbBuilder, onSubmitHandler, onModifyHandler, onDeleteHandler),

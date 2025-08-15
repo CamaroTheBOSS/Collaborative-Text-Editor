@@ -1,6 +1,12 @@
-#include "window_text_input.h"
+module;
 
-constexpr msg::OneByteInt version = 1;
+#include <string>
+#include "keypack_defs.h"
+
+module window.text_input;
+import messages;
+
+static constexpr msg::OneByteInt version = 1;
 
 TextInputWindow::TextInputHandler TextInputWindow::funcNoop() {
     return [](const TextInputWindow& win, const ClientSiteDocument& doc) {

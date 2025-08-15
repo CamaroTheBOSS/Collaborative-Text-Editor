@@ -1,4 +1,14 @@
-#include "window_helpers.h"
+module;
+
+#include "pos_helpers.h";
+#include <string>
+#include <vector>
+
+module screen.buffers.builder;
+import window.text_input;
+import window.menu;
+import events;
+import window.helpers;
 
 ScrollableScreenBufferBuilder makeCreateDocWindowBuilder(const COORD& consoleSize) {
     ScrollableScreenBufferBuilder builder;

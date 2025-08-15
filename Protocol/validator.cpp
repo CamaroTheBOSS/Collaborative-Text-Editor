@@ -1,6 +1,9 @@
-#include "validator.h"
+module;
 
 #include <algorithm>
+#include <string>
+
+module validator;
 
 std::string Validator::validateString(const std::string& str) {
 	if (str.empty()) {

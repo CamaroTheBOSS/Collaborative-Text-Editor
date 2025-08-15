@@ -137,16 +137,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="application_event_handlers.cpp" />
     <ClCompile Include="canvas.cpp" />
     <ClCompile Include="client_document.cpp" />
+    <ClCompile Include="events.ixx" />
+    <ClCompile Include="keypack.ixx" />
+    <ClCompile Include="screen_buffers.ixx" />
     <ClCompile Include="screen_buffers_builder.cpp" />
+    <ClCompile Include="screen_buffers_builder.ixx" />
+    <ClCompile Include="windows_manager.ixx" />
+    <ClCompile Include="window_base.ixx" />
     <ClCompile Include="window_helpers.cpp" />
     <ClCompile Include="windows_manager.cpp" />
     <ClCompile Include="window_base.cpp" />
+    <ClCompile Include="window_helpers.ixx" />
     <ClCompile Include="window_info.cpp" />
+    <ClCompile Include="window_info.ixx" />
     <ClCompile Include="window_menu.cpp" />
-    <ClCompile Include="window_menu.h" />
+    <ClCompile Include="window_menu.ixx" />
     <ClCompile Include="window_text_editor.cpp" />
     <ClCompile Include="application.cpp" />
     <ClCompile Include="logging.cpp" />
@@ -157,30 +164,22 @@
     <ClCompile Include="tcp_client.h" />
     <ClCompile Include="tcp_client_windows.cpp" />
     <ClCompile Include="terminal.cpp" />
+    <ClCompile Include="window_text_editor.ixx" />
     <ClCompile Include="window_text_input.cpp" />
+    <ClCompile Include="window_text_input.ixx" />
     <ClCompile Include="window_text_input_obsfucated.cpp" />
+    <ClCompile Include="window_text_input_obsfucated.ixx" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="action_scenarios.h" />
-    <ClInclude Include="application_event_handlers.h" />
     <ClInclude Include="canvas.h" />
     <ClInclude Include="client_document.h" />
-    <ClInclude Include="events.h" />
-    <ClInclude Include="keypack.h" />
-    <ClInclude Include="screen_buffers_builder.h" />
-    <ClInclude Include="window_helpers.h" />
-    <ClInclude Include="windows_manager.h" />
-    <ClInclude Include="window_base.h" />
-    <ClInclude Include="window_info.h" />
-    <ClInclude Include="window_text_editor.h" />
+    <ClInclude Include="keypack_defs.h" />
     <ClInclude Include="application.h" />
     <ClInclude Include="logging.h" />
     <ClInclude Include="renderer.h" />
     <ClInclude Include="repository.h" />
-    <ClInclude Include="screen_buffers.h" />
     <ClInclude Include="terminal.h" />
-    <ClInclude Include="window_text_input.h" />
-    <ClInclude Include="window_text_input_obsfucated.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Document\Document.vcxproj">

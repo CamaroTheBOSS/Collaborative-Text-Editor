@@ -1,7 +1,7 @@
 #pragma once
 #include <unordered_map>
 
-#include "framer.h"
+import framer;
 
 class MessageExtractor {
 public:

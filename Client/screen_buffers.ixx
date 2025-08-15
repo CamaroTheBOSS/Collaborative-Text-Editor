@@ -1,10 +1,13 @@
-#pragma once
+module;
+
 #include <winsock2.h>
 #include "Windows.h"
 #include "client_document.h"
 
-using TextLines = std::vector<std::string>;
-struct RenderCursor {
+export module screen.buffers;
+
+export using TextLines = std::vector<std::string>;
+export struct RenderCursor {
     RenderCursor(const COORD& pos, const char pointedChar, const int indexInDoc) :
         pos(pos),
         pointedChar(pointedChar),
@@ -14,13 +17,13 @@ struct RenderCursor {
     int indexInDoc;
 };
 
-template <typename T>
+export template <typename T>
 struct Pos {
     T X{ 0 };
     T Y{ 0 };
 };
 struct Frame;
-class ScrollableScreenBuffer {
+export class ScrollableScreenBuffer {
 public:
     friend class ScrollableScreenBufferBuilder;
     ScrollableScreenBuffer() = default;
@@ -95,7 +98,7 @@ private:
     std::string title;
 };
 
-struct Frame {
+export struct Frame {
     ScrollableScreenBuffer buffer;
     TextLines text;
 };

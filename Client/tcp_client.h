@@ -1,14 +1,16 @@
 #pragma once
 #define _WINSOCKAPI_ 
 #include <Windows.h>
+#include <WinSock2.h>
 #include <thread>
 #include <queue>
 #include <mutex>
 #include <atomic>
 
-#include "messages.h"
 #include "logging.h"
-#include "framer.h"
+
+import framer;
+import messages;
 
 class TCPClient {
 public:

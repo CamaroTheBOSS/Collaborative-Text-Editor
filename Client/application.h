@@ -1,9 +1,14 @@
 #pragma once
-#include "windows_manager.h"
 #include "terminal.h"
 #include "repository.h"
-#include "application_event_handlers.h"
-#include "window_menu.h"
+#include "tcp_client.h"
+
+#include <chrono>
+#include <unordered_map>
+
+import window.manager;
+import window.menu;
+import messages;
 
 using Windows = std::vector<std::unique_ptr<BaseWindow>>;
 using WindowsRegistry = std::unordered_map<std::string, bool>;
@@ -26,13 +31,32 @@ public:
 	void render();
 	std::vector<Option> getMainMenuOptions() const;
 private:
+	bool processEvent(const Event& event);
+	bool validateConnection();
+	bool validateTextInputWindow(const WindowsIt& window);
+	bool waitForResponseAndProccessIt(const msg::Type type);
+	bool joinCreateDocImpl(const msg::Type type, msg::OneByteInt version, const Event& pEvent);
+	void eventJoinDoc(const Event& pEvent);
+	void eventCreateDoc(const Event& pEvent);
+	void eventLoadItemDeleted(const Event& pEvent);
+	void eventLoadItemAccepted(const Event& pEvent);
+	void eventLoadItemClicked(const Event& pEvent);
+	void eventMainMenuShowAcCodeChosen(const Event& pEvent);
+	void eventMainMenuHelpChosen(const Event& pEvent);
+	void eventMainMenuExitChosen(const Event& pEvent);
+	void eventMainMenuLoadChosen(const Event& pEvent);
+	void eventMainMenuJoinChosen(const Event& pEvent);
+	void eventMainMenuCreateChosen(const Event& pEvent);
+	void eventMainMenuDisconnectChosen(const Event& pEvent);
+	void eventLoginPasswordAccepted(const Event& pEvent);
+	void eventMainMenuLoginRegisterChosen(const Event& pEvent);
+
 	TCPClient tcpClient;
 	Terminal terminal;
 	client::Repository repo;
 
-	ApplicationEventHandlers eventHandler;
 	WindowsManager windowsManager;
-
+	std::unordered_map<std::string, void(*)(const Event&)> eventHandlers;
 	std::string srvIp;
 	int srvPort;
 };

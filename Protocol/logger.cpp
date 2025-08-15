@@ -1,7 +1,9 @@
+module;
+
 #include <iomanip>
 #include <chrono>
 
-#include "logger.h"
+module logger;
 
 
 namespace logs {

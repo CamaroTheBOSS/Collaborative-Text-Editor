@@ -1,7 +1,6 @@
 #include "renderer.h"
 #include "pos_helpers.h"
 
-#include <iostream>
 #include <array>
 
 constexpr std::array<int, 8> colors = { 240, 128, 144, 160, 48, 192, 208, 96 };

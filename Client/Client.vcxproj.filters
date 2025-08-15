@@ -69,9 +69,6 @@
     <ClCompile Include="window_info.cpp">
       <Filter>Pliki źródłowe\Windows</Filter>
     </ClCompile>
-    <ClCompile Include="window_menu.h">
-      <Filter>Pliki nagłówkowe\Windows</Filter>
-    </ClCompile>
     <ClCompile Include="window_menu.cpp">
       <Filter>Pliki źródłowe\Windows</Filter>
     </ClCompile>
@@ -81,11 +78,44 @@
     <ClCompile Include="window_text_input.cpp">
       <Filter>Pliki źródłowe\Windows</Filter>
     </ClCompile>
-    <ClCompile Include="application_event_handlers.cpp">
-      <Filter>Pliki źródłowe</Filter>
-    </ClCompile>
     <ClCompile Include="window_text_input_obsfucated.cpp">
       <Filter>Pliki źródłowe\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="keypack.ixx">
+      <Filter>Pliki źródłowe\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="events.ixx">
+      <Filter>Pliki źródłowe\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="screen_buffers.ixx">
+      <Filter>Pliki źródłowe\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="screen_buffers_builder.ixx">
+      <Filter>Pliki źródłowe\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="window_base.ixx">
+      <Filter>Pliki źródłowe\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="window_helpers.ixx">
+      <Filter>Pliki źródłowe\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="window_info.ixx">
+      <Filter>Pliki źródłowe\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="window_menu.ixx">
+      <Filter>Pliki źródłowe\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="window_text_editor.ixx">
+      <Filter>Pliki źródłowe\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="window_text_input.ixx">
+      <Filter>Pliki źródłowe\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="window_text_input_obsfucated.ixx">
+      <Filter>Pliki źródłowe\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="windows_manager.ixx">
+      <Filter>Pliki źródłowe</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -107,46 +137,13 @@
     <ClInclude Include="client_document.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
-    <ClInclude Include="keypack.h">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
-    <ClInclude Include="window_base.h">
-      <Filter>Pliki nagłówkowe\Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="window_text_editor.h">
-      <Filter>Pliki nagłówkowe\Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="screen_buffers.h">
-      <Filter>Pliki nagłówkowe\Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="screen_buffers_builder.h">
-      <Filter>Pliki nagłówkowe\Windows</Filter>
-    </ClInclude>
     <ClInclude Include="canvas.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
-    <ClInclude Include="windows_manager.h">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
-    <ClInclude Include="events.h">
-      <Filter>Pliki nagłówkowe\Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="window_info.h">
-      <Filter>Pliki nagłówkowe\Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="window_helpers.h">
-      <Filter>Pliki nagłówkowe\Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="window_text_input.h">
-      <Filter>Pliki nagłówkowe\Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="application_event_handlers.h">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
-    <ClInclude Include="window_text_input_obsfucated.h">
-      <Filter>Pliki nagłówkowe\Windows</Filter>
-    </ClInclude>
     <ClInclude Include="action_scenarios.h">
+      <Filter>Pliki nagłówkowe</Filter>
+    </ClInclude>
+    <ClInclude Include="keypack_defs.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,4 +1,9 @@
-#include "framer.h"
+module;
+
+#include <assert.h>
+#include <numeric>
+
+module framer;
 
 void saveBuff(const msg::Buffer& src, std::vector<msg::Buffer>& dst, const int maxSize) {
 	dst.emplace_back(msg::Buffer{ src.size });

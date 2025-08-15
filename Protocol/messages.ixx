@@ -1,4 +1,5 @@
-#pragma once
+module;
+
 #include <Winsock2.h>
 #include <memory>
 #include <assert.h>
@@ -10,8 +11,9 @@
 
 #pragma comment(lib, "Ws2_32.lib")
 
+export module messages;
 
-namespace msg {
+export namespace msg {
 	using OneByteInt = unsigned char;
 	enum class Type {
 		// Commands
@@ -78,7 +80,7 @@ namespace msg {
 		void add(const std::pair<COORD, COORD>* val);
 		template<typename T>
 		void add(const std::vector<T>* arr) {
-			unsigned int arrSize = arr->size();
+			unsigned int arrSize = static_cast<unsigned int>(arr->size());
 			add(&arrSize);
 			for (const auto& element : *arr) {
 				add(&element);
@@ -105,7 +107,7 @@ namespace msg {
 	}
 	int parseObj(std::pair<COORD, COORD>& obj, const Buffer& buffer, const int offset);
 	int parseObj(std::string& obj, const Buffer& buffer, const int offset);
-	int parseObj(unsigned int& obj, const Buffer& buffer, const int offset); 
+	int parseObj(unsigned int& obj, const Buffer& buffer, const int offset);
 	int parseObj(Type& obj, const Buffer& buffer, const int offset);
 	int parseObj(MoveSide& obj, const Buffer& buffer, const int offset);
 	template<typename T>
@@ -124,7 +126,7 @@ namespace msg {
 	int parse(const Buffer& buffer, int pos, Args&... args) {
 		([&] {
 			pos += parseObj(args, buffer, pos);
-		} (), ...);
+			} (), ...);
 		return pos;
 	}
 
@@ -132,7 +134,7 @@ namespace msg {
 	void serializeTo(Buffer& buffer, int pos, Args&&... args) {
 		([&] {
 			buffer.add(&args);
-		} (), ...);
+			} (), ...);
 	}
 
 	struct AckMsg {

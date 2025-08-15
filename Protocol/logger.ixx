@@ -1,10 +1,15 @@
-#pragma once
+module;
+
 #include <fstream>
 #include <sstream>
-#include "messages.h"
+#include <vector>
+#include <typeinfo>
 
-namespace logs {
-	
+export module logger;
+import messages;
+
+export namespace logs {
+
 	enum class Level { error, info, debug };
 
 	std::string lvlToStr(Level lvl);
@@ -45,7 +50,7 @@ namespace logs {
 		void _log(std::stringstream& ss, const std::vector<T>& arg) {
 			ss << "vector of " << typeid(T).name();
 		}
-		void _log(std::stringstream& ss,  const msg::OneByteInt& arg) {
+		void _log(std::stringstream& ss, const msg::OneByteInt& arg) {
 			ss << static_cast<int>(arg) << " ";
 		}
 		std::ofstream file;

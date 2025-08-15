@@ -4,7 +4,7 @@
 #include <mutex>
 #include <set>
 
-#include "messages.h"
+import messages;
 #include "repository.h"
 #include "message_extractor.h"
 #include "authenticator.h"

@@ -1,6 +1,7 @@
 #include "repository.h"
 #include "pos_helpers.h"
 #include "logging.h"
+#include <assert.h>
 
 namespace client {
 	bool Repository::processMsg(ClientSiteDocument& doc, msg::Buffer& buffer) {

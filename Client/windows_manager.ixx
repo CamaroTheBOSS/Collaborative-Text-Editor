@@ -1,14 +1,23 @@
-#pragma once
-#include "window_helpers.h"
+module;
 
-using Window = std::unique_ptr<BaseWindow>;
-using Windows = std::vector<Window>;
-using WindowsRegistry = std::unordered_map<std::string, bool>;
-using WindowsIt = Windows::const_iterator;
-using TextInputHandler = TextInputWindow::TextInputHandler;
+#include <memory>
+#include <vector>
+#include <unordered_map>
+#include <string>
+
+export module window.manager;
+import window.helpers;
+import window.base;
+import window.text_input;
+
+export using Window = std::unique_ptr<BaseWindow>;
+export using Windows = std::vector<Window>;
+export using WindowsRegistry = std::unordered_map<std::string, bool>;
+export using WindowsIt = Windows::const_iterator;
+export using TextInputHandler = TextInputWindow::TextInputHandler;
 enum class FocusDirection { up, down, left, right };
 
-class WindowsManager {
+export class WindowsManager {
 public:
 	WindowsManager(const COORD& consoleSize);
 

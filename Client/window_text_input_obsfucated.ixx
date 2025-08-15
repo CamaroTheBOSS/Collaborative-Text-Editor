@@ -1,8 +1,12 @@
-#pragma once
-#include "window_text_input.h"
-#include <functional>
+module;
 
-class ObsfucatedTextInputWindow : public TextInputWindow {
+#include <functional>
+#include <string>
+
+export module window.text_input.obsfucated;
+import window.text_input;
+
+export class ObsfucatedTextInputWindow : public TextInputWindow {
 public:
 	using TextInputHandler = std::function<Event(const TextInputWindow&, const ClientSiteDocument&)>;
 	ObsfucatedTextInputWindow(const ScrollableScreenBufferBuilder& ssbBuilder, TextInputHandler onSubmitHandler = funcNoop(),
