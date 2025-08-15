@@ -33,7 +33,7 @@ public:
     COORD getTerminalCursorPos(const ClientSiteDocument& doc, const COORD& docCursor) const;
     RenderCursor getTerminalCursor(const ClientSiteDocument& doc, const int cursor) const;
     RenderCursor getMyTerminalCursor(const ClientSiteDocument& doc) const;
-    std::pair<std::vector<std::pair<COORD, COORD>>, int> getSegmentsTerminalCursorPos(const ClientSiteDocument& doc) const;
+    std::pair<std::vector<std::pair<COORD, COORD>>, size_t> getSegmentsTerminalCursorPos(const ClientSiteDocument& doc) const;
     std::vector<RenderCursor> getTerminalCursors(const ClientSiteDocument& doc) const;
     std::pair<ScrollableScreenBuffer, TextLines> getLineNumbersText() const;
     TextLines getTextInBuffer(const ClientSiteDocument& doc) const;
