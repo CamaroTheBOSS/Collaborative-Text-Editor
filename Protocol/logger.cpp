@@ -1,10 +1,8 @@
 module;
 
-#include <iomanip>
-#include <chrono>
+#include <time.h>
 
 module logger;
-
 
 namespace logs {
 	using namespace std::chrono;

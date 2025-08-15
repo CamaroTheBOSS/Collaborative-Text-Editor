@@ -1,14 +1,12 @@
 #include <WinSock2.h>
 #pragma comment(lib, "Ws2_32.lib")
 
-#include <iostream>
-#include <chrono>
-
 #include "action_scenarios.h"
 
 import args;
 import keypack;
 import application;
+import std;
 
 int main(int argc, char* argv[]) {
 	Args::ArgsMap argsConfig{

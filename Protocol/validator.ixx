@@ -1,8 +1,7 @@
 module;
 
-#include <string>
-
 export module validator;
+import std;
 
 export class Validator {
 public:

@@ -1,7 +1,5 @@
-#include <chrono>
-#include <thread>
+module;
 #include <assert.h>
-#include <array>
 
 #include "logging.h"
 #include "keypack_defs.h"
@@ -19,8 +17,6 @@ import validator;
 
 using namespace client;
 constexpr msg::OneByteInt version = 1;
-
-void xd(const Event& event) {};
 
 Application::Application(const std::string& ip, const int port) :
     srvIp(ip),

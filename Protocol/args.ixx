@@ -1,11 +1,7 @@
 module;
 
-#include <string>
-#include <unordered_map>
-#include <vector>
-#include <variant>
-
 export module args;
+import std;
 
 export constexpr const char* commandRun = "__run__";
 export constexpr const char* commandHelp = "help";

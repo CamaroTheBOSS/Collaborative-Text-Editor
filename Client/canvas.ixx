@@ -1,13 +1,11 @@
 module;
 
 #include <Windows.h>
-#include <string>
-#include <vector>
-#include <map>
 
 #include "pos_helpers.h"
 
 export module canvas;
+import std;
 
 export class Canvas {
 public:

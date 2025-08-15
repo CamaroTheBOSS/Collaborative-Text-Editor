@@ -1,9 +1,8 @@
 module;
 #include "pos_helpers.h"
-#include <string>
-#include <vector>
 
 module client.document;
+import std;
 
 std::pair<size_t, bool> binarySearchSegments(const TextContainer::Segments& segments, const size_t left, const size_t right, const COORD& pos) {
 	if (segments.empty()) {

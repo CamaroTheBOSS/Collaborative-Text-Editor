@@ -1,7 +1,6 @@
 module;
 
 #include <assert.h>
-#include <numeric>
 
 module framer;
 

@@ -1,17 +1,12 @@
 module;
 
 #include <Winsock2.h>
-#include <memory>
 #include <assert.h>
-#include <string>
-#include <vector>
-#include <sstream>
-#include <type_traits>
-#include <array>
 
 #pragma comment(lib, "Ws2_32.lib")
 
 export module messages;
+import std;
 
 export namespace msg {
 	using OneByteInt = unsigned char;

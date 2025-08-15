@@ -1,12 +1,10 @@
 module;
 
-#include <string>
-#include <vector>
-
 export module repository;
 import messages;
 import screen.buffers;
 import client.document;
+import std;
 
 namespace client {
 	export class Repository {

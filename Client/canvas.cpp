@@ -1,13 +1,10 @@
 module;
 
-#include <vector>
-#include <string>
-#include <iostream>
-#include <algorithm>
 #include <string_view>
 #include "pos_helpers.h"
 
 module canvas;
+import std;
 
 Canvas::Canvas(const COORD& size) :
 	_size(size),

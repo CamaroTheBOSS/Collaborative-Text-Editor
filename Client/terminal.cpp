@@ -2,7 +2,7 @@ module;
 
 #include <Windows.h>
 #include <conio.h>
-#include <iostream>
+#include <stdio.h>
 
 #include "logging.h"
 

@@ -2,10 +2,6 @@ module;
 #define _WINSOCKAPI_ 
 #include <Windows.h>
 #include <WinSock2.h>
-#include <thread>
-#include <queue>
-#include <mutex>
-#include <atomic>
 
 #include "logging.h"
 
@@ -13,6 +9,7 @@ export module tcp_client;
 
 import framer;
 import messages;
+import std;
 
 export class TCPClient {
 public:

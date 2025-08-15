@@ -1,9 +1,8 @@
 module;
 
-#include <vector>
-
 export module framer;
 import messages;
+import std;
 
 export using Messages = std::vector<msg::Buffer>;
 

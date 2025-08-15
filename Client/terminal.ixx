@@ -2,14 +2,12 @@ module;
 #define _WINSOCKAPI_ 
 #include <Winsock2.h>
 #include <Windows.h>
-#include <memory>
-#include <vector>
-#include <string>
 
 export module terminal;
 import window.base;
 import keypack;
 import canvas;
+import std;
 
 export class Terminal {
 public:

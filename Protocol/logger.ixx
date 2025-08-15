@@ -1,12 +1,8 @@
 module;
 
-#include <fstream>
-#include <sstream>
-#include <vector>
-#include <typeinfo>
-
 export module logger;
 import messages;
+import std;
 
 export namespace logs {
 

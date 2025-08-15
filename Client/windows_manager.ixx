@@ -1,14 +1,10 @@
 module;
 
-#include <memory>
-#include <vector>
-#include <unordered_map>
-#include <string>
-
 export module window.manager;
 import window.helpers;
 import window.base;
 import window.text_input;
+import std;
 
 export using Window = std::unique_ptr<BaseWindow>;
 export using Windows = std::vector<Window>;

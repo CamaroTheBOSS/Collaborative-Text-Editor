@@ -1,9 +1,6 @@
 module;
 #include "pos_helpers.h"
 
-#include <array>
-#include <string>
-
 module renderer;
 
 constexpr std::array<int, 8> colors = { 240, 128, 144, 160, 48, 192, 208, 96 };
