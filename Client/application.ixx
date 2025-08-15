@@ -1,8 +1,10 @@
-#pragma once
+module;
 
 #include <chrono>
 #include <unordered_map>
 #include <memory>
+
+export module application;
 
 import window.base;
 import window.manager;
@@ -15,7 +17,7 @@ import repository;
 using Windows = std::vector<std::unique_ptr<BaseWindow>>;
 using WindowsRegistry = std::unordered_map<std::string, bool>;
 using WindowsIt = Windows::const_iterator;
-class Application {
+export class Application {
 	friend class SyncTester;
 	friend class ApplicationEventHandlers;
 public:

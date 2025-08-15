@@ -137,6 +137,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="application.ixx" />
     <ClCompile Include="canvas.cpp" />
     <ClCompile Include="canvas.ixx" />
     <ClCompile Include="client_document.cpp" />
@@ -178,7 +179,6 @@
   <ItemGroup>
     <ClInclude Include="action_scenarios.h" />
     <ClInclude Include="keypack_defs.h" />
-    <ClInclude Include="application.h" />
     <ClInclude Include="logging.h" />
   </ItemGroup>
   <ItemGroup>

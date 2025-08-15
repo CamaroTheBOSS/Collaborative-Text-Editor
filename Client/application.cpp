@@ -3,9 +3,10 @@
 #include <assert.h>
 #include <array>
 
-#include "application.h"
 #include "logging.h"
 #include "keypack_defs.h"
+
+module application;
 
 import events;
 import window.text_editor;

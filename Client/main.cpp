@@ -6,6 +6,10 @@
 
 #include "action_scenarios.h"
 
+import args;
+import keypack;
+import application;
+
 int main(int argc, char* argv[]) {
 	Args::ArgsMap argsConfig{
 		{ ip, Args::Arg{ Args::Type::string, "IP of the server" } },
