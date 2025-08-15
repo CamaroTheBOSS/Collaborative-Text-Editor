@@ -145,6 +145,7 @@
     <ClCompile Include="screen_buffers.ixx" />
     <ClCompile Include="screen_buffers_builder.cpp" />
     <ClCompile Include="screen_buffers_builder.ixx" />
+    <ClCompile Include="tcp_client_windows.ixx" />
     <ClCompile Include="terminal.ixx" />
     <ClCompile Include="windows_manager.ixx" />
     <ClCompile Include="window_base.ixx" />
@@ -163,7 +164,6 @@
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="repository.cpp" />
     <ClCompile Include="screen_buffers.cpp" />
-    <ClCompile Include="tcp_client.h" />
     <ClCompile Include="tcp_client_windows.cpp" />
     <ClCompile Include="terminal.cpp" />
     <ClCompile Include="window_text_editor.ixx" />

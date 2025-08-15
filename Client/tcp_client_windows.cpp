@@ -1,7 +1,11 @@
+module;
+
 #include <WS2tcpip.h>
 #include <chrono>
+#include <mutex>
+#include "logging.h"
 
-#include "tcp_client.h"
+module tcp_client;
 
 using namespace client;
 

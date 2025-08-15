@@ -1,4 +1,4 @@
-#pragma once
+module;
 #define _WINSOCKAPI_ 
 #include <Windows.h>
 #include <WinSock2.h>
@@ -9,10 +9,12 @@
 
 #include "logging.h"
 
+export module tcp_client;
+
 import framer;
 import messages;
 
-class TCPClient {
+export class TCPClient {
 public:
 	bool connectServer(const std::string& ip, const int port);
 	bool disconnect();
@@ -20,7 +22,7 @@ public:
 	msg::Buffer getNextMsg();
 	template<typename... Args>
 	bool sendMsg(Args&&... args) const {
-		msg::Buffer buffer{128};
+		msg::Buffer buffer{ 128 };
 		msg::serializeTo(buffer, 0, args...);
 		msg::Buffer msgWithSize = msg::enrich(buffer);
 		int sentBytes = send(client, msgWithSize.get(), msgWithSize.size, 0);
@@ -30,17 +32,17 @@ public:
 		}
 		client::logger.logDebug("Send message with args:", args...);
 		return true;
-	}	
+	}
 
 private:
 	void recvMsg();
 
 	SOCKET client = INVALID_SOCKET;
 	sockaddr_in srvAddress = { 0 };
-	
+
 	std::thread recvThread;
 	std::queue<msg::Buffer> recvQueue;
 	std::mutex recvQueueLock;
 	std::atomic_bool connected;
-	Framer framer{4096};
+	Framer framer{ 4096 };
 };

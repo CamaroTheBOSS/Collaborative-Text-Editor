@@ -24,9 +24,6 @@
     <ClCompile Include="main.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
-    <ClCompile Include="tcp_client.h">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClCompile>
     <ClCompile Include="terminal.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
@@ -121,6 +118,9 @@
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
     <ClCompile Include="terminal.ixx">
+      <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
+    <ClCompile Include="tcp_client_windows.ixx">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
   </ItemGroup>

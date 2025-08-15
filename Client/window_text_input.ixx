@@ -5,6 +5,7 @@ module;
 
 export module window.text_input;
 import window.base;
+import tcp_client;
 
 export class TextInputWindow : public BaseWindow {
 public:
