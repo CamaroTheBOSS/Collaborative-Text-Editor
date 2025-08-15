@@ -142,6 +142,7 @@
     <ClCompile Include="client_document.cpp" />
     <ClCompile Include="events.ixx" />
     <ClCompile Include="keypack.ixx" />
+    <ClCompile Include="repository.ixx" />
     <ClCompile Include="screen_buffers.ixx" />
     <ClCompile Include="screen_buffers_builder.cpp" />
     <ClCompile Include="screen_buffers_builder.ixx" />
@@ -179,7 +180,6 @@
     <ClInclude Include="application.h" />
     <ClInclude Include="logging.h" />
     <ClInclude Include="renderer.h" />
-    <ClInclude Include="repository.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Document\Document.vcxproj">

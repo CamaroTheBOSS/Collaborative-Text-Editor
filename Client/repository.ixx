@@ -1,12 +1,13 @@
-#pragma once
+module;
 
 #include "client_document.h"
 
+export module repository;
 import messages;
 import screen.buffers;
 
 namespace client {
-	class Repository {
+	export class Repository {
 		friend class SyncTester;
 	public:
 		bool processMsg(ClientSiteDocument& doc, msg::Buffer& buffer);

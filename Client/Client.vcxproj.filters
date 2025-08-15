@@ -123,11 +123,11 @@
     <ClCompile Include="tcp_client_windows.ixx">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
+    <ClCompile Include="repository.ixx">
+      <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="repository.h">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
     <ClInclude Include="logging.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>

@@ -1,5 +1,4 @@
 #pragma once
-#include "repository.h"
 
 #include <chrono>
 #include <unordered_map>
@@ -11,6 +10,7 @@ import window.menu;
 import messages;
 import terminal;
 import tcp_client;
+import repository;
 
 using Windows = std::vector<std::unique_ptr<BaseWindow>>;
 using WindowsRegistry = std::unordered_map<std::string, bool>;
