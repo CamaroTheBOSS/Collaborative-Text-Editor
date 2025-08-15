@@ -1,4 +1,5 @@
-#pragma once
+module;
+
 #include <Windows.h>
 #include <string>
 #include <vector>
@@ -6,7 +7,9 @@
 
 #include "pos_helpers.h"
 
-class Canvas {
+export module canvas;
+
+export class Canvas {
 public:
 	Canvas(const COORD& size);
 	COORD size() const;

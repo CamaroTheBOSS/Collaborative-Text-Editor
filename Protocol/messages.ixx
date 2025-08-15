@@ -115,7 +115,7 @@ export namespace msg {
 		unsigned int arrSize;
 		int pos = offset;
 		pos += parseObj(arrSize, buffer, pos);
-		for (int i = 0; i < arrSize; i++) {
+		for (unsigned int i = 0; i < arrSize; i++) {
 			arr.push_back(T{});
 			pos += parseObj(arr[arr.size() - 1], buffer, pos);
 		}

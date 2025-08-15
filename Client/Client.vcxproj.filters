@@ -117,6 +117,9 @@
     <ClCompile Include="windows_manager.ixx">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
+    <ClCompile Include="canvas.ixx">
+      <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="terminal.h">
@@ -135,9 +138,6 @@
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
     <ClInclude Include="client_document.h">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
-    <ClInclude Include="canvas.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
     <ClInclude Include="action_scenarios.h">

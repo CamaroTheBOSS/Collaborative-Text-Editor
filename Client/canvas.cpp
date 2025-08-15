@@ -1,7 +1,13 @@
-#include "canvas.h"
+module;
+
+#include <vector>
+#include <string>
 #include <iostream>
 #include <algorithm>
 #include <string_view>
+#include "pos_helpers.h"
+
+module canvas;
 
 Canvas::Canvas(const COORD& size) :
 	_size(size),
@@ -29,15 +35,15 @@ void Canvas::write(const std::string& data) {
 	if (_size.X == 0 || _size.Y == 0) {
 		return;
 	}
-	int pos = 0;
+	size_t pos = 0;
 	while (pos < data.size()) {
 		auto& line = _canvas[cursor.Y];
 		size_t length = (std::min)(data.size() - pos, line.size() - cursor.X);
 		std::copy(std::begin(data), std::begin(data) + length, std::begin(line) + cursor.X);
 		pos += length;
-		cursor.X += length;
+		cursor.X += static_cast<SHORT>(length);
 		if (cursor.X >= _canvas[cursor.Y].size()) {
-			cursor.X == 0;
+			cursor.X = 0;
 			cursor.Y++;
 			if (cursor.Y >= _canvas[cursor.Y].size()) {
 				cursor = _size;

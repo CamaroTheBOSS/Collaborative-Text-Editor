@@ -37,7 +37,7 @@ public:
 		auto window = std::make_unique<WindowClass>(builder, std::forward<Args>(args)...);
 		windowsRegistry[window->name()] = true;
 		windows.emplace_back(std::move(window));
-		setFocus(windows.size() - 1);
+		setFocus(static_cast<int>(windows.size() - 1));
 		return windows.cend() - 1;
 	}
 	void destroyLastWindow(const TCPClient& client);

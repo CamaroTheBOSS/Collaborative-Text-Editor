@@ -1,13 +1,13 @@
 module;
 
 #include "tcp_client.h"
-#include "canvas.h"
 #include "client_document.h"
 #include <unordered_map>
 
 export module window.base;
 export import screen.buffers.builder;
 export import keypack;
+import canvas;
 
 export struct Event {
 	std::string name;
