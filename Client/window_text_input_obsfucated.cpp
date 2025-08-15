@@ -1,10 +1,11 @@
 module;
 
-#include "renderer.h"
 #include "keypack_defs.h"
+#include <string>
 
 module window.text_input.obsfucated;
 import messages;
+import renderer;
 
 static constexpr msg::OneByteInt version = 1;
 

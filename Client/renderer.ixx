@@ -1,10 +1,12 @@
+module;
 #include <memory>
 #include "client_document.h"
 
+export module renderer;
 import window.base;
 import canvas;
 
-class Renderer {
+export class Renderer {
 public:
 	static void addToCanvas(Canvas& canvas, const BaseWindow& window);
 	static void addToCanvas(Canvas& canvas, const ScrollableScreenBuffer& buffer, const ClientSiteDocument& doc, const bool isActive);
