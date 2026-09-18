@@ -27,8 +27,8 @@ COORD TextContainer::insert(COORD pos, const std::vector<std::string>& parsedLin
 	for (int i = 1; i < parsedLines.size(); i++) {
 		addLine(pos.Y + i, parsedLines[i]);
 	}
-	pos.Y += parsedLines.size() - 1;
-	pos.X = data[pos.Y].size();
+	pos.Y += (SHORT)parsedLines.size() - 1;
+	pos.X = (SHORT)data[pos.Y].size();
 	data[pos.Y].append(toMoveDown);
 	return pos;
 }
@@ -51,7 +51,7 @@ COORD TextContainer::erase(COORD pos, int eraseSize, std::vector<std::string>& e
 			eraseSize -= size;
 			erasedText.emplace_back(std::move(line));
 		}
-		auto [newX, line] = LineModifier::erase(data[pos.Y], data[pos.Y].size(), eraseSize);
+		auto [newX, line] = LineModifier::erase(data[pos.Y], (int)data[pos.Y].size(), eraseSize);
 		LineModifier::append(data[pos.Y], toMoveUp);
 		pos.X = newX;
 		erasedText.emplace_back(std::move(line));
@@ -60,7 +60,7 @@ COORD TextContainer::erase(COORD pos, int eraseSize, std::vector<std::string>& e
 }
 
 std::pair<int, std::string> TextContainer::eraseLine(const int col) {
-	int size = data[col].size() + 1;
+	int size = (int)data[col].size() + 1;
 	std::string line = data[col];
 	data.erase(data.cbegin() + col);
 	return { size, std::move(line) };
@@ -108,7 +108,7 @@ TextContainer::Segments TextContainer::findAll(const std::string& pattern) const
 				break;
 			}
 			COORD start{ (SHORT)pos, (SHORT)i };
-			COORD end{ (SHORT)pos + pattern.size(), (SHORT)i};
+			COORD end{ (SHORT)pos + (SHORT)pattern.size(), (SHORT)i};
 			segments.emplace_back(std::make_pair(std::move(start), std::move(end)));
 			pos++;
 		}
@@ -147,15 +147,15 @@ int TextContainer::getLineSize(const int col) const {
 	if (col < 0 || col >= getHeight()) {
 		return -1;
 	}
-	return data[col].size();
+	return (int)data[col].size();
 }
 
 int TextContainer::getHeight() const {
-	return data.size();
+	return (int)data.size();
 }
 
 COORD TextContainer::getSize() const {
-	return COORD{ static_cast<SHORT>(getLineSize(data.size() - 1)),  static_cast<SHORT>(data.size()) };
+	return COORD{ static_cast<SHORT>(getLineSize((int)data.size() - 1)),  static_cast<SHORT>(data.size()) };
 }
 
 COORD TextContainer::getEndPos() const {

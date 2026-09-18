@@ -5,6 +5,7 @@
 #include <chrono>
 #include <random>
 #include "action_scenarios.h"
+#include "logger.h"
 
 auto getRandomEngine() {
 	std::random_device device;
@@ -45,15 +46,16 @@ int getRandomKey() {
 
 int main(int argc, char* argv[]) {
 	Args::ArgsMap argsConfig{
-		{ ip, Args::Arg{ Args::Type::string, "IP of the server" } },
+		{ ip, Args::Arg{ Args::Type::string, std::string("127.0.0.1"), "IP of the server" } },
 		{ port, Args::Arg{ Args::Type::integer, 8081, "Port of the server"} },
 		{ login, Args::Arg{ Args::Type::string, "Login for the user"} },
 		{ password, Args::Arg{ Args::Type::string, "Password for the user"} },
 		{ acCode, Args::Arg{ Args::Type::string, "Access code to document"} },
 		{ filename, Args::Arg{ Args::Type::string, std::string{"X"}, "Reserved"} },
+		{ log_level, Args::Arg{ Args::Type::string, std::string("info"), "Logging level"}},
 	};
 	Args::Commands commands{
-		Args::Command{join, "Joins to the existing document session using provided access code", { ip, port, login, password, acCode }},
+		Args::Command{join, "Joins to the existing document session using provided access code", { login, password, acCode }},
 		Args::Command{registration, "Registers user in the server and terminating", { login, password }},
 		Args::Command{help, "Prints all arguments and commands"},
 	};
@@ -64,16 +66,20 @@ int main(int argc, char* argv[]) {
 		return 0;
 	}
 	auto command = args.getCommand();
-	if (command == commandHelp || command == commandRun) {
+	if (command == commandHelp || command == commandRun || args.getCommand().empty()) {
 		std::cout << args.getDescription();
 		return 0;
 	}
+
+	auto loglvlstr = args.get<std::string>(log_level);
+	auto lvl = logs::strToLvl(loglvlstr);
+	client::logger.setLogLevel(lvl);
 
 	WSADATA wsaData;
 	WORD mVersionRequested = MAKEWORD(2, 2);
 	int wsaError = WSAStartup(mVersionRequested, &wsaData);
 	if (wsaError) {
-		std::cout << wsaError << " Error on WSA stratup\n";
+		client::logger.logError(wsaError, " Error on WSA stratup\n");
 		WSACleanup();
 		return 0;
 	}

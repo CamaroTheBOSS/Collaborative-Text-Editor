@@ -58,7 +58,7 @@ bool Server::open(const int nWorkers) {
 		logger.logError(WSAGetLastError(), ": Error when starting listening");
 		return false;
 	}
-	logger.logDebug("Server opened for listening.");
+	logger.logInfo("Server opened for listening on ip: ", ip, " port: ", port);
 	initWorkers(nWorkers);
 	state = State::opened;
 	return true;
@@ -67,7 +67,7 @@ bool Server::open(const int nWorkers) {
 void Server::start() {
 	FD_ZERO(&unassignedConns);
 	FD_SET(listenSocket, &unassignedConns);
-	logger.logDebug("Listening for connections...");
+	logger.logInfo("Listening for connections...");
 	while (state == State::opened) {
 		FD_SET conns = unassignedConns;
 		int selectCount = select(0, &conns, nullptr, nullptr, nullptr);
@@ -82,20 +82,20 @@ void Server::start() {
 				msg::OneByteInt version;
 				msg::parse(buffer, 0, type, version);
 				if (type == msg::Type::create) {
-					buffer.replace(2, client);
+					buffer.replace(2, (const unsigned int)client);
 					int worker = selectWorker();
 					forwardConnection(client, buffer, worker);
 				}
 				else if (type == msg::Type::load) {
 					auto msg = Deserializer::parseConnectCreateDoc(buffer);
 					auto userData = auth.getUserData(client);
-					buffer.replace(2, client);
+					buffer.replace(2, (const unsigned int)client);
 					int worker = selectWorkerWithUsernameAndFilename(userData.username, msg.filename);
 					forwardConnection(client, buffer, worker);
 				}
 				else if (type == msg::Type::join) {
 					std::string accessCode;
-					buffer.replace(2, client);
+					buffer.replace(2, (const unsigned int)client);
 					msg::parse(buffer, 6, accessCode);
 					int worker = selectWorkerWithAcCode(accessCode);
 					forwardConnection(client, buffer, worker);
@@ -120,6 +120,7 @@ bool Server::acceptConnection(const SOCKET client) {
 		closesocket(newConnection);
 		return false;
 	}
+	logger.logInfo("Accepted new connection with socket ", newConnection);
 	FD_SET(newConnection, &unassignedConns);
 	return true;
 }
@@ -183,26 +184,32 @@ int Server::selectWorker() {
 }
 
 int Server::selectWorkerWithAcCode(const std::string& acCode) {
+	int workerIndex = 0;
 	for (int i = 0; i < workers.size(); i++) {
 		if (workers[i].acCodeExistsInRepo(acCode)) {
-			return i;
+			workerIndex = i;
+			break;
 		}
 	}
-	return 0;
+	logger.logDebug("Selecting worker with accode returned worker ", workerIndex);
+	return workerIndex;
 }
 
 int Server::selectWorkerWithUsernameAndFilename(const std::string& username, const std::string& filename) {
+	int workerIndex = 0;
 	for (int i = 0; i < workers.size(); i++) {
 		if (workers[i].userFileExistsInRepo(username, filename)) {
-			return i;
+			workerIndex = i;
+			break;
 		}
 	}
-	return 0;
+	logger.logDebug("Selecting worker with username and filename returned worker ", workerIndex);
+	return workerIndex;
 }
 
 int Server::closeWorkers() {
 	int closed = 0;
-	for (int i = workers.size() - 1; i >= 0; i--) {
+	for (int i = (int)workers.size() - 1; i >= 0; i--) {
 		auto id = workers[i].thread.get_id();
 		int sendBytes = send(notifiers[i], closeMsgBuffer, msgBufferSize, 0);
 		if (sendBytes < 0) {
@@ -264,7 +271,7 @@ server::Response Server::processMsg(const SOCKET client, msg::Buffer& buffer) {
 server::Response Server::shutdownConnection(const SOCKET client, msg::Buffer& buffer) {
 	closesocket(client);
 	shutdown(client, SD_SEND);
-	logger.logDebug("Closing connection with", client);
+	logger.logInfo("Closing connection with", client);
 	buffer.clear();
 	msg::serializeTo(buffer, 0, msg::Type::logout, static_cast<msg::OneByteInt>(1));
 	FD_CLR(client, &unassignedConns);

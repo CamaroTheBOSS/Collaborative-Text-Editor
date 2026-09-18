@@ -31,6 +31,7 @@ bld/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
+*/x64/*
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
@@ -399,14 +400,12 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
-ClientPrototype/*
-ServerPrototype/*
-Client/client.log
-Client/document.txt
+ClientMain/client.log
+ClientMain/document.txt
 RandomClient/client.log
 RandomClient/document.txt
-Server/server.log
-Server/db/*
+ServerMain/server.log
+ServerMain/db/*
 Test/db_test/*
 scripts/client.log
 scripts/.idea/*

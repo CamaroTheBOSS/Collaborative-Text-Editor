@@ -51,7 +51,7 @@ TEST(BufferTests, SerializeVectorTest) {
 	msg::Buffer buffer{128};
 	std::vector<unsigned int> values = { 34, 54, 64, 12, 127, 2 };
 	msg::serializeTo(buffer, 0, values);
-	values.insert(values.cbegin(), values.size());
+	values.insert(values.cbegin(), (unsigned int)values.size());
 	for (int i = 0; i < values.size(); i++) {
 		int index = 4 * (i + 1);
 		EXPECT_EQ(buffer.get()[index - 4], 0);
@@ -130,7 +130,7 @@ TEST(BufferTests, ParseOneByteIntTest) {
 TEST(BufferTests, ParseStringTest) {
 	msg::Buffer buffer{8};
 	memcpy(buffer.get(), str.c_str(), str.size() + 1);
-	buffer.size = str.size() + 1;
+	buffer.size = (int)str.size() + 1;
 	std::string myStr;
 	msg::parse(buffer, 0, myStr);
 	EXPECT_EQ(myStr, str);

@@ -1,7 +1,7 @@
 #include "test_client.h"
 #include "engine.h"
 
-#include <iostream>;
+#include <iostream>
 #include <array>
 
 constexpr static std::array<const char*, 20> randomStrings = { 

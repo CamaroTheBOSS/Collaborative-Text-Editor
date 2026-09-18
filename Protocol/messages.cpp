@@ -32,10 +32,10 @@ namespace msg {
 		add(&byteVal);
 	}
 	void Buffer::add(const std::string* str) {
-		reserveIfNeeded(str->size() + 1);
+		reserveIfNeeded((int)str->size() + 1);
 		assert(capacity >= size + str->size() + 1 && "Error, buffer size excedeed!");
 		memcpy(data.get() + size, str->c_str(), str->size() + 1);
-		size += str->size() + 1;
+		size += (int)str->size() + 1;
 	}
 	void Buffer::add(const Buffer* other) {
 		reserveIfNeeded(other->size);
@@ -118,7 +118,7 @@ namespace msg {
 	}
 	int parseObj(std::string& obj, const Buffer& buffer, const int offset) {
 		obj = std::string{ buffer.get() + offset };
-		return obj.size() + 1;
+		return (int)obj.size() + 1;
 	}
 	int parseObj(unsigned int& obj, const Buffer& buffer, const int offset) {
 		u_long objBuff;

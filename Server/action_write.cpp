@@ -82,7 +82,7 @@ Action::UndoPair WriteAction::undo() {
 	}
 	std::vector<std::string> erasedText;
 	COORD startPos = target->validatePos(getEndPos());
-	COORD endPos = target->erase(startPos, getText().size(), erasedText);
+	COORD endPos = target->erase(startPos, (int)getText().size(), erasedText);
 	UndoReturn undoReturn{ ActionType::erase, startPos, endPos, container.getText()};
 	ActionPtr action = std::make_unique<EraseAction>(startPos, endPos, container, target, getTimestamp(), true, eraseRegistry);
 	removeItselfFromRegistry();

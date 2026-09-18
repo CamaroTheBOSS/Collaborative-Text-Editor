@@ -25,7 +25,7 @@ namespace history {
 
 	int HistoryManager::addHistory() {
 		histories.emplace_back(ActionHistory(mergeInterval, capacity));
-		return histories.size() - 1;
+		return (int)histories.size() - 1;
 	}
 
 	bool HistoryManager::removeHistory(const int index) {

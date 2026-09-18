@@ -25,6 +25,7 @@ private:
 	void eventLoadItemClicked(Application& app, const Event& pEvent);
 	void eventLoadItemAccepted(Application& app, const Event& pEvent);
 	void eventLoadItemDeleted(Application& app, const Event& pEvent);
+	void eventDestoryWindow(Application& app, const Event& pEvent);
 	void eventCreateDoc(Application& app, const Event& pEvent);
 	void eventJoinDoc(Application& app, const Event& pEvent);
 	bool joinCreateDocImpl(const msg::Type type, msg::OneByteInt version, Application& app, const Event& pEvent);

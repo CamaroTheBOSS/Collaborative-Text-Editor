@@ -1,7 +1,7 @@
 #include "parser.h"
 
 std::vector<std::string> Parser::parseLineToVector(const std::string& line, const char delimiter) {
-	int prev = 0, curr = 0;
+	size_t prev = 0, curr = 0;
 	std::vector<std::string> parsedLines;
 	while (curr = line.find(delimiter, prev), curr != std::string::npos) {
 		parsedLines.emplace_back(line.substr(prev, curr - prev));
@@ -48,7 +48,7 @@ std::string Parser::parseVectorToText(const std::vector<std::string>& vec, const
 
 void Parser::postprocess(std::vector<std::string>& text) {
 	for (auto& line : text) {
-		int pos = 0;
+		size_t pos = 0;
 		while (pos < text.size()) {
 			pos = line.find('\t', pos);
 			if (pos == std::string::npos) {

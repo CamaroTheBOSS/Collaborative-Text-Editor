@@ -273,7 +273,7 @@ int BaseDocument::getMyCursor() const {
 }
 
 int BaseDocument::getCursorNum() const {
-	return users.size();
+	return (int)users.size();
 }
 
 char BaseDocument::getCharPointedByCursor(const int index) const {

@@ -34,6 +34,8 @@ Event InfoWindow::processChar(TCPClient& client, const KeyPack& key, const std::
         doc.setCursorPos(0, doc.getEndPos());
         doc.setCursorAnchor(0, COORD{ 0, 0 });
         return Event{};
+    case ENTER:
+        return Event{ windows::app::events::destroyWindow, winName, windows::app::name };
     }
     return Event{};
 }

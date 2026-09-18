@@ -1,5 +1,5 @@
 #include "logging.h"
 
 namespace server {
-	logs::Logger logger("server.log");
+	logs::Logger logger("server.log", true);
 }

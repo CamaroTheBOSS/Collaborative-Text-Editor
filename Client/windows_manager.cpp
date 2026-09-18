@@ -27,7 +27,7 @@ void WindowsManager::setFocus(const std::string& winName) {
     if (window == windows.cend()) {
         return;
     }
-    const int newFocus = std::distance(windows.cbegin(), window);
+    const int newFocus = (int)std::distance(windows.cbegin(), window);
     return setFocus(newFocus);
 }
 
@@ -42,9 +42,9 @@ void WindowsManager::setFocus(const int newFocus) {
     windows[focus]->activate();
 }
 
-void WindowsManager::destroyLastWindow(const TCPClient& client) {
+bool WindowsManager::destroyLastWindow(const TCPClient& client) {
     if (windows.size() <= 1) {
-        return;
+        return false;
     }
     auto& last = windows.back();
     auto pEvent = last->onDelete();
@@ -53,8 +53,9 @@ void WindowsManager::destroyLastWindow(const TCPClient& client) {
     windowsRegistry.erase(last->name());
     windows.erase(windows.cend() - 1);
     if (isActive) {
-        setFocus(windows.size() - 1);
+        setFocus((int)windows.size() - 1);
     }
+    return true;
 }
 
 void WindowsManager::destroyWindow(const std::string& name, const TCPClient& client) {
@@ -103,7 +104,7 @@ WindowsIt WindowsManager::findWindow(const std::string& name) const {
             return it;
         }
     }
-    windows.cend();
+    return windows.cend();
 }
 
 void WindowsManager::changeFocus(const ChangeFocusDirection direction) {

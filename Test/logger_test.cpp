@@ -21,26 +21,26 @@ bool testLogFileFirstLine(const std::string& desiredStr) {
 }
 
 TEST(LoggerTests, HappyLogTest) {
-	logs::Logger logger(testLogFilePath);
+	logs::Logger logger(testLogFilePath, false);
 	logger.logInfo("Test log");
 	EXPECT_TRUE(testLogFileFirstLine("INFO Test log"));
 }
 
 TEST(LoggerTests, LogIntTest) {
-	logs::Logger logger(testLogFilePath);
+	logs::Logger logger(testLogFilePath, false);
 	logger.logInfo(1);
 	EXPECT_TRUE(testLogFileFirstLine("INFO 1"));
 }
 
 TEST(LoggerTests, LogUnsignedIntTest) {
-	logs::Logger logger(testLogFilePath);
+	logs::Logger logger(testLogFilePath, false);
 	unsigned int n = 3;
 	logger.logInfo(n);
 	EXPECT_TRUE(testLogFileFirstLine("INFO 3"));
 }
 
 TEST(LoggerTests, LogOneByteIntTest) {
-	logs::Logger logger(testLogFilePath);
+	logs::Logger logger(testLogFilePath, false);
 	msg::OneByteInt n = 7;
 	logger.logInfo(n);
 	EXPECT_TRUE(testLogFileFirstLine("INFO 7"));

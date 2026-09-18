@@ -13,7 +13,7 @@ using Timestamp = std::chrono::time_point<std::chrono::system_clock>;
 enum class ActionType {write, erase, noop};
 
 struct UndoReturn {
-	ActionType type;
+	ActionType type = ActionType::noop;
 	COORD startPos;
 	COORD endPos;
 	std::string text;

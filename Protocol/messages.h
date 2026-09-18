@@ -78,7 +78,7 @@ namespace msg {
 		void add(const std::pair<COORD, COORD>* val);
 		template<typename T>
 		void add(const std::vector<T>* arr) {
-			unsigned int arrSize = arr->size();
+			unsigned int arrSize = (unsigned int)arr->size();
 			add(&arrSize);
 			for (const auto& element : *arr) {
 				add(&element);
@@ -113,7 +113,7 @@ namespace msg {
 		unsigned int arrSize;
 		int pos = offset;
 		pos += parseObj(arrSize, buffer, pos);
-		for (int i = 0; i < arrSize; i++) {
+		for (unsigned int i = 0; i < arrSize; i++) {
 			arr.push_back(T{});
 			pos += parseObj(arr[arr.size() - 1], buffer, pos);
 		}

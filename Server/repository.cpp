@@ -11,7 +11,7 @@ namespace server {
 	Repository::Repository(server::Authenticator* auth) :
 		auth(auth) {}
 	
-	Repository::Repository(Repository&& other) :
+	Repository::Repository(Repository&& other) noexcept :
 		clientToUserData(std::move(other.clientToUserData)),
 		acCodeToDocMap(std::move(other.acCodeToDocMap)),
 		auth(other.auth),
@@ -22,7 +22,7 @@ namespace server {
 		userFileCombinedLock(),
 		userFileCombinedSet(std::move(other.userFileCombinedSet)) {}
 
-	Repository& Repository::operator=(Repository&& other) {
+	Repository& Repository::operator=(Repository&& other) noexcept {
 		clientToUserData = std::move(other.clientToUserData);
 		acCodeToDocMap = std::move(other.acCodeToDocMap);
 		auth = auth;
@@ -64,7 +64,7 @@ namespace server {
 			if (type == msg::Type::disconnect) {
 				auth->clearUser(client);
 			}
-			logger.logDebug("Document for client", client, "not found");
+			logger.logError("Document for client", client, "not found");
 			return Response{ std::move(buffer), {}, msg::Type::error };
 		}
 		ArgPack argPack{ client, buffer, doc };
@@ -219,6 +219,7 @@ namespace server {
 		if (doc.getCursorNum() == 0) {
 			deleteSession(erasedUsername, erasedAcCode, doc);
 		}
+		logger.logInfo("User ", erasedUsername, " removed from the session (", doc.getId(), ", ", doc.getFilename(), ")");
 	}
 
 	void Repository::deleteSession(const std::string& username, const std::string& acCode, ServerSiteDocument& doc) {
@@ -253,12 +254,12 @@ namespace server {
 		auto& doc = *argPack.doc;
 		int userIdx = doc.findUser(argPack.client);
 		if (userIdx < 0) {
-			logger.logDebug(msg.type, "command failed. User not found error");
+			logger.logError(msg.type, "command failed. User not found error");
 			return Response{ std::move(argPack.buffer), {}, msg::Type::error };
 		}
 		COORD startPos = doc.getCursorPos(userIdx);
 		doc.write(userIdx, msg.text);
-		logger.logInfo("User", userIdx, "wrote", msg.text.size(), "letters");
+		logger.logTrace("User", userIdx, "wrote", msg.text.size(), "letters");
 		auto newBuffer = Serializer::makeWriteResponse(startPos, userIdx, msg);
 		return Response{ std::move(newBuffer), doc.getConnectedClients(), msg::Type::write };
 	}
@@ -268,12 +269,12 @@ namespace server {
 		auto& doc = *argPack.doc;
 		int userIdx = doc.findUser(argPack.client);
 		if (userIdx < 0) {
-			logger.logDebug(msg.type, "command failed. User not found error");
+			logger.logError(msg.type, "command failed. User not found error");
 			return Response{ std::move(argPack.buffer), {}, msg::Type::error };
 		}
 		COORD startPos = doc.getCursorPos(userIdx);
 		doc.erase(userIdx, msg.eraseSize);
-		logger.logInfo("User", userIdx, "erased", msg.eraseSize, "letters from document");
+		logger.logTrace("User", userIdx, "erased", msg.eraseSize, "letters from document");
 		auto newBuffer = Serializer::makeEraseResponse(startPos, userIdx, msg);
 		return Response{ std::move(newBuffer), doc.getConnectedClients(), msg::Type::erase };
 	}
@@ -283,16 +284,16 @@ namespace server {
 		auto& doc = *argPack.doc;
 		int userIdx = doc.findUser(argPack.client);
 		if (userIdx < 0) {
-			logger.logDebug(msg.type, "command failed. User not found error");
+			logger.logError(msg.type, "command failed. User not found error");
 			return Response{ std::move(argPack.buffer), {}, msg::Type::error };
 		}
 		if (msg.side == msg::MoveSide::left) {
 			doc.moveCursorLeft(userIdx, msg.withSelect);
-			logger.logInfo("User", userIdx, "moved left");
+			logger.logTrace("User", userIdx, "moved left");
 		}
 		else if (msg.side == msg::MoveSide::right) {
 			doc.moveCursorRight(userIdx, msg.withSelect);
-			logger.logInfo("User", userIdx, "moved right");
+			logger.logTrace("User", userIdx, "moved right");
 		}
 		else {
 			logger.logError("Invalid MoveSide parameter in MoveHorizontal");
@@ -307,16 +308,16 @@ namespace server {
 		auto& doc = *argPack.doc;
 		int userIdx = doc.findUser(argPack.client);
 		if (userIdx < 0) {
-			logger.logDebug(msg.type, "command failed. User not found error");
+			logger.logError(msg.type, "command failed. User not found error");
 			return Response{ std::move(argPack.buffer), {}, msg::Type::error };
 		}
 		if (msg.side == msg::MoveSide::up) {
 			doc.moveCursorUp(userIdx, msg.clientWidth, msg.withSelect);
-			logger.logInfo("User", userIdx, "moved up");
+			logger.logTrace("User", userIdx, "moved up");
 		}
 		else if (msg.side == msg::MoveSide::down) {
 			doc.moveCursorDown(userIdx, msg.clientWidth, msg.withSelect);
-			logger.logInfo("User", userIdx, "moved down");
+			logger.logTrace("User", userIdx, "moved down");
 		}
 		else {
 			logger.logError("Invalid MoveSide parameter in MoveHorizontal");
@@ -331,7 +332,7 @@ namespace server {
 		auto& doc = *argPack.doc;
 		int userIdx = doc.findUser(argPack.client);
 		if (userIdx < 0) {
-			logger.logDebug(msg.type, "command failed. User not found error");
+			logger.logError(msg.type, "command failed. User not found error");
 			return Response{ std::move(argPack.buffer), {}, msg::Type::error };
 		}
 		doc.setCursorPos(userIdx, COORD{ (SHORT)msg.X, (SHORT)msg.Y });
@@ -344,12 +345,12 @@ namespace server {
 		auto& doc = *argPack.doc;
 		int userIdx = doc.findUser(argPack.client);
 		if (userIdx < 0) {
-			logger.logDebug(msg.type, "command failed. User not found error");
+			logger.logError(msg.type, "command failed. User not found error");
 			return Response{ std::move(argPack.buffer), {}, msg::Type::error };
 		}
 		doc.setCursorPos(userIdx, doc.getEndPos());
 		doc.setCursorAnchor(userIdx, COORD{ 0, 0 });
-		logger.logInfo("User", userIdx, "selected all");
+		logger.logTrace("User", userIdx, "selected all");
 		auto newBuffer = Serializer::makeMoveResponse(*argPack.doc, userIdx, msg);
 		return Response{ std::move(newBuffer), doc.getConnectedClients(), msg::Type::selectAll };
 	}
@@ -359,7 +360,7 @@ namespace server {
 		auto& doc = *argPack.doc;
 		int userIdx = doc.findUser(argPack.client);
 		if (userIdx < 0) {
-			logger.logDebug(msg.type, "command failed. User not found error");
+			logger.logError(msg.type, "command failed. User not found error");
 			return Response{ std::move(argPack.buffer), {}, msg::Type::error };
 		}
 		auto undoReturn = msg.type == msg::Type::undo ? doc.undo(userIdx) : doc.redo(userIdx);
@@ -369,11 +370,11 @@ namespace server {
 			return Response{ std::move(newBuffer), doc.getConnectedClients(), msg::Type::write };
 		}
 		else if (undoReturn.type == ActionType::erase) {
-			msg::Erase newMsg{ msg::Type::erase, msg.version, "", undoReturn.text.size() };
+			msg::Erase newMsg{ msg::Type::erase, msg.version, "", (unsigned int)undoReturn.text.size() };
 			auto newBuffer = Serializer::makeEraseResponse(undoReturn.startPos, userIdx, newMsg);
 			return Response{ std::move(newBuffer), doc.getConnectedClients(), msg::Type::erase };
 		}
-		logger.logDebug(msg.type, "returned noop action. Nothing changed.");
+		logger.logTrace(msg.type, "returned noop action. Nothing changed.");
 		return Response{ std::move(argPack.buffer), {}, msg::Type::error };
 	}
 
@@ -382,7 +383,7 @@ namespace server {
 		auto& doc = *argPack.doc;
 		int userIdx = doc.findUser(argPack.client);
 		if (userIdx < 0) {
-			logger.logDebug(msg.type, "command failed. User not found error");
+			logger.logError(msg.type, "command failed. User not found error");
 			return Response{ std::move(argPack.buffer), {}, msg::Type::error };
 		}
 		for (auto segment = msg.segments.rbegin(); segment != msg.segments.rend(); segment++) {
@@ -403,8 +404,8 @@ namespace server {
 		doc.addUser();
 		std::lock_guard lock{userFileCombinedLock};
 		userFileCombinedSet.insert(userAuthData.username + "-" + doc.getFilename());
-		clientToUserData.emplace(client, ClientUserData{ std::move(acCode), std::move(userAuthData.username), std::move(userAuthData.authToken) });
-		logger.logDebug("User", client, "added to session (docId", doc.getId() + ")");
+		clientToUserData.emplace(client, ClientUserData{ acCode, std::move(userAuthData.username), std::move(userAuthData.authToken) });
+		logger.logInfo("User", client, "added to session (docId", doc.getId(), ", ", doc.getFilename(), ")");
 		return true;
 	}
 }

@@ -28,10 +28,10 @@ public:
 		auto window = std::make_unique<WindowClass>(builder, std::forward<Args>(args)...);
 		windowsRegistry[window->name()] = true;
 		windows.emplace_back(std::move(window));
-		setFocus(windows.size() - 1);
+		setFocus((int)windows.size() - 1);
 		return windows.cend() - 1;
 	}
-	void destroyLastWindow(const TCPClient& client);
+	bool destroyLastWindow(const TCPClient& client);
 	void destroyWindow(const std::string& name, const TCPClient& client);
 
 	const Window& getFocusedWindow() const;

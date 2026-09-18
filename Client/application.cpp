@@ -16,6 +16,7 @@ Application::Application(const std::string& ip, const int port) :
     terminal(),
     windowsManager(terminal.getScreenSize()),
     repo() {
+    logger.logInfo("Started application with config ip: ", ip, " port: ", port);
     windowsManager.showWindow<TextEditorWindow>(makeTextEditorWindowBuilder(terminal.getScreenSize()));
     windowsManager.showWindow<MenuWindow>(makeMenuWindowBuilder(terminal.getScreenSize(), windows::mainmenu::name), getMainMenuOptions());
 }
@@ -94,7 +95,11 @@ bool Application::processChar(const KeyPack& key) {
         );
         return true;
     case ESC:
-        windowsManager.destroyLastWindow(tcpClient);
+        if (!windowsManager.destroyLastWindow(tcpClient)) {
+            windowsManager.showWindow<MenuWindow>(
+                makeMenuWindowBuilder(terminal.getScreenSize(), windows::mainmenu::name), getMainMenuOptions()
+            );
+        }
         return true;
     }
     Event pEvent = window->processChar(tcpClient, key);

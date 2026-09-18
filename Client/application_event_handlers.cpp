@@ -7,6 +7,7 @@
 
 ApplicationEventHandlers::ApplicationEventHandlers():
     handlers({
+        {windows::app::events::destroyWindow, &ApplicationEventHandlers::eventDestoryWindow},
         {windows::app::events::createDoc, &ApplicationEventHandlers::eventCreateDoc},
         {windows::app::events::joinDoc, &ApplicationEventHandlers::eventJoinDoc},
         {windows::app::events::exit, &ApplicationEventHandlers::eventMainMenuExitChosen},
@@ -210,6 +211,10 @@ void ApplicationEventHandlers::eventLoadItemDeleted(Application& app, const Even
     );
     app.windowsManager.destroyWindow(pEvent.src, app.tcpClient);
     app.windowsManager.destroyWindow("Choose document", app.tcpClient);
+}
+
+void ApplicationEventHandlers::eventDestoryWindow(Application& app, const Event& pEvent) {
+    app.windowsManager.destroyWindow(pEvent.src, app.tcpClient);
 }
 
 void ApplicationEventHandlers::eventCreateDoc(Application& app, const Event& pEvent) {

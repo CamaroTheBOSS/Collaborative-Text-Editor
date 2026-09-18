@@ -19,10 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>16.0</VCProjectVersion>
+    <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{17b3342d-55ff-40b6-917d-eaf43c7fe265}</ProjectGuid>
-    <RootNamespace>Server</RootNamespace>
+    <ProjectGuid>{37d21c05-7a45-43df-ad1e-a1f7eb40b2cf}</ProjectGuid>
+    <RootNamespace>ClientMain</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -40,13 +40,13 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -76,7 +76,6 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -91,12 +90,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
@@ -106,14 +102,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\Client;..\Protocol;..\RandomEngine;..\Document</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>..\Document;..\Protocol;..\RandomEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>Document.lib;Protocol.lib;RandomEngine.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\$(IntDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Document.lib;Protocol.lib;RandomEngine.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -124,61 +120,22 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\Client;..\Protocol;..\RandomEngine;..\Document</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>..\Document;..\Protocol;..\RandomEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>Document.lib;Protocol.lib;RandomEngine.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\$(IntDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Document.lib;Protocol.lib;RandomEngine.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="action.cpp" />
-    <ClCompile Include="action_erase.cpp" />
-    <ClCompile Include="action_history.cpp" />
-    <ClCompile Include="action_write.cpp" />
-    <ClCompile Include="database.cpp" />
-    <ClCompile Include="deserializer.cpp" />
-    <ClCompile Include="history_manager.cpp" />
-    <ClCompile Include="message_extractor.cpp" />
-    <ClCompile Include="server_document.cpp" />
-    <ClCompile Include="logging.cpp" />
-    <ClCompile Include="repository.cpp" />
-    <ClCompile Include="serializer.cpp" />
-    <ClCompile Include="server.cpp" />
-    <ClCompile Include="authenticator.cpp" />
-    <ClCompile Include="user_history.cpp" />
-    <ClCompile Include="worker.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="action.h" />
-    <ClInclude Include="action_erase.h" />
-    <ClInclude Include="action_history.h" />
-    <ClInclude Include="action_write.h" />
-    <ClInclude Include="database.h" />
-    <ClInclude Include="deserializer.h" />
-    <ClInclude Include="history_manager.h" />
-    <ClInclude Include="message_extractor.h" />
-    <ClInclude Include="response.h" />
-    <ClInclude Include="server_document.h" />
-    <ClInclude Include="logging.h" />
-    <ClInclude Include="repository.h" />
-    <ClInclude Include="serializer.h" />
-    <ClInclude Include="server.h" />
-    <ClInclude Include="authenticator.h" />
-    <ClInclude Include="user_history.h" />
-    <ClInclude Include="worker.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Document\Document.vcxproj">
-      <Project>{35fff3d9-a0de-44f8-8c78-8c731a78fd27}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Protocol\Protocol.vcxproj">
-      <Project>{678f5027-d666-49f3-8f8f-07bdfbb01944}</Project>
+    <ProjectReference Include="..\Client\Client.vcxproj">
+      <Project>{c6b1bf4f-d67b-4e55-8406-844f408affa2}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

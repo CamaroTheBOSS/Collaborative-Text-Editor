@@ -63,7 +63,7 @@ std::string SyncTester::compareDocs(const ClientSiteDocument& clientDoc, const S
 		ss << nError << ". ClientDoc.size() = " << clientData.size() << "\n";
 		ss << "   Serverdoc.size() = " << serverData.size() << "\n";
 	}
-	int minSize = (std::min)(clientData.size(), serverData.size());
+	int minSize = (int)(std::min)(clientData.size(), serverData.size());
 	for (int i = 0; i < minSize; i++) {
 		if (clientData[i] != serverData[i]) {
 			nError++;

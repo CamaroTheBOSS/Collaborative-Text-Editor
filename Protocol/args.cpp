@@ -50,6 +50,10 @@ std::string Args::parse(int argc, char* argv[]) {
 			return msg + "\n";
 		}
 	}
+	if (command == commandRun) {
+		command = commands[0].key;
+		setCommandIdx = 0;
+	}
 	for (const auto& [key, arg] : args) {
 		auto isArgNull = arg.value.index() == to_underlying(Type::null);
 		auto requiredForCommand = setCommandIdx >= 0 &&
@@ -59,6 +63,7 @@ std::string Args::parse(int argc, char* argv[]) {
 			return "Required argument '--" + key + "' not found!\n";
 		}
 		else if (isArgNull && setCommandIdx < 0) {
+			valid = false;
 			return "Required argument '--" + key + "' not found!\n";
 		}
 		

@@ -1,18 +1,18 @@
 #include "serializer.h"
 
 msg::Buffer Serializer::makeAckResponse(const msg::Type& type, const msg::OneByteInt version, const std::string& errMsg) {
-	int size = errMsg.size() + 6;
+	int size = (int)errMsg.size() + 6;
 	msg::Buffer buffer{size};
 	msg::serializeTo(buffer, 0, type, version, errMsg);
 	return buffer;
 }
 
 msg::Buffer Serializer::makeGetNamesResponse(const msg::OneByteInt version, const std::string& errMsg, const std::vector<std::string>& docNames) {
-	int size = errMsg.size();
+	size_t size = errMsg.size();
 	for (const auto& name : docNames) {
 		size += name.size();
 	}
-	msg::Buffer buffer{size + 10};
+	msg::Buffer buffer{(int)size + 10};
 	msg::serializeTo(buffer, 0, msg::Type::getDocNames, version, errMsg, docNames);
 	return buffer;
 }
@@ -107,7 +107,7 @@ msg::Buffer Serializer::makeMoveResponseImpl(const ServerSiteDocument& doc, cons
 }
 
 msg::Buffer Serializer::makeReplaceResponse(const int userIdx, const msg::Replace& msg) {
-	int bufferSize = 16 * msg.segments.size() + msg.text.size() + 10;
+	int bufferSize = 16 * (int)msg.segments.size() + (int)msg.text.size() + 10;
 	msg::Buffer buffer{ bufferSize };
 	auto userBuff = static_cast<msg::OneByteInt>(userIdx);
 	msg::serializeTo(buffer, 0, msg::Type::replace, msg.version, userBuff, msg.text, msg.segments);

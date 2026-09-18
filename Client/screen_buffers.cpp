@@ -52,7 +52,7 @@ COORD ScrollableScreenBuffer::getTerminalCursorPos(const ClientSiteDocument& doc
 	COORD tCursor{0, 0};
 	const auto& data = doc.get();
 	for (int row = 0; row < docCursor.Y; row++) {
-		tCursor.Y += data[row].size() / screenWidth + 1;
+		tCursor.Y += (SHORT)(data[row].size() / screenWidth + 1);
 	}
 	tCursor.Y += docCursor.X / screenWidth + top - scroll;
 	tCursor.X = left + (docCursor.X % screenWidth);
@@ -75,7 +75,7 @@ std::pair<std::vector<std::pair<COORD, COORD>>, int> ScrollableScreenBuffer::get
 		auto& dCursor1 = segments[i].first;
 		auto& dCursor2 = segments[i].second;
 		for (row; row < dCursor1.Y; row++) {
-			tGlobalY += data[row].size() / screenWidth + 1;
+			tGlobalY += (int)data[row].size() / screenWidth + 1;
 		}
 		COORD tCursor1;
 		COORD tCursor2;
@@ -91,7 +91,7 @@ std::pair<std::vector<std::pair<COORD, COORD>>, int> ScrollableScreenBuffer::get
 		}
 		terminalCursorPairs.emplace_back(std::make_pair(tCursor1, tCursor2));
 		if (i == chosenSegment) {
-			newChosenSegment = terminalCursorPairs.size() - 1;
+			newChosenSegment = (int)terminalCursorPairs.size() - 1;
 		}
 	}
 	return { terminalCursorPairs, newChosenSegment };
@@ -121,7 +121,7 @@ std::pair<ScrollableScreenBuffer, TextLines> ScrollableScreenBuffer::getLineNumb
 	}
 	int screenHeight = height();
 	int lastLineIndex = scroll + screenHeight + 1;
-	int desiredSize = std::to_string(lastLineIndex).size() + leftFramePattern.size() + 1;
+	int desiredSize = (int)std::to_string(lastLineIndex).size() + (int)leftFramePattern.size() + 1;
 	for (int n = scroll + 1; n <= lastLineIndex; n++) {
 		std::string base = std::to_string(n) + leftFramePattern;
 		std::string line = std::string(desiredSize - base.size(), ' ') + base;
@@ -153,7 +153,7 @@ TextLines ScrollableScreenBuffer::getTextInBuffer(const ClientSiteDocument& doc)
 				continue;
 			}
 			std::string tLine = line.substr(head, tail - head);
-			int spaceCount = screenWidth - tLine.size();
+			int spaceCount = screenWidth - (int)tLine.size();
 			tLine += std::string(spaceCount, ' ') + "\n";
 			textLines.emplace_back(std::move(tLine));
 			head += screenWidth;
@@ -162,7 +162,7 @@ TextLines ScrollableScreenBuffer::getTextInBuffer(const ClientSiteDocument& doc)
 		}
 	}
 
-	int textLinesSize = textLines.size();
+	int textLinesSize = (int)textLines.size();
 	for (int i = 0; i <= screenHeight - textLinesSize; i++) {
 		std::string emptyLine = std::string(screenWidth, ' ') + "\n";
 		textLines.emplace_back(std::move(emptyLine));
@@ -196,10 +196,10 @@ void ScrollableScreenBuffer::setBufferSize(Pos<double> newLeftTop, Pos<double> n
 	rightBottom = validatePos(newRightBottom);
 	center.X = (leftTop.X + rightBottom.X) / 2.;
 	center.Y = (leftTop.Y + rightBottom.Y) / 2.;
-	left = leftTop.X * consoleSize.X;
-	right = rightBottom.X * consoleSize.X;
-	top = leftTop.Y * consoleSize.Y;
-	bottom = rightBottom.Y * consoleSize.Y;
+	left = (int)(leftTop.X * consoleSize.X);
+	right = (int)(rightBottom.X * consoleSize.X);
+	top = (int)(leftTop.Y * consoleSize.Y);
+	bottom = (int)(rightBottom.Y * consoleSize.Y);
 }
 
 void ScrollableScreenBuffer::setBufferAbsoluteSize(const int newLeft, const int newTop, const int newRight, const int newBottom) {
@@ -260,10 +260,11 @@ Pos<double> ScrollableScreenBuffer::getCenter() const {
 	return center;
 }
 
-Pos<double>& ScrollableScreenBuffer::validatePos(Pos<double>& pos) {
-	pos.X = (std::max)((std::min)(1., pos.X), 0.);
-	pos.Y = (std::max)((std::min)(1., pos.Y), 0.);
-	return pos;
+Pos<double> ScrollableScreenBuffer::validatePos(Pos<double>& pos) {
+	Pos<double> newPos = {};
+	newPos.X = (std::max)((std::min)(1., pos.X), 0.);
+	newPos.Y = (std::max)((std::min)(1., pos.Y), 0.);
+	return newPos;
 }
 
 int ScrollableScreenBuffer::validateAbsolutePosX(int X) {
@@ -278,14 +279,14 @@ Frame ScrollableScreenBuffer::getLeftFrame() const {
 	if (!showLineNumbers && !leftFramePattern.empty()) {
 		TextLines textLines = TextLines(std::vector<std::string>(height() + 1, leftFramePattern));
 		ScrollableScreenBuffer buffer = *this;
-		buffer.setBufferAbsoluteSizeNoValidation(left - leftFramePattern.size(), top, left, bottom);
+		buffer.setBufferAbsoluteSizeNoValidation(left - (int)leftFramePattern.size(), top, left, bottom);
 		return { std::move(buffer), std::move(textLines) };
 	}
 	else if (showLineNumbers) {
 		TextLines textLines;
 		int screenHeight = height();
 		int lastLineIndex = scroll + screenHeight + 1;
-		int desiredSize = std::to_string(lastLineIndex).size() + leftFramePattern.size() + 2;
+		int desiredSize = (int)std::to_string(lastLineIndex).size() + (int)leftFramePattern.size() + 2;
 		for (int n = scroll + 1; n <= lastLineIndex; n++) {
 			std::string base = std::to_string(n) + leftFramePattern;
 			std::string line = std::string(desiredSize - base.size(), ' ') + base;
@@ -304,7 +305,7 @@ Frame ScrollableScreenBuffer::getRightFrame() const {
 	}
 	TextLines textLines = TextLines(std::vector<std::string>(height() + 1, rightFramePattern));
 	ScrollableScreenBuffer buffer = *this;
-	buffer.setBufferAbsoluteSizeNoValidation(right, top, right + rightFramePattern.size(), bottom);
+	buffer.setBufferAbsoluteSizeNoValidation(right, top, right + (int)rightFramePattern.size(), bottom);
 	return { std::move(buffer), std::move(textLines) };
 }
 
@@ -313,7 +314,7 @@ TextLines ScrollableScreenBuffer::getHorizontalFrame(const std::string& pattern)
 		return TextLines();
 	}
 	int lastLineIndex = scroll + height() + 1;
-	int desiredSize = leftFramePattern.size() + width() + rightFramePattern.size();
+	int desiredSize = (int)leftFramePattern.size() + width() + (int)rightFramePattern.size();
 	std::string line;
 	while (line.size() < desiredSize) {
 		line += topFramePattern;
@@ -329,7 +330,7 @@ Frame ScrollableScreenBuffer::getTopFrame() const {
 		return {};
 	}
 	ScrollableScreenBuffer buffer = *this;
-	buffer.setBufferAbsoluteSizeNoValidation(left - leftFramePattern.size(), top - 1, right + rightFramePattern.size(), top - 1);
+	buffer.setBufferAbsoluteSizeNoValidation(left - (int)leftFramePattern.size(), top - 1, right + (int)rightFramePattern.size(), top - 1);
 	auto topLine = getHorizontalFrame(topFramePattern);
 	if (!title.empty() && title.size() < topLine[0].size()) {
 		topLine[0].insert((topLine[0].size() - title.size()) / 2, title);
@@ -344,7 +345,7 @@ Frame ScrollableScreenBuffer::getBottomFrame() const {
 		return {};
 	}
 	ScrollableScreenBuffer buffer = *this;
-	buffer.setBufferAbsoluteSizeNoValidation(left - leftFramePattern.size(), bottom + 1, right + rightFramePattern.size(), bottom + 1);
+	buffer.setBufferAbsoluteSizeNoValidation(left - (int)leftFramePattern.size(), bottom + 1, right + (int)rightFramePattern.size(), bottom + 1);
 	return { std::move(buffer), getHorizontalFrame(botFramePattern) };
 }
 

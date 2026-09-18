@@ -15,8 +15,18 @@ namespace logs {
 			return "INFO ";
 		case Level::debug:
 			return "DEBUG ";
+		case Level::trace:
+			return "TRACE ";
 		}
 		return "UNDEFINED";
+	}
+
+	Level strToLvl(std::string& str) {
+		if (str == "error") { return Level::error; }
+		if (str == "info") { return Level::info; }
+		if (str == "debug") { return Level::debug; }
+		if (str == "trace") { return Level::trace; }
+		return Level::info;
 	}
 
 	std::stringstream getCurrentTime() {
@@ -31,8 +41,9 @@ namespace logs {
 		return ss;
 	}
 
-	Logger::Logger(std::string logFilePath) :
-		file(logFilePath, std::ofstream::out | std::ofstream::trunc) {}
+	Logger::Logger(std::string logFilePath, bool stdOutLogs) :
+		file(logFilePath, std::ofstream::out | std::ofstream::trunc),
+		stdOutLogs(stdOutLogs) {}
 
 	Logger::~Logger() {
 		file.close();

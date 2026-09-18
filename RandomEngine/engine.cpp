@@ -14,7 +14,7 @@ namespace random {
 			return std::mt19937(seed);
 		}
 		std::mt19937_64::result_type reproducibleSeed = seed;
-		return std::mt19937(reproducibleSeed);
+		return std::mt19937((unsigned int)reproducibleSeed);
 	}
 
 	Engine::Engine() :

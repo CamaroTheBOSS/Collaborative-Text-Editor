@@ -8,6 +8,7 @@ static constexpr const char* login = "login";
 static constexpr const char* password = "password";
 static constexpr const char* acCode = "access-code";
 static constexpr const char* filename = "filename";
+static constexpr const char* log_level = "log-level";
 
 static constexpr const char* help = "help";
 static constexpr const char* run = "run";

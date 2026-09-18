@@ -1,6 +1,6 @@
 #include "args.h"
 
-#include <iostream>;
+#include <iostream>
 
 static std::unordered_map<std::string, int> getDefaultArgs() {
 	return {

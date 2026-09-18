@@ -26,8 +26,8 @@ namespace server {
 
 		Repository(const Repository&) = delete;
 		Repository& operator=(const Repository&) = delete;
-		Repository(Repository&&);
-		Repository& operator=(Repository&&);
+		Repository(Repository&&) noexcept;
+		Repository& operator=(Repository&&) noexcept;
 
 		Response process(SOCKET client, msg::Buffer& buffer, bool authenticateUser = true);
 		bool acCodeExists(const std::string& acCode);
@@ -65,11 +65,12 @@ namespace server {
 		template <ServerSiteDocumentType T>
 		SessionIt createNewSession(const std::string& username, T&& doc) {
 			auto acCode = random::Engine::get().getRandomString(6);
+			auto filename = doc.getFilename();
 			auto session = acCodeToDocMap.emplace(acCode, std::move(doc));
 			logger.logDebug("Created new session!");
 			std::scoped_lock lock{acCodesLock, userFileCombinedLock};
 			acCodeSet.insert(acCode);
-			userFileCombinedSet.insert(username + "-" + doc.getFilename());
+			userFileCombinedSet.insert(username + "-" + filename);
 			return session.first;
 		}
 		void deleteSession(const std::string& username, const std::string& acCode, ServerSiteDocument& doc);

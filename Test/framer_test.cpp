@@ -171,7 +171,7 @@ TEST(FramerTests, ContinousExtractionTest) {
 		int nSymbols = (std::min)(remainingSymbols, fragmentation);
 		buffer.add(&continousBuffer, head, nSymbols);
 		auto extractedMsgs = extractStrings(framer, buffer);
-		nMsgs += extractedMsgs.size();
+		nMsgs += (int)extractedMsgs.size();
 		for (const auto& msg : extractedMsgs) {
 			EXPECT_EQ(msg, strWithPrimarSize);
 		}

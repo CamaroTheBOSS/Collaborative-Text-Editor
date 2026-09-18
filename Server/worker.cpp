@@ -96,7 +96,7 @@ bool Worker::userFileExistsInRepo(const std::string& username, const std::string
 
 void Worker::close() {
     std::scoped_lock lock{connSetLock};
-    for (int i = 0; i < connections.fd_count; i++) {
+    for (unsigned int i = 0; i < connections.fd_count; i++) {
         closesocket(connections.fd_array[i]);
     }
     closesocket(masterListener);

@@ -10,7 +10,7 @@ std::vector<msg::Buffer> MessageExtractor::extractMessages(const SOCKET client) 
         auto [it, newOne] = clientFramerMap.try_emplace(client, Framer{ defaultBuffSize });
         auto msgBuffers = it->second.extractMessages(recvBuff);
         if (!msgBuffers.empty()) {
-            server::logger.logDebug("Received", msgBuffers.size(), "messages from client", client);
+            server::logger.logTrace("Received", msgBuffers.size(), "messages from client", client);
         }
         return msgBuffers;
     }

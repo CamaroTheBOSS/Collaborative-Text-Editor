@@ -96,7 +96,7 @@ void ClientSiteDocument::afterWriteAction(const int index, const COORD& startPos
 		return;
 	}
 	COORD diff = endPos - startPos;
-	auto [closestSegment, toDelete] = binarySearchSegments(segments, 0, segments.size(), startPos);
+	auto [closestSegment, toDelete] = binarySearchSegments(segments, 0, (int)segments.size(), startPos);
 	int start = (std::max)(closestSegment, 0);
 	for (int i = start; i < segments.size(); i++) {
 		moveSegment(segments[i], startPos, diff);
@@ -114,12 +114,12 @@ void ClientSiteDocument::afterEraseAction(const int index, const COORD& startPos
 		return;
 	}
 	COORD diff = endPos - startPos;
-	auto [closestSegmnetToEnd, toDeleteEnd] = binarySearchSegments(segments, 0, segments.size(), endPos);
+	auto [closestSegmnetToEnd, toDeleteEnd] = binarySearchSegments(segments, 0, (int)segments.size(), endPos);
 	int start = (std::max)(closestSegmnetToEnd, 0);
 	std::vector<int> indexesToDelete;
-	for (int i = start; i < segments.size(); i++) {
+	for (size_t i = start; i < segments.size(); i++) {
 		if (segmentsIntersect(segments[i].first, segments[i].second, endPos, startPos)) {
-			indexesToDelete.push_back(i);
+			indexesToDelete.push_back((int)i);
 			continue;
 		}
 		moveSegment(segments[i], startPos, diff);

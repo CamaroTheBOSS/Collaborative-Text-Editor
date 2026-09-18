@@ -5,13 +5,13 @@ SHORT LineModifier::insert(std::string& line, const int pos, const std::string_v
 		return pos;
 	}
 	line.insert(pos, std::string{ newText });
-	return pos + newText.size();
+	return pos + (SHORT)newText.size();
 }
 
 int LineModifier::append(std::string& line, const std::string_view newText) {
 
 	line.append(std::string{ newText });
-	return line.size();
+	return (int)line.size();
 }
 
 std::pair<int, std::string> LineModifier::erase(std::string& line, const int pos, const int n) {

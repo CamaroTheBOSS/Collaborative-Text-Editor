@@ -121,7 +121,7 @@ namespace server {
 		std::vector<std::string> names;
 		auto lines = Parser::parseTextToVector(ss.str());
 		for (const auto& line : lines) {
-			int pos = line.find(',');
+			int pos = (int)line.find(',');
 			if (pos == std::string::npos) {
 				continue;
 			}
@@ -326,7 +326,7 @@ namespace server {
 	}
 
 	std::vector<std::string> Database::parseRow(const std::string& line) const {
-		int prev = 0, curr = 0;
+		size_t prev = 0, curr = 0;
 		std::vector<std::string> row;
 		while (curr = line.find(',', prev), curr != std::string::npos) {
 			row.emplace_back(line.substr(prev, curr - prev));

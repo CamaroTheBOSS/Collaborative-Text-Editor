@@ -60,7 +60,7 @@ public:
 private:
     void setBufferAbsoluteSizeNoValidation(const int newLeft, const int newTop, const int newRight, const int newBottom);
     void scrollScreen(const int units);
-    Pos<double>& validatePos(Pos<double>& pos);
+    Pos<double> validatePos(Pos<double>& pos);
     int validateAbsolutePosX(int X);
     int validateAbsolutePosY(int Y);
 
