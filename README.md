@@ -19,29 +19,57 @@ Project makes possible editing file from multiple clients. Connection to existin
 - Windows SDK
 
 ## Components
-- Server for controlling state of documents between multiple clients
-- Client is simple interface where users can login/create/load/join/delete docs and collaborate with other clients around the world
+- ServerMain for controlling state of documents between multiple clients
+- ClientMain is simple interface where users can login/create/load/join/delete docs and collaborate with other clients around the world
 - RandomClient is a client created for testing purposes - it performs random actions
-- No build script provided. Please build with Visual Studio MSVC
+- Test project is for unit tests
+- TestRandomClientServerSync is e2e client-server synchronization tester
 
-## How to run
-- build Server, Client and RandomClient
-To run server:
+## Build
+Open CollaborativeTextEditor.sln with Visual Studio. Build whole solution to build executables with tests or just \[BUILD\] project for building only ServerMain, ClientMain and RandomClient.
+
+## Run
+
+From repository root directory:
+
+Go to the output directory (<configuration> => (Debug | Release))
 ```
-Server.exe --ip <server_ip> --port <server_port>
+cd ./x64/<configuration>/
 ```
-To run client:
+
+Run the server:
 ```
-Client.exe run --ip <server_ip> --port <server_port>
+./ServerMain.exe --log-level debug
 ```
-To run random client:
+
+Run the client:
 ```
-RandomClient.exe join --ip <server_ip> --port <server_port> --login <login> --password <password> --access-code <access_code>
+./ClientMain.exe
 ```
-For more information run
+
+Register user, log in and create new document. Grab the session access code and run another ClientMain or RandomClient for joining the collaborative session.
+
+To run the random client firstly pre register the user from your ClientMain and then use this user to start the random client:
+```
+./RandomClient --login <user> --password <pass> --access-code <code>
+```
+
+For more information run for guidance:
 ```
 <binary> help
 ```
 
 ## Scripts
 - client.py for creating multiple sessions and connecting multiple random clients into specific session
+
+  To run the script:
+  - Run manually the first ClientMain
+  - Pre-register all the users you want to use in client.py
+  - Create a doc and connect to it
+  - Run client.py
+    ```
+    cd ./scripts
+    python -m client --login <login1>,<login2>,<login3>... --password <pass1>,<pass2>,<pass3>... --access-code <code> --exe-path <path_to_ClientMain_or_RandomClient>
+    ```
+
+    Run `python -m client --help` for guidance
