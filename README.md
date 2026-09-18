@@ -1,7 +1,7 @@
 # Collaborative Text Editor
 Server-client architecture console text editor. Built on purpose for learning socket-based network programming.
 
-## Proejct
+## Project
 Text editor for writing shared documents in real time for Windows without using third-party libraries. Most important features
 - :white_check_mark: Basic text editor functionality write/erase/select/cut-copy-paste/find-replace/undo-redo
 - :white_check_mark: File-based database for containing users data and documents data
