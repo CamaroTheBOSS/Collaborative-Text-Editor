@@ -16,8 +16,7 @@ Project makes possible editing file from multiple clients. Connection to existin
 
 ## Prerequisities
 - Windows
-- Ws2_32.dll
-- C++20
+- Windows SDK
 
 ## Components
 - Server for controlling state of documents between multiple clients
